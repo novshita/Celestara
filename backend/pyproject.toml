@@ -4,15 +4,19 @@ version = "0.1.0"
 description = "Celestara backend - deterministic astrology calculation and AI interpretation"
 requires-python = ">=3.12"
 dependencies = [
+    "fastapi>=0.115",
     "pydantic>=2.9",
     "pyswisseph>=2.10",
     "timezonefinder>=6.5",
     "tzdata>=2024.1",
+    "uvicorn>=0.30",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    # Starlette's TestClient prefers httpx2; plain httpx works but warns.
+    "httpx2>=2.13",
 ]
 
 [tool.pytest.ini_options]

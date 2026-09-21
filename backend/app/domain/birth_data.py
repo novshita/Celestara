@@ -16,6 +16,15 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from pydantic import BaseModel, Field, model_validator
 
 
+class InvalidBirthDataError(ValueError):
+    """Birth data cannot be resolved into a calculable moment.
+
+    Distinct from a generic `ValueError` so the API layer knows the message is
+    one we authored and is safe to show a user, rather than an internal detail
+    that must not leak (engineering spec §22).
+    """
+
+
 class BirthTimeConfidence(str, Enum):
     """How much the birth time can be trusted.
 
@@ -138,7 +147,7 @@ def resolve_timezone(birth: BirthData) -> str:
         try:
             ZoneInfo(birth.timezone_name)
         except (ZoneInfoNotFoundError, ValueError) as exc:
-            raise ValueError(
+            raise InvalidBirthDataError(
                 f"unknown timezone {birth.timezone_name!r}"
             ) from exc
         return birth.timezone_name
@@ -150,7 +159,7 @@ def resolve_timezone(birth: BirthData) -> str:
     finder = TimezoneFinder()
     found = finder.timezone_at(lat=birth.latitude, lng=birth.longitude)
     if found is None:
-        raise ValueError(
+        raise InvalidBirthDataError(
             f"could not determine a timezone for {birth.latitude}, "
             f"{birth.longitude}; the coordinates may be mid-ocean. Ask the "
             f"user to supply one."
