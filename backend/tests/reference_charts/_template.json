@@ -1,0 +1,33 @@
+{
+  "source": "REPLACE ME - software name and version, e.g. Jagannatha Hora 8.0",
+  "notes": "Optional. Where the birth details came from, anything unusual.",
+  "tolerance_arcmin": 2,
+
+  "birth": {
+    "birth_date": "1990-08-15",
+    "birth_time": "14:30:00",
+    "time_confidence": "EXACT",
+    "latitude": 18.9756,
+    "longitude": 72.8258,
+    "timezone_name": "Asia/Kolkata"
+  },
+
+  "ascendant": {
+    "rashi": "REPLACE ME",
+    "deg": 0,
+    "min": 0,
+    "sec": 0
+  },
+
+  "placements": [
+    { "graha": "Sun",     "rashi": "REPLACE ME", "deg": 0, "min": 0 },
+    { "graha": "Moon",    "rashi": "REPLACE ME", "deg": 0, "min": 0 },
+    { "graha": "Mars",    "rashi": "REPLACE ME", "deg": 0, "min": 0 },
+    { "graha": "Mercury", "rashi": "REPLACE ME", "deg": 0, "min": 0 },
+    { "graha": "Jupiter", "rashi": "REPLACE ME", "deg": 0, "min": 0 },
+    { "graha": "Venus",   "rashi": "REPLACE ME", "deg": 0, "min": 0 },
+    { "graha": "Saturn",  "rashi": "REPLACE ME", "deg": 0, "min": 0, "retrograde": true },
+    { "graha": "Rahu",    "rashi": "REPLACE ME", "deg": 0, "min": 0 },
+    { "graha": "Ketu",    "rashi": "REPLACE ME", "deg": 0, "min": 0 }
+  ]
+}
