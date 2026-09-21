@@ -1,0 +1,21 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Environment / secrets - never commit these (engineering spec §37)
+.env
+.env.*
+!.env.example
+
+# Swiss Ephemeris data files, if ever added: large binaries, licence-bound
+*.se1
+
+# Editors / OS
+.DS_Store
+.idea/
+*.swp
