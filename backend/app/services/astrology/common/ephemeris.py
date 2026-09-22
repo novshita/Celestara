@@ -62,10 +62,17 @@ class HouseFrame:
 class EphemerisEngine(Protocol):
     """What the astrology services are allowed to ask an engine for.
 
-    Every method returns sidereal values. There is no tropical accessor and no
-    ayanamsa-subtraction helper, on purpose: mixing frames by hand is the
-    single easiest way to introduce a silent offset, so the engine is the only
-    thing permitted to convert between them.
+    Both zodiac frames are available, but each is reached through its own
+    explicitly named method - `sidereal_positions` or `tropical_positions`,
+    never a shared method with a `sidereal=True` flag. A boolean is exactly
+    how the two get mixed up: it defaults, it gets forgotten, and the result
+    is off by the ayanamsa with nothing to show it. Naming the frame at every
+    call site makes a Vedic service reaching for tropical data visible on the
+    line where it happens.
+
+    There is still no ayanamsa-subtraction helper. Converting between frames
+    by hand caused a real 14-arcsecond error early in this project; the engine
+    remains the only thing permitted to do it.
     """
 
     @property
@@ -83,6 +90,24 @@ class EphemerisEngine(Protocol):
         self, jd_ut: float, latitude: float, longitude: float
     ) -> HouseFrame:
         """Sidereal house frame for a Julian Day (UT) and geographic position."""
+        ...
+
+    def tropical_positions(
+        self, jd_ut: float, bodies: tuple[str, ...]
+    ) -> dict[str, BodyPosition]:
+        """Tropical positions for the named bodies at a Julian Day (UT).
+
+        The tropical zodiac is measured from the vernal equinox rather than
+        the fixed stars, so these longitudes differ from the sidereal ones by
+        the ayanamsa - currently about 24 degrees, nearly a whole sign. Only
+        Western services may call this.
+        """
+        ...
+
+    def tropical_houses(
+        self, jd_ut: float, latitude: float, longitude: float
+    ) -> HouseFrame:
+        """Tropical house frame for a Julian Day (UT) and geographic position."""
         ...
 
     def ayanamsa(self, jd_ut: float) -> float:

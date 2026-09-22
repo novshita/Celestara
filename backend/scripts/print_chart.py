@@ -88,6 +88,50 @@ def _print_chart(chart: VedicChart) -> None:
         print(f"  unavailable    : {', '.join(chart.metadata.unavailable)}")
 
 
+def _print_western(birth: BirthData) -> None:
+    """Print the Western (tropical) chart alongside its aspects."""
+    from app.services.astrology.western.chart import calculate_western_chart
+
+    chart = calculate_western_chart(birth)
+
+    print()
+    print("=" * 74)
+    print("WESTERN (TROPICAL) CHART")
+    print("=" * 74)
+    print(f"  house system : {chart.metadata.house_system}")
+    if chart.angles is None:
+        print("  angles       : UNAVAILABLE (birth time unknown)")
+    else:
+        angles = chart.angles
+        print(f"  Ascendant    : {angles.ascendant_sign} "
+              f"{angles.ascendant_degrees:.2f}deg (ruler {angles.ascendant_ruler})")
+        print(f"  Midheaven    : {angles.midheaven_sign}")
+    if chart.metadata.unavailable:
+        print(f"  unavailable  : {', '.join(chart.metadata.unavailable)}")
+    print()
+    print(f"  {'BODY':8s} {'SIGN':12s} {'DEGREES':>14s} {'H':>2s} "
+          f"{'ELEMENT':7s} {'MODALITY':9s} R")
+    print(f"  {'-' * 8} {'-' * 12} {'-' * 14} {'-' * 2} {'-' * 7} {'-' * 9} -")
+
+    for position in chart.positions:
+        flag = " UNCERTAIN" if position.uncertain else ""
+        print(f"  {position.body:8s} {position.sign:12s} "
+              f"{_dms(position.longitude):>14s} "
+              f"{position.house if position.house else '-':>2} "
+              f"{position.element:7s} {position.modality:9s} "
+              f"{'R' if position.retrograde else ' '}{flag}")
+
+    print()
+    print(f"  ASPECTS ({len(chart.aspects)}), tightest first:")
+    for aspect in chart.aspects:
+        tone = {True: "harmonious", False: "challenging", None: "neutral"}[
+            aspect.harmonious
+        ]
+        flow = "applying" if aspect.applying else "separating"
+        print(f"    {aspect.first:8s} {aspect.aspect:12s} {aspect.second:8s} "
+              f"orb {aspect.orb:+6.2f}  {flow:10s} {tone}")
+
+
 def _print_transits(birth: BirthData) -> None:
     """Print current graha positions against the natal chart."""
     from app.services.astrology.transit.service import calculate_transits
@@ -212,6 +256,11 @@ def main() -> int:
         help="calculate without a birth time",
     )
     parser.add_argument(
+        "--western",
+        action="store_true",
+        help="also print the Western (tropical) chart and its aspects",
+    )
+    parser.add_argument(
         "--transits",
         action="store_true",
         help="also print current transits against the natal chart",
@@ -252,6 +301,9 @@ def main() -> int:
     )
 
     _print_chart(calculate_d1_chart(birth))
+
+    if args.western:
+        _print_western(birth)
 
     if args.transits:
         _print_transits(birth)

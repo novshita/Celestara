@@ -97,7 +97,30 @@ class CalculationConfig(BaseModel):
     model_config = {"frozen": True}
 
     ayanamsa: Ayanamsa = Ayanamsa.LAHIRI
+
     house_system: HouseSystem = HouseSystem.WHOLE_SIGN
+    """Bhava division for the Vedic services."""
+
+    western_house_system: HouseSystem = HouseSystem.PLACIDUS
+    """House division for the Western services.
+
+    Configured separately from the Vedic one because the traditions default
+    differently - whole sign for Jyotish, Placidus for Western - and a single
+    setting would force one of them to be wrong.
+    """
+
+    aspect_orb_degrees: float = Field(default=8.0, gt=0.0, le=15.0)
+    """How far from exact an aspect may be and still count, for the major
+    aspects. Practitioners disagree on orbs, so this is configurable rather
+    than fixed."""
+
+    sextile_orb_degrees: float = Field(default=6.0, gt=0.0, le=15.0)
+    """Sextiles are conventionally allowed a tighter orb than the others."""
+
+    include_outer_planets: bool = True
+    """Whether Western charts include Uranus, Neptune and Pluto. They are
+    invisible to the naked eye and absent from classical Western astrology as
+    well as from Jyotish, so some users will want them off."""
     ephemeris_source: EphemerisSource = EphemerisSource.MOSHIER
     node_type: NodeType = NodeType.MEAN
 
