@@ -88,6 +88,40 @@ def _print_chart(chart: VedicChart) -> None:
         print(f"  unavailable    : {', '.join(chart.metadata.unavailable)}")
 
 
+def _print_transits(birth: BirthData) -> None:
+    """Print current graha positions against the natal chart."""
+    from app.services.astrology.transit.service import calculate_transits
+
+    report = calculate_transits(birth)
+
+    print()
+    print("=" * 74)
+    print(f"TRANSITS (GOCHAR) at {report.snapshot.moment:%Y-%m-%d %H:%M} UTC")
+    print("=" * 74)
+    print(f"  natal lagna : {report.natal_ascendant_rashi or 'UNAVAILABLE'}")
+    print(f"  natal moon  : {report.natal_moon_rashi or 'UNAVAILABLE'}")
+    if report.unavailable:
+        print(f"  unavailable : {', '.join(report.unavailable)}")
+    print()
+    print(f"  {'GRAHA':8s} {'TRANSITING':12s} {'DEGREES':>14s} "
+          f"{'ASC':>4s} {'MOON':>4s} {'NATAL':12s} {'SEP':>7s} R")
+    print(f"  {'-' * 8} {'-' * 12} {'-' * 14} {'-' * 4} {'-' * 4} "
+          f"{'-' * 12} {'-' * 7} -")
+
+    for transit in report.transits:
+        position = transit.transit
+        asc = transit.bhava_from_ascendant
+        moon = transit.bhava_from_moon
+        print(
+            f"  {transit.graha:8s} {position.rashi:12s} "
+            f"{_dms(position.longitude):>14s} "
+            f"{asc if asc else '-':>4} {moon if moon else '-':>4} "
+            f"{transit.natal_rashi:12s} {transit.separation_from_natal:7.2f} "
+            f"{'R' if position.retrograde else ' '}"
+            f"{'  <- returned' if transit.in_natal_rashi else ''}"
+        )
+
+
 def _print_dasha(birth: BirthData) -> None:
     """Print the Vimshottari timeline, marking the period active today."""
     from datetime import datetime, timezone
@@ -178,6 +212,11 @@ def main() -> int:
         help="calculate without a birth time",
     )
     parser.add_argument(
+        "--transits",
+        action="store_true",
+        help="also print current transits against the natal chart",
+    )
+    parser.add_argument(
         "--dasha",
         action="store_true",
         help="also print the Vimshottari Dasha timeline",
@@ -213,6 +252,9 @@ def main() -> int:
     )
 
     _print_chart(calculate_d1_chart(birth))
+
+    if args.transits:
+        _print_transits(birth)
 
     if args.dasha:
         _print_dasha(birth)

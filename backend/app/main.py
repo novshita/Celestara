@@ -17,7 +17,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import Response
 
 from app.api.errors import new_request_id, register_error_handlers
-from app.api.routes import charts, dashas, health
+from app.api.routes import charts, dashas, health, transits
 from app.core.logging import configure_logging
 
 configure_logging()
@@ -78,3 +78,4 @@ register_error_handlers(app)
 app.include_router(health.router)
 app.include_router(charts.router, prefix=API_PREFIX)
 app.include_router(dashas.router, prefix=API_PREFIX)
+app.include_router(transits.router, prefix=API_PREFIX)
