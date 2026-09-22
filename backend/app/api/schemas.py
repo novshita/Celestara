@@ -9,10 +9,13 @@ shape to send.
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 from app.core.config import CalculationConfig
 from app.domain.birth_data import BirthData
+from app.domain.dasha import DashaPeriod, DashaTimeline
 from app.domain.vedic import VedicChart
 
 
@@ -85,6 +88,85 @@ class VedicChartResponse(BaseModel):
     """A calculated D1 chart."""
 
     chart: VedicChart
+
+
+class VimshottariRequest(BaseModel):
+    """A request for a Vimshottari Dasha timeline."""
+
+    birth: BirthData
+
+    config: CalculationConfig | None = Field(
+        default=None,
+        description=(
+            "Optional overrides. `dasha_year_length` is the one worth knowing "
+            "about: traditions disagree over whether a Dasha year is 360 "
+            "days, a Julian year or a sidereal year, and over a 120-year "
+            "cycle the choice moves period boundaries by more than a year."
+        ),
+    )
+
+    as_of: datetime | None = Field(
+        default=None,
+        description=(
+            "Moment to report the active period for. Defaults to now. Naive "
+            "values are read as UTC."
+        ),
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "summary": "Default settings",
+                    "description": "Julian years, Mahadasha plus Antardasha.",
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "birth_time": "14:30:00",
+                            "time_confidence": "EXACT",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                            "timezone_name": "Asia/Kolkata",
+                        }
+                    },
+                },
+                {
+                    "summary": "Traditional 360-day years, three levels deep",
+                    "description": (
+                        "Adds Pratyantardasha. Each level multiplies the "
+                        "period count by nine."
+                    ),
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "birth_time": "14:30:00",
+                            "time_confidence": "EXACT",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                            "timezone_name": "Asia/Kolkata",
+                        },
+                        "config": {
+                            "dasha_year_length": "savana",
+                            "dasha_levels": 3,
+                        },
+                    },
+                },
+            ]
+        }
+    }
+
+
+class VimshottariResponse(BaseModel):
+    """A calculated Vimshottari timeline."""
+
+    timeline: DashaTimeline
+
+    as_of: datetime
+    """The moment `active_now` was evaluated at."""
+
+    active_now: tuple[DashaPeriod, ...] = ()
+    """The period lineage in effect at `as_of`, outermost first. Empty when
+    `as_of` falls outside the generated cycle."""
 
 
 class HealthResponse(BaseModel):

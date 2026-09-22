@@ -58,6 +58,35 @@ class NodeType(str, Enum):
     TRUE = "true"
 
 
+class DashaYearLength(str, Enum):
+    """Which definition of "year" the Vimshottari periods are measured in.
+
+    Traditions genuinely disagree, and the choice is not cosmetic: over a
+    120-year cycle the options diverge by more than five years, so a period
+    boundary can land in a different calendar year depending on this setting
+    alone. It is therefore explicit configuration (engineering spec §8) and
+    recorded in the timeline metadata.
+    """
+
+    JULIAN = "julian"
+    """365.25 days. The most common choice in modern software."""
+
+    SAVANA = "savana"
+    """360 days. The traditional civil year used in several classical texts."""
+
+    SIDEREAL = "sidereal"
+    """365.256363 days - one orbit of Earth against the fixed stars, which is
+    the frame the sidereal zodiac already uses."""
+
+
+#: Days per year for each definition above.
+DASHA_YEAR_DAYS: dict[DashaYearLength, float] = {
+    DashaYearLength.JULIAN: 365.25,
+    DashaYearLength.SAVANA: 360.0,
+    DashaYearLength.SIDEREAL: 365.256363,
+}
+
+
 class CalculationConfig(BaseModel):
     """Explicit, versioned calculation settings.
 
@@ -71,6 +100,17 @@ class CalculationConfig(BaseModel):
     house_system: HouseSystem = HouseSystem.WHOLE_SIGN
     ephemeris_source: EphemerisSource = EphemerisSource.MOSHIER
     node_type: NodeType = NodeType.MEAN
+
+    dasha_year_length: DashaYearLength = DashaYearLength.JULIAN
+
+    dasha_levels: int = Field(default=2, ge=1, le=4)
+    """How deep to nest Dasha periods: 1 = Mahadasha only, 2 adds Antardasha,
+    3 adds Pratyantardasha, 4 adds Sookshma. Each level multiplies the period
+    count by nine, so 4 produces over 6500 periods - available for advanced
+    users, but a poor default."""
+
+    dasha_cycles: int = Field(default=1, ge=1, le=2)
+    """How many 120-year cycles to generate. One covers any lifespan."""
 
     #: Filesystem path to Swiss Ephemeris `.se1` files. Required when
     #: ephemeris_source is SWISS, ignored otherwise.

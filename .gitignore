@@ -15,6 +15,11 @@ __pycache__/
 # Swiss Ephemeris data files, if ever added: large binaries, licence-bound
 *.se1
 
+# Scratch file for composing multi-line commit messages, used with
+# `git commit -F .commitmsg`. Pasting a multi-line `-m` into the shell drops
+# everything after the first newline.
+.commitmsg
+
 # Editors / OS
 .DS_Store
 .idea/
