@@ -23,6 +23,7 @@ from pydantic import BaseModel
 
 from app.domain.birth_data import InvalidBirthDataError
 from app.services.astrology.common.ephemeris import EphemerisError
+from app.services.astrology.vedic.dasha import DashaUnavailableError
 
 logger = logging.getLogger("celestara.api")
 
@@ -31,6 +32,7 @@ class ErrorCode(str, Enum):
     """The error vocabulary from engineering spec §29."""
 
     INVALID_BIRTH_DATA = "INVALID_BIRTH_DATA"
+    UNKNOWN_BIRTH_TIME = "UNKNOWN_BIRTH_TIME"
     CALCULATION_ERROR = "CALCULATION_ERROR"
     UNSUPPORTED_CONFIGURATION = "UNSUPPORTED_CONFIGURATION"
     INTERNAL_ERROR = "INTERNAL_ERROR"
@@ -110,6 +112,24 @@ def register_error_handlers(app: FastAPI) -> None:
             request,
             status.HTTP_400_BAD_REQUEST,
             ErrorCode.INVALID_BIRTH_DATA,
+            str(exc),
+        )
+
+    @app.exception_handler(DashaUnavailableError)
+    async def _dasha_unavailable(
+        request: Request, exc: DashaUnavailableError
+    ) -> JSONResponse:
+        """The birth data is valid, but this output needs a birth time.
+
+        Distinct from INVALID_BIRTH_DATA: nothing is wrong with the request.
+        An unknown birth time is a supported state, it simply cannot seed a
+        Dasha timeline. The message explains why rather than just refusing, so
+        the UI can tell the user what would be needed.
+        """
+        return _response(
+            request,
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            ErrorCode.UNKNOWN_BIRTH_TIME,
             str(exc),
         )
 
@@ -214,5 +234,16 @@ BIRTH_DATA_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
         ErrorCode.CALCULATION_ERROR,
         "The chart could not be calculated. This has been logged; please try "
         "again or contact support with the request id.",
+    ),
+}
+
+#: Error responses for endpoints that additionally require a birth time.
+DASHA_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
+    **BIRTH_DATA_ERROR_RESPONSES,
+    422: error_response(
+        "Birth data was rejected, or is valid but lacks a birth time",
+        ErrorCode.UNKNOWN_BIRTH_TIME,
+        "The Vimshottari timeline is seeded from the Moon's nakshatra, which "
+        "cannot be determined without a birth time.",
     ),
 }

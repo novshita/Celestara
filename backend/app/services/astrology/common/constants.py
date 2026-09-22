@@ -87,8 +87,9 @@ NAKSHATRAS: tuple[str, ...] = (
     "Revati",
 )
 
-# The Vimshottari lord cycle repeats every 9 nakshatras. Kept here because it
-# defines nakshatra identity; the Dasha timeline itself is a later feature.
+# The Vimshottari lord cycle repeats every 9 nakshatras. This order is also the
+# order the Dasha periods themselves run in, so changing it would silently
+# reorder every timeline.
 NAKSHATRA_LORD_CYCLE: tuple[str, ...] = (
     "Ketu",
     "Venus",
@@ -100,6 +101,22 @@ NAKSHATRA_LORD_CYCLE: tuple[str, ...] = (
     "Saturn",
     "Mercury",
 )
+
+#: Length of each lord's Vimshottari period in years. Summing to exactly 120 is
+#: definitional, not coincidental - the name means "of one hundred and twenty".
+VIMSHOTTARI_PERIOD_YEARS: dict[str, int] = {
+    "Ketu": 7,
+    "Venus": 20,
+    "Sun": 6,
+    "Moon": 10,
+    "Mars": 7,
+    "Rahu": 18,
+    "Jupiter": 16,
+    "Saturn": 19,
+    "Mercury": 17,
+}
+
+VIMSHOTTARI_TOTAL_YEARS = 120
 
 NAKSHATRA_COUNT = 27
 PADAS_PER_NAKSHATRA = 4

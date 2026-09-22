@@ -88,6 +88,54 @@ def _print_chart(chart: VedicChart) -> None:
         print(f"  unavailable    : {', '.join(chart.metadata.unavailable)}")
 
 
+def _print_dasha(birth: BirthData) -> None:
+    """Print the Vimshottari timeline, marking the period active today."""
+    from datetime import datetime, timezone
+
+    from app.services.astrology.vedic.dasha import (
+        DashaUnavailableError,
+        calculate_vimshottari,
+    )
+
+    print()
+    print("=" * 74)
+    print("VIMSHOTTARI DASHA")
+    print("=" * 74)
+
+    try:
+        timeline = calculate_vimshottari(birth)
+    except DashaUnavailableError as exc:
+        print(f"  UNAVAILABLE: {exc}")
+        return
+
+    now = datetime.now(timezone.utc)
+    active = {id(period) for period in timeline.active_at(now)}
+
+    print(f"  seeded from    : Moon in {timeline.moon_nakshatra.name} "
+          f"pada {timeline.moon_nakshatra.pada}")
+    print(f"  starting lord  : {timeline.starting_lord} "
+          f"({timeline.elapsed_fraction:.1%} of its period already elapsed)")
+    print(f"  balance at birth: {timeline.balance_years:.4f} years")
+    print(f"  year length    : {timeline.year_length.value} "
+          f"({timeline.year_days} days)")
+    if timeline.uncertainty_days:
+        print(f"  DATE UNCERTAINTY: ±{timeline.uncertainty_days:.0f} days, from "
+              f"the birth-time uncertainty")
+    print()
+
+    for period in timeline.periods:
+        marker = " <- now" if id(period) in active else ""
+        partial = " (partial)" if period.is_partial else ""
+        print(f"  {period.lord:8s} {period.start:%Y-%m-%d} -> "
+              f"{period.end:%Y-%m-%d}  {period.duration_years:7.3f}y"
+              f"{partial}{marker}")
+
+        for sub in period.sub_periods:
+            if id(sub) in active:
+                print(f"      └─ {sub.lord:8s} {sub.start:%Y-%m-%d} -> "
+                      f"{sub.end:%Y-%m-%d}  {sub.duration_years:6.3f}y  <- now")
+
+
 def _print_skeleton(birth: BirthData) -> None:
     """Emit a fixture stub: inputs filled, expected values blank."""
     skeleton = {
@@ -130,6 +178,11 @@ def main() -> int:
         help="calculate without a birth time",
     )
     parser.add_argument(
+        "--dasha",
+        action="store_true",
+        help="also print the Vimshottari Dasha timeline",
+    )
+    parser.add_argument(
         "--skeleton",
         action="store_true",
         help="also print a reference-fixture stub",
@@ -160,6 +213,9 @@ def main() -> int:
     )
 
     _print_chart(calculate_d1_chart(birth))
+
+    if args.dasha:
+        _print_dasha(birth)
 
     if args.skeleton:
         _print_skeleton(birth)
