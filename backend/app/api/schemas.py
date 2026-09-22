@@ -18,6 +18,7 @@ from app.domain.birth_data import BirthData
 from app.domain.dasha import DashaPeriod, DashaTimeline
 from app.domain.transit import TransitReport, TransitSnapshot
 from app.domain.vedic import VedicChart
+from app.domain.western import WesternChart
 
 
 class VedicChartRequest(BaseModel):
@@ -89,6 +90,70 @@ class VedicChartResponse(BaseModel):
     """A calculated D1 chart."""
 
     chart: VedicChart
+
+
+class WesternChartRequest(BaseModel):
+    """A request for a Western natal chart."""
+
+    birth: BirthData
+
+    config: CalculationConfig | None = Field(
+        default=None,
+        description=(
+            "Optional overrides. The ones worth knowing about here are "
+            "`western_house_system` (Placidus by default, configured "
+            "separately from the Vedic bhava division), `include_outer_"
+            "planets`, and the aspect orbs."
+        ),
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "summary": "Default settings",
+                    "description": "Placidus houses, outer planets included.",
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "birth_time": "14:30:00",
+                            "time_confidence": "EXACT",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                            "timezone_name": "Asia/Kolkata",
+                        }
+                    },
+                },
+                {
+                    "summary": "Classical: equal houses, no outer planets",
+                    "description": (
+                        "Uranus, Neptune and Pluto are invisible to the naked "
+                        "eye and absent from classical Western astrology."
+                    ),
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "birth_time": "14:30:00",
+                            "time_confidence": "EXACT",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                            "timezone_name": "Asia/Kolkata",
+                        },
+                        "config": {
+                            "western_house_system": "equal",
+                            "include_outer_planets": False,
+                        },
+                    },
+                },
+            ]
+        }
+    }
+
+
+class WesternChartResponse(BaseModel):
+    """A calculated Western natal chart."""
+
+    chart: WesternChart
 
 
 class VimshottariRequest(BaseModel):

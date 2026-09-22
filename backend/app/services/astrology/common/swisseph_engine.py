@@ -42,6 +42,11 @@ _BODY_IDS: dict[str, int] = {
     "Jupiter": swe.JUPITER,
     "Venus": swe.VENUS,
     "Saturn": swe.SATURN,
+    # Used by Western only. Jyotish works with the seven visible grahas plus
+    # the nodes, so the Vedic services never request these.
+    "Uranus": swe.URANUS,
+    "Neptune": swe.NEPTUNE,
+    "Pluto": swe.PLUTO,
 }
 
 _AYANAMSA_MODES: dict[Ayanamsa, int] = {
@@ -105,9 +110,20 @@ class SwissEphemerisEngine:
             swe.MEAN_NODE if config.node_type is NodeType.MEAN else swe.TRUE_NODE
         )
 
-        # Base flags for every position call. FLG_SIDEREAL is not optional -
-        # see rule 2 in the module docstring.
+        # Base flags for every position call. FLG_SIDEREAL is not optional on
+        # the sidereal path - see rule 2 in the module docstring.
         self._calc_flags = self._source_flag | swe.FLG_SPEED | swe.FLG_SIDEREAL
+
+        # The tropical path is the same minus FLG_SIDEREAL, which is the whole
+        # difference between the two zodiacs.
+        self._tropical_flags = self._source_flag | swe.FLG_SPEED
+
+        try:
+            self._western_house_code = _HOUSE_CODES[config.western_house_system]
+        except KeyError:
+            raise EphemerisError(
+                f"unsupported western house system: {config.western_house_system}"
+            ) from None
 
     # -- protocol ----------------------------------------------------------
 
@@ -128,6 +144,17 @@ class SwissEphemerisEngine:
     def sidereal_positions(
         self, jd_ut: float, bodies: tuple[str, ...]
     ) -> dict[str, BodyPosition]:
+        return self._positions(jd_ut, bodies, self._calc_flags)
+
+    def _positions(
+        self, jd_ut: float, bodies: tuple[str, ...], flags: int
+    ) -> dict[str, BodyPosition]:
+        """Fetch positions under the given flags.
+
+        Shared by both frames so the body lookup, the Ketu guard and the
+        ephemeris-source assertion cannot drift apart between them. The frame
+        is decided entirely by `flags`, which the public methods supply.
+        """
         positions: dict[str, BodyPosition] = {}
 
         with _SWE_LOCK:
@@ -144,7 +171,7 @@ class SwissEphemerisEngine:
                 if body_id is None:
                     raise EphemerisError(f"unknown body: {body}")
 
-                values, retflag = swe.calc_ut(jd_ut, body_id, self._calc_flags)
+                values, retflag = swe.calc_ut(jd_ut, body_id, flags)
                 self._assert_source(retflag, body)
 
                 positions[body] = BodyPosition(
@@ -175,6 +202,10 @@ class SwissEphemerisEngine:
                 swe.FLG_SIDEREAL,
             )
 
+        return self._to_house_frame(cusps, ascmc)
+
+    @staticmethod
+    def _to_house_frame(cusps, ascmc) -> HouseFrame:
         if not cusps or len(cusps) < 12:
             raise EphemerisError(
                 "engine returned no house cusps; this happens at extreme "
@@ -186,6 +217,29 @@ class SwissEphemerisEngine:
             midheaven=ascmc[1] % 360.0,
             cusps=tuple(c % 360.0 for c in cusps[:12]),
         )
+
+    def tropical_positions(
+        self, jd_ut: float, bodies: tuple[str, ...]
+    ) -> dict[str, BodyPosition]:
+        return self._positions(jd_ut, bodies, self._tropical_flags)
+
+    def tropical_houses(
+        self, jd_ut: float, latitude: float, longitude: float
+    ) -> HouseFrame:
+        """Tropical houses, using `western_house_system` from config.
+
+        The house division is configured separately from the Vedic one because
+        the two traditions default differently - whole sign for Jyotish,
+        Placidus for Western - and a single setting would force one of them to
+        be wrong.
+        """
+        with _SWE_LOCK:
+            self._apply_global_state()
+            cusps, ascmc = swe.houses_ex(
+                jd_ut, latitude, longitude, self._western_house_code
+            )
+
+        return self._to_house_frame(cusps, ascmc)
 
     def ayanamsa(self, jd_ut: float) -> float:
         with _SWE_LOCK:
