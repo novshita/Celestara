@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 from app.core.config import CalculationConfig
 from app.domain.birth_data import BirthData
 from app.domain.dasha import DashaPeriod, DashaTimeline
+from app.domain.transit import TransitReport, TransitSnapshot
 from app.domain.vedic import VedicChart
 
 
@@ -167,6 +168,69 @@ class VimshottariResponse(BaseModel):
     active_now: tuple[DashaPeriod, ...] = ()
     """The period lineage in effect at `as_of`, outermost first. Empty when
     `as_of` falls outside the generated cycle."""
+
+
+class TransitSnapshotResponse(BaseModel):
+    """Graha positions at a moment, with no reference to any birth chart."""
+
+    snapshot: TransitSnapshot
+
+
+class TransitReportRequest(BaseModel):
+    """A request for transits relative to a natal chart."""
+
+    birth: BirthData
+    config: CalculationConfig | None = None
+
+    at: datetime | None = Field(
+        default=None,
+        description=(
+            "Moment to calculate transits for. Defaults to now. Naive values "
+            "are read as UTC, and the moment is rounded down to the minute."
+        ),
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "summary": "Transits now",
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "birth_time": "14:30:00",
+                            "time_confidence": "EXACT",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                            "timezone_name": "Asia/Kolkata",
+                        }
+                    },
+                },
+                {
+                    "summary": "Unknown birth time",
+                    "description": (
+                        "Still works. Transiting positions depend on the "
+                        "present moment, not the birth, so only the "
+                        "natal-relative fields are withheld."
+                    ),
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "time_confidence": "UNKNOWN",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                        }
+                    },
+                },
+            ]
+        }
+    }
+
+
+class TransitReportResponse(BaseModel):
+    """Transits related to a natal chart."""
+
+    report: TransitReport
 
 
 class HealthResponse(BaseModel):
