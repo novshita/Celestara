@@ -12,12 +12,52 @@ The experience is designed to feel like entering a living celestial observatory:
 
 ## 🚧 Project Status
 
-**Specification phase.** This repository currently contains the product and engineering specifications only — no application code has been written yet.
+**Backend calculation layer in progress.** The deterministic astrology engine is being built first, in line with the priority order below — calculation accuracy before everything else. The AI interpretation layer and the Next.js frontend have not been started.
+
+| Area | Status |
+|---|---|
+| 🕉️ Vedic D1 / Rashi chart | ✅ Implemented |
+| 🔮 Western natal chart + aspects | ✅ Implemented |
+| ⏳ Vimshottari Dasha timeline | ✅ Implemented |
+| 🌍 Transit / Gochar engine | ✅ Implemented |
+| 🌐 FastAPI endpoints | ✅ Implemented |
+| 🤖 AI interpretation layer | ⬜ Not started |
+| 🖥️ Next.js frontend | ⬜ Not started |
 
 | 📄 Document | What it covers |
 |---|---|
 | [Celestara-product-spec.md](Celestara-product-spec.md) | Vision, user journeys, features, visual direction, safety, V1/V2 scope |
 | [Celestara-engineering-spec.md](Celestara-engineering-spec.md) | Architecture, calculation layer, AI orchestration, data model, testing, security |
+
+---
+
+## 🛠️ Running the Backend
+
+Requires **Python 3.12+**.
+
+```bash
+cd backend
+python -m venv ../.venv && source ../.venv/bin/activate
+pip install -e ".[dev]"
+
+uvicorn app.main:app --reload     # http://127.0.0.1:8000
+pytest                            # run the test suite
+```
+
+Interactive API docs are served at `/docs` once the server is running.
+
+### 🌐 API Endpoints
+
+All calculation endpoints are namespaced under `/api/v1`.
+
+| Method | Path | Returns |
+|---|---|---|
+| `GET` | `/health` | Liveness check |
+| `POST` | `/api/v1/charts/vedic` | Vedic D1 (Rashi) chart |
+| `POST` | `/api/v1/charts/western` | Western natal chart |
+| `POST` | `/api/v1/dashas/vimshottari` | Vimshottari Dasha timeline |
+| `GET` | `/api/v1/transits` | Graha positions at a moment |
+| `POST` | `/api/v1/transits/vedic` | Transits relative to a natal chart |
 
 ---
 
