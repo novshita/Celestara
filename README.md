@@ -22,6 +22,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | ⏳ Vimshottari Dasha timeline | ✅ Implemented |
 | 🌍 Transit / Gochar engine | ✅ Implemented |
 | 🌐 FastAPI endpoints | ✅ Implemented |
+| 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI interpretation layer | ⬜ Not started |
 | 🖥️ Next.js frontend | ⬜ Not started |
 
@@ -47,6 +48,26 @@ pytest                            # run the test suite
 
 Interactive API docs are served at `/docs` once the server is running.
 
+Data is stored in a local SQLite file (`celestara.db`) by default - nothing
+to install. Set `DATABASE_URL` to point at Postgres instead; see
+`backend/.env.example` for every environment variable the app reads.
+
+### 🔑 Authentication
+
+Endpoints under `/profile`, `/journal` and `/account` require a bearer
+token:
+
+```bash
+curl -X POST localhost:8000/api/v1/auth/register \
+  -d '{"email": "you@example.com", "password": "at least 8 characters"}'
+
+TOKEN=$(curl -X POST localhost:8000/api/v1/auth/login \
+  -d '{"email": "you@example.com", "password": "at least 8 characters"}' \
+  | jq -r .access_token)
+
+curl localhost:8000/api/v1/profile -H "Authorization: Bearer $TOKEN"
+```
+
 ### 🌐 API Endpoints
 
 All calculation endpoints are namespaced under `/api/v1`.
@@ -60,6 +81,13 @@ All calculation endpoints are namespaced under `/api/v1`.
 | `POST` | `/api/v1/dashas/vimshottari` | Vimshottari Dasha timeline |
 | `GET` | `/api/v1/transits` | Graha positions at a moment |
 | `POST` | `/api/v1/transits/vedic` | Transits relative to a natal chart |
+| `POST` | `/api/v1/auth/register` | Create an account |
+| `POST` | `/api/v1/auth/login` | Exchange credentials for a bearer token |
+| `POST` | `/api/v1/auth/logout` | Revoke the current session |
+| `GET`/`PUT` | `/api/v1/profile` | The one saved birth profile |
+| `GET`/`POST` | `/api/v1/journal` | List / create journal entries |
+| `GET`/`PUT`/`DELETE` | `/api/v1/journal/{id}` | Read, edit, or remove an entry |
+| `DELETE` | `/api/v1/account/data` | Permanently delete the account and all its data |
 
 ---
 
