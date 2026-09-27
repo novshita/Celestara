@@ -17,12 +17,21 @@ from fastapi import FastAPI, Request
 from fastapi.responses import Response
 
 from app.api.errors import new_request_id, register_error_handlers
-from app.api.routes import charts, dashas, health, transits
+from app.api.routes import account, auth, charts, dashas, health, journal, profile, transits
 from app.core.logging import configure_logging
+from app.db.models import Base
+from app.db.session import engine
 
 configure_logging()
 
 logger = logging.getLogger("celestara.api.access")
+
+# Creates any tables that do not exist yet; never alters or drops an existing
+# one, so it is safe to run on every startup. This is a stand-in for real
+# migrations (Alembic, tracking one schema version at a time) and should be
+# replaced before this schema needs its first change in a deployment that
+# already holds data - `create_all` cannot express "add this column".
+Base.metadata.create_all(bind=engine)
 
 API_PREFIX = "/api/v1"
 
@@ -79,3 +88,7 @@ app.include_router(health.router)
 app.include_router(charts.router, prefix=API_PREFIX)
 app.include_router(dashas.router, prefix=API_PREFIX)
 app.include_router(transits.router, prefix=API_PREFIX)
+app.include_router(auth.router, prefix=API_PREFIX)
+app.include_router(profile.router, prefix=API_PREFIX)
+app.include_router(journal.router, prefix=API_PREFIX)
+app.include_router(account.router, prefix=API_PREFIX)

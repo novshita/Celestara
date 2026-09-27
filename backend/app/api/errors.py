@@ -24,6 +24,13 @@ from pydantic import BaseModel
 from app.domain.birth_data import InvalidBirthDataError
 from app.services.astrology.common.ephemeris import EphemerisError
 from app.services.astrology.vedic.dasha import DashaUnavailableError
+from app.services.auth.service import (
+    EmailAlreadyRegisteredError,
+    InvalidCredentialsError,
+    InvalidSessionError,
+)
+from app.services.journal.service import JournalEntryNotFoundError
+from app.services.profile.service import ProfileNotFoundError
 
 logger = logging.getLogger("celestara.api")
 
@@ -36,6 +43,11 @@ class ErrorCode(str, Enum):
     CALCULATION_ERROR = "CALCULATION_ERROR"
     UNSUPPORTED_CONFIGURATION = "UNSUPPORTED_CONFIGURATION"
     INTERNAL_ERROR = "INTERNAL_ERROR"
+
+    EMAIL_ALREADY_REGISTERED = "EMAIL_ALREADY_REGISTERED"
+    INVALID_CREDENTIALS = "INVALID_CREDENTIALS"
+    AUTH_REQUIRED = "AUTH_REQUIRED"
+    NOT_FOUND = "NOT_FOUND"
 
 
 class ErrorResponse(BaseModel):
@@ -155,6 +167,61 @@ def register_error_handlers(app: FastAPI) -> None:
             "try again or contact support with the request id.",
         )
 
+    @app.exception_handler(EmailAlreadyRegisteredError)
+    async def _email_already_registered(
+        request: Request, exc: EmailAlreadyRegisteredError
+    ) -> JSONResponse:
+        return _response(
+            request,
+            status.HTTP_409_CONFLICT,
+            ErrorCode.EMAIL_ALREADY_REGISTERED,
+            "An account with this email already exists.",
+        )
+
+    @app.exception_handler(InvalidCredentialsError)
+    async def _invalid_credentials(
+        request: Request, exc: InvalidCredentialsError
+    ) -> JSONResponse:
+        return _response(
+            request,
+            status.HTTP_401_UNAUTHORIZED,
+            ErrorCode.INVALID_CREDENTIALS,
+            "Email or password is incorrect.",
+        )
+
+    @app.exception_handler(InvalidSessionError)
+    async def _invalid_session(
+        request: Request, exc: InvalidSessionError
+    ) -> JSONResponse:
+        return _response(
+            request,
+            status.HTTP_401_UNAUTHORIZED,
+            ErrorCode.AUTH_REQUIRED,
+            "Authentication is required, or the session has expired.",
+        )
+
+    @app.exception_handler(ProfileNotFoundError)
+    async def _profile_not_found(
+        request: Request, exc: ProfileNotFoundError
+    ) -> JSONResponse:
+        return _response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            ErrorCode.NOT_FOUND,
+            "No birth profile has been saved yet.",
+        )
+
+    @app.exception_handler(JournalEntryNotFoundError)
+    async def _journal_entry_not_found(
+        request: Request, exc: JournalEntryNotFoundError
+    ) -> JSONResponse:
+        return _response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            ErrorCode.NOT_FOUND,
+            "No journal entry with this id was found.",
+        )
+
     @app.exception_handler(Exception)
     async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
         """Last resort: never let a stack trace reach the client."""
@@ -245,5 +312,42 @@ DASHA_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
         ErrorCode.UNKNOWN_BIRTH_TIME,
         "The Vimshottari timeline is seeded from the Moon's nakshatra, which "
         "cannot be determined without a birth time.",
+    ),
+}
+
+#: Every authenticated endpoint can fail this way if the bearer token is
+#: missing, unknown, or expired.
+AUTH_REQUIRED_RESPONSES: dict[int | str, dict[str, object]] = {
+    401: error_response(
+        "Authentication is required, or the session has expired",
+        ErrorCode.AUTH_REQUIRED,
+        "Authentication is required, or the session has expired.",
+    ),
+}
+
+REGISTER_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
+    409: error_response(
+        "The email is already registered",
+        ErrorCode.EMAIL_ALREADY_REGISTERED,
+        "An account with this email already exists.",
+    ),
+}
+
+LOGIN_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
+    401: error_response(
+        "Email or password did not match",
+        ErrorCode.INVALID_CREDENTIALS,
+        "Email or password is incorrect.",
+    ),
+}
+
+#: An authenticated request for a resource that does not exist, or exists
+#: but is owned by someone else - the two are indistinguishable by design.
+NOT_FOUND_RESPONSES: dict[int | str, dict[str, object]] = {
+    **AUTH_REQUIRED_RESPONSES,
+    404: error_response(
+        "No matching resource was found",
+        ErrorCode.NOT_FOUND,
+        "No journal entry with this id was found.",
     ),
 }

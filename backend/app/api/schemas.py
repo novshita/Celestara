@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 from app.core.config import CalculationConfig
 from app.domain.birth_data import BirthData
@@ -363,3 +363,79 @@ class HealthResponse(BaseModel):
     status: str
     calculation_version: str
     engine_id: str
+
+
+# --- Auth -------------------------------------------------------------
+
+
+class RegisterRequest(BaseModel):
+    """Create an account."""
+
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=200)
+
+
+class LoginRequest(BaseModel):
+    """Exchange credentials for a session token."""
+
+    email: EmailStr
+    password: str = Field(min_length=1, max_length=200)
+
+
+class AuthTokenResponse(BaseModel):
+    """A bearer token. Send it as `Authorization: Bearer <token>`."""
+
+    access_token: str
+    token_type: str = "bearer"
+
+
+class UserResponse(BaseModel):
+    """The account created by registration."""
+
+    model_config = {"from_attributes": True}
+
+    id: int
+    email: EmailStr
+    created_at: datetime
+
+
+# --- Birth profile -------------------------------------------------------
+
+
+class SaveProfileRequest(BaseModel):
+    """Create or replace the user's one saved birth profile."""
+
+    birth: BirthData
+
+
+class BirthProfileResponse(BaseModel):
+    """The saved profile, in the same shape the chart endpoints accept."""
+
+    id: int
+    birth: BirthData
+    created_at: datetime
+    updated_at: datetime
+
+
+# --- Journal ---------------------------------------------------------------
+
+
+class JournalEntryRequest(BaseModel):
+    """Create or replace a journal entry's content."""
+
+    title: str = Field(min_length=1, max_length=200)
+    body: str = Field(min_length=1, max_length=20_000)
+
+
+class JournalEntryResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: int
+    title: str
+    body: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class JournalEntryListResponse(BaseModel):
+    entries: tuple[JournalEntryResponse, ...]
