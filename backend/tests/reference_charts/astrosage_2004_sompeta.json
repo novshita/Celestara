@@ -1,0 +1,33 @@
+{
+  "source": "AstroSage AI free chart (astrosage.com), accessed 2026-09-27",
+  "notes": "Chart settings confirmed as Lahiri ayanamsa and whole-sign (Rasi) houses. AstroSage reports Lahiri as 023-55-32 for this date, matching our engine's ayanamsa within the tolerance below.",
+  "tolerance_arcmin": 2,
+
+  "birth": {
+    "birth_date": "2004-12-11",
+    "birth_time": "05:30:00",
+    "time_confidence": "EXACT",
+    "latitude": 18.9667,
+    "longitude": 84.5667,
+    "timezone_name": "Asia/Kolkata"
+  },
+
+  "ascendant": {
+    "rashi": "Scorpio",
+    "deg": 14,
+    "min": 33,
+    "sec": 4
+  },
+
+  "placements": [
+    { "graha": "Sun",     "rashi": "Scorpio",  "deg": 25, "min": 22, "sec": 2 },
+    { "graha": "Moon",    "rashi": "Scorpio",  "deg": 10, "min": 27, "sec": 38 },
+    { "graha": "Mars",    "rashi": "Libra",    "deg": 26, "min": 6,  "sec": 3 },
+    { "graha": "Mercury", "rashi": "Scorpio",  "deg": 23, "min": 47, "sec": 56, "retrograde": true },
+    { "graha": "Jupiter", "rashi": "Virgo",    "deg": 20, "min": 51, "sec": 31 },
+    { "graha": "Venus",   "rashi": "Libra",    "deg": 28, "min": 57, "sec": 33 },
+    { "graha": "Saturn",  "rashi": "Cancer",   "deg": 2,  "min": 26, "sec": 34, "retrograde": true },
+    { "graha": "Rahu",    "rashi": "Aries",    "deg": 5,  "min": 30, "sec": 22, "retrograde": true },
+    { "graha": "Ketu",    "rashi": "Libra",    "deg": 5,  "min": 30, "sec": 22, "retrograde": true }
+  ]
+}
