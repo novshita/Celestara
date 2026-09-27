@@ -18,6 +18,7 @@ The experience is designed to feel like entering a living celestial observatory:
 |---|---|
 | 🕉️ Vedic D1 / Rashi chart | ✅ Implemented |
 | 🔮 Western natal chart + aspects | ✅ Implemented |
+| ⚖️ Compare (Vedic ↔ Western) | ✅ Implemented |
 | ⏳ Vimshottari Dasha timeline | ✅ Implemented |
 | 🌍 Transit / Gochar engine | ✅ Implemented |
 | 🌐 FastAPI endpoints | ✅ Implemented |
@@ -55,6 +56,7 @@ All calculation endpoints are namespaced under `/api/v1`.
 | `GET` | `/health` | Liveness check |
 | `POST` | `/api/v1/charts/vedic` | Vedic D1 (Rashi) chart |
 | `POST` | `/api/v1/charts/western` | Western natal chart |
+| `POST` | `/api/v1/charts/compare` | Both charts plus how they differ |
 | `POST` | `/api/v1/dashas/vimshottari` | Vimshottari Dasha timeline |
 | `GET` | `/api/v1/transits` | Graha positions at a moment |
 | `POST` | `/api/v1/transits/vedic` | Transits relative to a natal chart |

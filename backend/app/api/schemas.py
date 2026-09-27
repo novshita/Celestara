@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 from app.core.config import CalculationConfig
 from app.domain.birth_data import BirthData
+from app.domain.compare import ChartComparison
 from app.domain.dasha import DashaPeriod, DashaTimeline
 from app.domain.transit import TransitReport, TransitSnapshot
 from app.domain.vedic import VedicChart
@@ -154,6 +155,64 @@ class WesternChartResponse(BaseModel):
     """A calculated Western natal chart."""
 
     chart: WesternChart
+
+
+class CompareChartRequest(BaseModel):
+    """A request for the Vedic and Western charts, side by side."""
+
+    birth: BirthData
+
+    config: CalculationConfig | None = Field(
+        default=None,
+        description=(
+            "Optional overrides, applied to both pipelines - e.g. "
+            "`western_house_system` for the Western half and `house_system` "
+            "for the Vedic half. Omit to use the validated defaults."
+        ),
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "summary": "Exact birth time",
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "birth_time": "14:30:00",
+                            "time_confidence": "EXACT",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                            "timezone_name": "Asia/Kolkata",
+                        }
+                    },
+                },
+                {
+                    "summary": "Unknown birth time",
+                    "description": (
+                        "Both charts still come back. `ascendant` is omitted "
+                        "from the comparison and listed in "
+                        "metadata.unavailable, since neither system has one "
+                        "without a birth time."
+                    ),
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "time_confidence": "UNKNOWN",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                        }
+                    },
+                },
+            ]
+        }
+    }
+
+
+class CompareChartResponse(BaseModel):
+    """The Vedic chart, the Western chart, and how they differ."""
+
+    comparison: ChartComparison
 
 
 class VimshottariRequest(BaseModel):
