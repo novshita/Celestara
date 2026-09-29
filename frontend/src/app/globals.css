@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/*
+ * Dark by default rather than following system preference: product spec
+ * describes the experience as "a living celestial observatory," and that
+ * tone doesn't survive a bright-white background. This is a functional
+ * first pass, not the celestial visualization layer (engineering spec §3
+ * defers that to its own feature) - just a background that doesn't fight it.
+ */
+:root {
+  --background: #0b0f1a;
+  --foreground: #e2e8f0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .input {
+    @apply rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-amber-400 focus:outline-none;
+  }
+}

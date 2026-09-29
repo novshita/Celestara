@@ -24,7 +24,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI interpretation layer | ⬜ Not started |
-| 🖥️ Next.js frontend | ⬜ Not started |
+| 🖥️ Next.js frontend | 🚧 Started - Vedic chart form only |
 
 | 📄 Document | What it covers |
 |---|---|
@@ -88,6 +88,30 @@ All calculation endpoints are namespaced under `/api/v1`.
 | `GET`/`POST` | `/api/v1/journal` | List / create journal entries |
 | `GET`/`PUT`/`DELETE` | `/api/v1/journal/{id}` | Read, edit, or remove an entry |
 | `DELETE` | `/api/v1/account/data` | Permanently delete the account and all its data |
+
+---
+
+## 🖥️ Running the Frontend
+
+Requires **Node.js 20+**. Start the backend first (above) - the frontend
+calls it directly.
+
+```bash
+cd frontend
+npm install
+npm run dev     # http://localhost:3000
+```
+
+A birth-data form calculates a Vedic D1 chart against the running backend.
+This is the first working slice of the frontend - Western/Compare views,
+auth, journal, the AI Guide, and the celestial visualization layer are all
+still to come; see `frontend/.env.example` for the one setting it reads
+(`BACKEND_URL`, only needed if the backend isn't on its default port).
+
+The API call happens in a [Server Function](https://nextjs.org/docs/app/getting-started/mutating-data)
+(`frontend/src/app/actions.ts`), not in the browser - the backend never
+needs CORS configuration because it only ever talks to the Next.js server,
+not directly to a user's browser.
 
 ---
 
@@ -170,16 +194,16 @@ Not a side-by-side chart viewer — a **unified visualization** that shows the r
                               Next.js UI
 ```
 
-### ⚙️ Planned Stack
+### ⚙️ Stack
 
-| Layer | Technology |
-|---|---|
-| 🖥️ Frontend | Next.js + TypeScript |
-| 🐍 Backend | FastAPI + Python + Pydantic |
-| 🗄️ Database | PostgreSQL + pgvector |
-| 🌟 Calculation | Established astronomical engine behind a service boundary |
-| 🧩 AI | Multi-provider model abstraction |
-| 📚 Knowledge | RAG over curated astrology material |
+| Layer | Technology | Status |
+|---|---|---|
+| 🖥️ Frontend | Next.js + TypeScript | 🚧 Started |
+| 🐍 Backend | FastAPI + Python + Pydantic | ✅ In place |
+| 🗄️ Database | SQLite (dev) → PostgreSQL + pgvector (planned for prod) | ✅ In place |
+| 🌟 Calculation | Swiss Ephemeris behind a service boundary | ✅ In place |
+| 🧩 AI | Multi-provider model abstraction | ⬜ Planned |
+| 📚 Knowledge | RAG over curated astrology material | ⬜ Planned |
 
 ---
 
