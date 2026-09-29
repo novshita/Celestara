@@ -6,8 +6,8 @@ export default function Home() {
       <header className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold text-amber-300">🌌 Celestara</h1>
         <p className="text-slate-400">
-          Enter a birth record to calculate its Vedic Rashi (D1) chart. The
-          system calculates; nothing here interprets.
+          Enter a birth record to calculate its Vedic, Western, or compared
+          chart. The system calculates; nothing here interprets.
         </p>
       </header>
 

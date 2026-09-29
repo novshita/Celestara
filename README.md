@@ -24,7 +24,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI interpretation layer | ⬜ Not started |
-| 🖥️ Next.js frontend | 🚧 Started - Vedic chart form only |
+| 🖥️ Next.js frontend | 🚧 Started - Vedic, Western, Compare views |
 
 | 📄 Document | What it covers |
 |---|---|
@@ -102,11 +102,11 @@ npm install
 npm run dev     # http://localhost:3000
 ```
 
-A birth-data form calculates a Vedic D1 chart against the running backend.
-This is the first working slice of the frontend - Western/Compare views,
-auth, journal, the AI Guide, and the celestial visualization layer are all
-still to come; see `frontend/.env.example` for the one setting it reads
-(`BACKEND_URL`, only needed if the backend isn't on its default port).
+A birth-data form calculates a Vedic, Western, or Compare chart against the
+running backend. Auth, journal, the AI Guide, and the celestial
+visualization layer are still to come; see `frontend/.env.example` for the
+one setting it reads (`BACKEND_URL`, only needed if the backend isn't on
+its default port).
 
 The API call happens in a [Server Function](https://nextjs.org/docs/app/getting-started/mutating-data)
 (`frontend/src/app/actions.ts`), not in the browser - the backend never

@@ -10,7 +10,13 @@
 
 import "server-only";
 
-import type { ApiErrorResponse, BirthData, VedicChartResponse } from "./types";
+import type {
+  ApiErrorResponse,
+  BirthData,
+  CompareChartResponse,
+  VedicChartResponse,
+  WesternChartResponse,
+} from "./types";
 
 const DEFAULT_BACKEND_URL = "http://127.0.0.1:8000";
 
@@ -56,4 +62,16 @@ export async function calculateVedicChart(
   birth: BirthData,
 ): Promise<VedicChartResponse> {
   return post<VedicChartResponse>("/api/v1/charts/vedic", { birth });
+}
+
+export async function calculateWesternChart(
+  birth: BirthData,
+): Promise<WesternChartResponse> {
+  return post<WesternChartResponse>("/api/v1/charts/western", { birth });
+}
+
+export async function calculateComparison(
+  birth: BirthData,
+): Promise<CompareChartResponse> {
+  return post<CompareChartResponse>("/api/v1/charts/compare", { birth });
 }
