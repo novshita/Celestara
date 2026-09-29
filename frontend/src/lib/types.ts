@@ -87,6 +87,113 @@ export interface VedicChartResponse {
   chart: VedicChart;
 }
 
+// --- Western -----------------------------------------------------------
+
+export interface PlanetPosition {
+  body: string;
+  longitude: number;
+  sign_index: number;
+  sign: string;
+  degrees_in_sign: number;
+  element: string;
+  modality: string;
+  retrograde: boolean;
+  speed_longitude: number;
+  house: number | null;
+  uncertain: boolean;
+}
+
+export interface House {
+  number: number;
+  cusp_longitude: number;
+  sign_index: number;
+  sign: string;
+  ruler: string;
+  size_degrees: number;
+  bodies: string[];
+}
+
+export interface Aspect {
+  first: string;
+  second: string;
+  aspect: string;
+  exact_angle: number;
+  separation: number;
+  orb: number;
+  applying: boolean;
+  harmonious: boolean | null;
+}
+
+export interface Angles {
+  ascendant: number;
+  ascendant_sign: string;
+  ascendant_degrees: number;
+  ascendant_ruler: string;
+  midheaven: number;
+  midheaven_sign: string;
+  descendant: number;
+  imum_coeli: number;
+}
+
+export interface WesternChartMetadata {
+  engine_id: string;
+  calculation_version: string;
+  moment: ResolvedBirthMoment;
+  house_system: string;
+  bodies_included: string[];
+  unavailable: string[];
+}
+
+export interface WesternChart {
+  system: "western";
+  zodiac: "tropical";
+  positions: PlanetPosition[];
+  houses: House[];
+  angles: Angles | null;
+  aspects: Aspect[];
+  metadata: WesternChartMetadata;
+}
+
+export interface WesternChartResponse {
+  chart: WesternChart;
+}
+
+// --- Compare -------------------------------------------------------------
+
+export interface SharedBodyComparison {
+  body: string;
+  vedic_rashi: string;
+  vedic_degrees_in_rashi: number;
+  western_sign: string;
+  western_degrees_in_sign: number;
+  signs_apart: number;
+  vedic_uncertain: boolean;
+  western_uncertain: boolean;
+}
+
+export interface AscendantComparison {
+  vedic_rashi: string;
+  western_sign: string;
+  signs_apart: number;
+}
+
+export interface ComparisonMetadata {
+  ayanamsa_degrees: number;
+  unavailable: string[];
+}
+
+export interface ChartComparison {
+  vedic: VedicChart;
+  western: WesternChart;
+  shared_bodies: SharedBodyComparison[];
+  ascendant: AscendantComparison | null;
+  metadata: ComparisonMetadata;
+}
+
+export interface CompareChartResponse {
+  comparison: ChartComparison;
+}
+
 /** The shape every backend error response takes (`app/api/errors.py`). */
 export interface ApiErrorResponse {
   code: string;

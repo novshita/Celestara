@@ -2,9 +2,11 @@
 
 import { useActionState, useState } from "react";
 
-import { submitBirthData, type ChartFormState } from "@/app/actions";
+import { submitBirthData, type ChartFormState, type ChartSystem } from "@/app/actions";
 import type { BirthTimeConfidence } from "@/lib/types";
+import { CompareResult } from "@/components/CompareResult";
 import { VedicChartResult } from "@/components/VedicChartResult";
+import { WesternChartResult } from "@/components/WesternChartResult";
 
 const INITIAL_STATE: ChartFormState = { status: "idle" };
 
@@ -12,6 +14,12 @@ const TIME_CONFIDENCE_OPTIONS: { value: BirthTimeConfidence; label: string }[] =
   { value: "EXACT", label: "Exact - I know the time" },
   { value: "ESTIMATED", label: "Estimated - approximately" },
   { value: "UNKNOWN", label: "Unknown - I don't know it" },
+];
+
+const SYSTEM_OPTIONS: { value: ChartSystem; label: string }[] = [
+  { value: "vedic", label: "Vedic (Rashi / D1)" },
+  { value: "western", label: "Western (Tropical)" },
+  { value: "compare", label: "Compare both" },
 ];
 
 export function BirthDataForm() {
@@ -28,6 +36,21 @@ export function BirthDataForm() {
   return (
     <div className="flex flex-col gap-8">
       <form action={formAction} className="flex flex-col gap-5">
+        <div className="flex gap-4 text-sm text-slate-300">
+          {SYSTEM_OPTIONS.map((option) => (
+            <label key={option.value} className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="system"
+                value={option.value}
+                defaultChecked={option.value === "vedic"}
+                className="accent-amber-400"
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <Field label="Birth date" error={fieldErrors["birth.birth_date"]}>
             <input
@@ -121,7 +144,15 @@ export function BirthDataForm() {
         )}
       </form>
 
-      {state.status === "success" && <VedicChartResult chart={state.chart} />}
+      {state.status === "success" && state.system === "vedic" && (
+        <VedicChartResult chart={state.chart} />
+      )}
+      {state.status === "success" && state.system === "western" && (
+        <WesternChartResult chart={state.chart} />
+      )}
+      {state.status === "success" && state.system === "compare" && (
+        <CompareResult comparison={state.comparison} />
+      )}
     </div>
   );
 }
