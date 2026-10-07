@@ -24,7 +24,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI interpretation layer | ⬜ Not started |
-| 🖥️ Next.js frontend | 🚧 Started - Vedic, Western, Compare, Dasha views |
+| 🖥️ Next.js frontend | 🚧 Started - all five calculation views in place |
 
 | 📄 Document | What it covers |
 |---|---|
@@ -102,9 +102,10 @@ npm install
 npm run dev     # http://localhost:3000
 ```
 
-A birth-data form calculates a Vedic, Western, Compare, or Vimshottari
-Dasha view against the running backend. Transit views, auth, journal, the
-AI Guide, and the celestial visualization layer are still to come; see
+A birth-data form calculates a Vedic, Western, Compare, Vimshottari Dasha,
+or current-transits view against the running backend - every calculation
+endpoint the backend exposes. Auth, journal, the AI Guide, and the
+celestial visualization layer are still to come; see
 `frontend/.env.example` for the one setting it reads (`BACKEND_URL`, only
 needed if the backend isn't on its default port).
 

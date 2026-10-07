@@ -7,8 +7,8 @@ export default function Home() {
         <h1 className="text-2xl font-semibold text-amber-300">🌌 Celestara</h1>
         <p className="text-slate-400">
           Enter a birth record to calculate its Vedic, Western, compared
-          chart, or Vimshottari Dasha timeline. The system calculates;
-          nothing here interprets.
+          chart, Vimshottari Dasha timeline, or current transits. The
+          system calculates; nothing here interprets.
         </p>
       </header>
 

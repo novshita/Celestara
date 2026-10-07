@@ -6,6 +6,7 @@ import { submitBirthData, type ChartFormState, type ChartSystem } from "@/app/ac
 import type { BirthTimeConfidence } from "@/lib/types";
 import { CompareResult } from "@/components/CompareResult";
 import { DashaResult } from "@/components/DashaResult";
+import { TransitResult } from "@/components/TransitResult";
 import { VedicChartResult } from "@/components/VedicChartResult";
 import { WesternChartResult } from "@/components/WesternChartResult";
 
@@ -22,6 +23,7 @@ const SYSTEM_OPTIONS: { value: ChartSystem; label: string }[] = [
   { value: "western", label: "Western (Tropical)" },
   { value: "compare", label: "Compare both" },
   { value: "dasha", label: "Vimshottari Dasha" },
+  { value: "transit", label: "Current transits (Gochar)" },
 ];
 
 export function BirthDataForm() {
@@ -157,6 +159,9 @@ export function BirthDataForm() {
       )}
       {state.status === "success" && state.system === "dasha" && (
         <DashaResult dasha={state.dasha} />
+      )}
+      {state.status === "success" && state.system === "transit" && (
+        <TransitResult report={state.report} />
       )}
     </div>
   );
