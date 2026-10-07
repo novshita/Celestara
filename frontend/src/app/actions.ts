@@ -3,6 +3,7 @@
 import {
   BackendError,
   calculateComparison,
+  calculateTransitReport,
   calculateVedicChart,
   calculateVimshottariDasha,
   calculateWesternChart,
@@ -11,12 +12,13 @@ import type {
   BirthData,
   BirthTimeConfidence,
   ChartComparison,
+  TransitReport,
   VedicChart,
   VimshottariResponse,
   WesternChart,
 } from "@/lib/types";
 
-export type ChartSystem = "vedic" | "western" | "compare" | "dasha";
+export type ChartSystem = "vedic" | "western" | "compare" | "dasha" | "transit";
 
 export type ChartFormState =
   | { status: "idle" }
@@ -24,7 +26,8 @@ export type ChartFormState =
   | { status: "success"; system: "vedic"; chart: VedicChart }
   | { status: "success"; system: "western"; chart: WesternChart }
   | { status: "success"; system: "compare"; comparison: ChartComparison }
-  | { status: "success"; system: "dasha"; dasha: VimshottariResponse };
+  | { status: "success"; system: "dasha"; dasha: VimshottariResponse }
+  | { status: "success"; system: "transit"; report: TransitReport };
 
 /** `<input type="time">` submits `HH:MM`; the backend wants `HH:MM:SS`. */
 function withSeconds(time: string): string {
@@ -54,7 +57,7 @@ function buildBirthData(formData: FormData): BirthData {
  * server: the browser posts the form, this function calls the FastAPI
  * backend, and only the result (chart or error) crosses back to the client.
  *
- * One action handles all four systems rather than separate actions each,
+ * One action handles all five systems rather than separate actions each,
  * because the request shape (birth data) and the failure handling are
  * identical across them - the only difference is which endpoint answers
  * and how the result is tagged for the renderer to pick a view.
@@ -79,6 +82,10 @@ export async function submitBirthData(
       case "dasha": {
         const dasha = await calculateVimshottariDasha(birth);
         return { status: "success", system: "dasha", dasha };
+      }
+      case "transit": {
+        const { report } = await calculateTransitReport(birth);
+        return { status: "success", system: "transit", report };
       }
       case "vedic":
       default: {

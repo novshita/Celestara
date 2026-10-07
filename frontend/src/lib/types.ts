@@ -225,6 +225,49 @@ export interface VimshottariResponse {
   active_now: DashaPeriod[];
 }
 
+// --- Transit (Gochar) -----------------------------------------------------
+
+export interface TransitPosition {
+  graha: string;
+  longitude: number;
+  rashi_index: number;
+  rashi: string;
+  degrees_in_rashi: number;
+  nakshatra: Nakshatra;
+  retrograde: boolean;
+  speed_longitude: number;
+  derived_from: string | null;
+}
+
+export interface TransitSnapshot {
+  moment: string;
+  granularity_seconds: number;
+  positions: TransitPosition[];
+}
+
+export interface GrahaTransit {
+  graha: string;
+  transit: TransitPosition;
+  natal_longitude: number;
+  natal_rashi: string;
+  bhava_from_ascendant: number | null;
+  bhava_from_moon: number | null;
+  in_natal_rashi: boolean;
+  separation_from_natal: number;
+}
+
+export interface TransitReport {
+  snapshot: TransitSnapshot;
+  transits: GrahaTransit[];
+  natal_ascendant_rashi: string | null;
+  natal_moon_rashi: string | null;
+  unavailable: string[];
+}
+
+export interface TransitReportResponse {
+  report: TransitReport;
+}
+
 /** The shape every backend error response takes (`app/api/errors.py`). */
 export interface ApiErrorResponse {
   code: string;
