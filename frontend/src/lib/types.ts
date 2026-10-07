@@ -194,6 +194,37 @@ export interface CompareChartResponse {
   comparison: ChartComparison;
 }
 
+// --- Vimshottari Dasha ---------------------------------------------------
+
+export type DashaLevel = "maha" | "antar" | "pratyantar" | "sookshma";
+
+export interface DashaPeriod {
+  lord: string;
+  level: DashaLevel;
+  start: string;
+  end: string;
+  duration_years: number;
+  is_partial: boolean;
+  sub_periods: DashaPeriod[];
+}
+
+export interface DashaTimeline {
+  system: "vimshottari";
+  moon_nakshatra: Nakshatra;
+  starting_lord: string;
+  elapsed_fraction: number;
+  balance_years: number;
+  periods: DashaPeriod[];
+  uncertainty_days: number;
+  moment: ResolvedBirthMoment;
+}
+
+export interface VimshottariResponse {
+  timeline: DashaTimeline;
+  as_of: string;
+  active_now: DashaPeriod[];
+}
+
 /** The shape every backend error response takes (`app/api/errors.py`). */
 export interface ApiErrorResponse {
   code: string;

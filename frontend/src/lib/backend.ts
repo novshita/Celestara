@@ -15,6 +15,7 @@ import type {
   BirthData,
   CompareChartResponse,
   VedicChartResponse,
+  VimshottariResponse,
   WesternChartResponse,
 } from "./types";
 
@@ -74,4 +75,10 @@ export async function calculateComparison(
   birth: BirthData,
 ): Promise<CompareChartResponse> {
   return post<CompareChartResponse>("/api/v1/charts/compare", { birth });
+}
+
+export async function calculateVimshottariDasha(
+  birth: BirthData,
+): Promise<VimshottariResponse> {
+  return post<VimshottariResponse>("/api/v1/dashas/vimshottari", { birth });
 }

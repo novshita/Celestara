@@ -4,6 +4,7 @@ import {
   BackendError,
   calculateComparison,
   calculateVedicChart,
+  calculateVimshottariDasha,
   calculateWesternChart,
 } from "@/lib/backend";
 import type {
@@ -11,17 +12,19 @@ import type {
   BirthTimeConfidence,
   ChartComparison,
   VedicChart,
+  VimshottariResponse,
   WesternChart,
 } from "@/lib/types";
 
-export type ChartSystem = "vedic" | "western" | "compare";
+export type ChartSystem = "vedic" | "western" | "compare" | "dasha";
 
 export type ChartFormState =
   | { status: "idle" }
   | { status: "error"; message: string; fieldErrors: Record<string, string> }
   | { status: "success"; system: "vedic"; chart: VedicChart }
   | { status: "success"; system: "western"; chart: WesternChart }
-  | { status: "success"; system: "compare"; comparison: ChartComparison };
+  | { status: "success"; system: "compare"; comparison: ChartComparison }
+  | { status: "success"; system: "dasha"; dasha: VimshottariResponse };
 
 /** `<input type="time">` submits `HH:MM`; the backend wants `HH:MM:SS`. */
 function withSeconds(time: string): string {
@@ -51,9 +54,9 @@ function buildBirthData(formData: FormData): BirthData {
  * server: the browser posts the form, this function calls the FastAPI
  * backend, and only the result (chart or error) crosses back to the client.
  *
- * One action handles all three systems rather than three separate actions,
+ * One action handles all four systems rather than separate actions each,
  * because the request shape (birth data) and the failure handling are
- * identical for all three - the only difference is which endpoint answers
+ * identical across them - the only difference is which endpoint answers
  * and how the result is tagged for the renderer to pick a view.
  */
 export async function submitBirthData(
@@ -72,6 +75,10 @@ export async function submitBirthData(
       case "compare": {
         const { comparison } = await calculateComparison(birth);
         return { status: "success", system: "compare", comparison };
+      }
+      case "dasha": {
+        const dasha = await calculateVimshottariDasha(birth);
+        return { status: "success", system: "dasha", dasha };
       }
       case "vedic":
       default: {
