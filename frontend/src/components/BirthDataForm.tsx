@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { submitBirthData, type ChartFormState, type ChartSystem } from "@/app/actions";
 import type { BirthTimeConfidence } from "@/lib/types";
 import { CompareResult } from "@/components/CompareResult";
+import { DashaResult } from "@/components/DashaResult";
 import { VedicChartResult } from "@/components/VedicChartResult";
 import { WesternChartResult } from "@/components/WesternChartResult";
 
@@ -20,6 +21,7 @@ const SYSTEM_OPTIONS: { value: ChartSystem; label: string }[] = [
   { value: "vedic", label: "Vedic (Rashi / D1)" },
   { value: "western", label: "Western (Tropical)" },
   { value: "compare", label: "Compare both" },
+  { value: "dasha", label: "Vimshottari Dasha" },
 ];
 
 export function BirthDataForm() {
@@ -152,6 +154,9 @@ export function BirthDataForm() {
       )}
       {state.status === "success" && state.system === "compare" && (
         <CompareResult comparison={state.comparison} />
+      )}
+      {state.status === "success" && state.system === "dasha" && (
+        <DashaResult dasha={state.dasha} />
       )}
     </div>
   );
