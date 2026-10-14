@@ -24,7 +24,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI interpretation layer | ⬜ Not started |
-| 🖥️ Next.js frontend | 🚧 Started - all calculation views + register/login |
+| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, saved profile |
 
 | 📄 Document | What it covers |
 |---|---|
@@ -107,10 +107,12 @@ or current-transits view against the running backend - every calculation
 endpoint the backend exposes. You can also register and log in; the
 session is a bearer token from the backend held in an httpOnly cookie, set
 and read entirely server-side (Next.js Server Actions and Server
-Components - the token is never exposed to client JavaScript). Journal,
-the AI Guide, and the celestial visualization layer are still to come; see
-`frontend/.env.example` for the one setting it reads (`BACKEND_URL`, only
-needed if the backend isn't on its default port).
+Components - the token is never exposed to client JavaScript). Logged in,
+you can save your one birth profile (product spec §28) so you don't have
+to retype it every time. Journal, the AI Guide, and the celestial
+visualization layer are still to come; see `frontend/.env.example` for the
+one setting it reads (`BACKEND_URL`, only needed if the backend isn't on
+its default port).
 
 The API call happens in a [Server Function](https://nextjs.org/docs/app/getting-started/mutating-data)
 (`frontend/src/app/actions.ts`), not in the browser - the backend never

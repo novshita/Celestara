@@ -14,6 +14,7 @@ import type {
   ApiErrorResponse,
   AuthTokenResponse,
   BirthData,
+  BirthProfileResponse,
   CompareChartResponse,
   TransitReportResponse,
   UserResponse,
@@ -131,4 +132,33 @@ export async function loginUser(
  * always sends a JSON body and expects one back. */
 export async function logoutSession(token: string): Promise<void> {
   await request("/api/v1/auth/logout", { method: "POST", token });
+}
+
+/** `null` means "nothing saved yet" (the backend's 404), not an error -
+ * product spec §8's "absence is a valid state, not a failure" applies here
+ * just as it does to an unknown birth time. */
+export async function getProfile(
+  token: string,
+): Promise<BirthProfileResponse | null> {
+  try {
+    const response = await request("/api/v1/profile", { method: "GET", token });
+    return (await response.json()) as BirthProfileResponse;
+  } catch (error) {
+    if (error instanceof BackendError && error.code === "NOT_FOUND") {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function saveProfile(
+  token: string,
+  birth: BirthData,
+): Promise<BirthProfileResponse> {
+  const response = await request("/api/v1/profile", {
+    method: "PUT",
+    body: JSON.stringify({ birth }),
+    token,
+  });
+  return response.json() as Promise<BirthProfileResponse>;
 }
