@@ -268,6 +268,19 @@ export interface TransitReportResponse {
   report: TransitReport;
 }
 
+// --- Auth ------------------------------------------------------------------
+
+export interface UserResponse {
+  id: number;
+  email: string;
+  created_at: string;
+}
+
+export interface AuthTokenResponse {
+  access_token: string;
+  token_type: "bearer";
+}
+
 /** The shape every backend error response takes (`app/api/errors.py`). */
 export interface ApiErrorResponse {
   code: string;

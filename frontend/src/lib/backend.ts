@@ -12,9 +12,11 @@ import "server-only";
 
 import type {
   ApiErrorResponse,
+  AuthTokenResponse,
   BirthData,
   CompareChartResponse,
   TransitReportResponse,
+  UserResponse,
   VedicChartResponse,
   VimshottariResponse,
   WesternChartResponse,
@@ -40,11 +42,19 @@ export class BackendError extends Error {
   }
 }
 
-async function post<T>(path: string, body: unknown): Promise<T> {
+async function request(
+  path: string,
+  init: RequestInit & { token?: string } = {},
+): Promise<Response> {
+  const { token, headers, ...rest } = init;
+
   const response = await fetch(`${backendUrl()}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    ...rest,
+    headers: {
+      ...(rest.body ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...headers,
+    },
     // Chart calculation is deterministic per input (engineering spec §10),
     // but "no store" keeps this route trivially correct while the caching
     // story for authenticated, per-user data is worked out; correctness
@@ -57,6 +67,19 @@ async function post<T>(path: string, body: unknown): Promise<T> {
     throw new BackendError(errorBody);
   }
 
+  return response;
+}
+
+async function post<T>(
+  path: string,
+  body: unknown,
+  token?: string,
+): Promise<T> {
+  const response = await request(path, {
+    method: "POST",
+    body: JSON.stringify(body),
+    token,
+  });
   return response.json() as Promise<T>;
 }
 
@@ -88,4 +111,24 @@ export async function calculateTransitReport(
   birth: BirthData,
 ): Promise<TransitReportResponse> {
   return post<TransitReportResponse>("/api/v1/transits/vedic", { birth });
+}
+
+export async function registerUser(
+  email: string,
+  password: string,
+): Promise<UserResponse> {
+  return post<UserResponse>("/api/v1/auth/register", { email, password });
+}
+
+export async function loginUser(
+  email: string,
+  password: string,
+): Promise<AuthTokenResponse> {
+  return post<AuthTokenResponse>("/api/v1/auth/login", { email, password });
+}
+
+/** No request body and a 204 response - doesn't go through `post()`, which
+ * always sends a JSON body and expects one back. */
+export async function logoutSession(token: string): Promise<void> {
+  await request("/api/v1/auth/logout", { method: "POST", token });
 }
