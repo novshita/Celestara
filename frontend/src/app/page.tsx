@@ -1,3 +1,4 @@
+import { AccountBar } from "@/components/AccountBar";
 import { BirthDataForm } from "@/components/BirthDataForm";
 
 export default function Home() {
@@ -11,6 +12,8 @@ export default function Home() {
           system calculates; nothing here interprets.
         </p>
       </header>
+
+      <AccountBar />
 
       <BirthDataForm />
     </main>
