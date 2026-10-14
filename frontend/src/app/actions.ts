@@ -8,9 +8,8 @@ import {
   calculateVimshottariDasha,
   calculateWesternChart,
 } from "@/lib/backend";
+import { buildBirthData } from "@/lib/birthFormData";
 import type {
-  BirthData,
-  BirthTimeConfidence,
   ChartComparison,
   TransitReport,
   VedicChart,
@@ -28,29 +27,6 @@ export type ChartFormState =
   | { status: "success"; system: "compare"; comparison: ChartComparison }
   | { status: "success"; system: "dasha"; dasha: VimshottariResponse }
   | { status: "success"; system: "transit"; report: TransitReport };
-
-/** `<input type="time">` submits `HH:MM`; the backend wants `HH:MM:SS`. */
-function withSeconds(time: string): string {
-  return time.length === 5 ? `${time}:00` : time;
-}
-
-function buildBirthData(formData: FormData): BirthData {
-  const timeConfidence = formData.get("time_confidence") as BirthTimeConfidence;
-  const rawTime = formData.get("birth_time");
-  const rawTimezone = formData.get("timezone_name");
-
-  return {
-    birth_date: formData.get("birth_date") as string,
-    birth_time:
-      timeConfidence === "UNKNOWN" || !rawTime
-        ? null
-        : withSeconds(rawTime as string),
-    time_confidence: timeConfidence,
-    latitude: Number.parseFloat(formData.get("latitude") as string),
-    longitude: Number.parseFloat(formData.get("longitude") as string),
-    timezone_name: rawTimezone ? (rawTimezone as string) : null,
-  };
-}
 
 /**
  * Server Action backing the birth-data form. Runs entirely on the Next.js

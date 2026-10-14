@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 
 import { submitBirthData, type ChartFormState, type ChartSystem } from "@/app/actions";
-import type { BirthTimeConfidence } from "@/lib/types";
+import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
 import { CompareResult } from "@/components/CompareResult";
 import { DashaResult } from "@/components/DashaResult";
 import { TransitResult } from "@/components/TransitResult";
@@ -11,12 +11,6 @@ import { VedicChartResult } from "@/components/VedicChartResult";
 import { WesternChartResult } from "@/components/WesternChartResult";
 
 const INITIAL_STATE: ChartFormState = { status: "idle" };
-
-const TIME_CONFIDENCE_OPTIONS: { value: BirthTimeConfidence; label: string }[] = [
-  { value: "EXACT", label: "Exact - I know the time" },
-  { value: "ESTIMATED", label: "Estimated - approximately" },
-  { value: "UNKNOWN", label: "Unknown - I don't know it" },
-];
 
 const SYSTEM_OPTIONS: { value: ChartSystem; label: string }[] = [
   { value: "vedic", label: "Vedic (Rashi / D1)" },
@@ -31,11 +25,8 @@ export function BirthDataForm() {
     submitBirthData,
     INITIAL_STATE,
   );
-  const [timeConfidence, setTimeConfidence] =
-    useState<BirthTimeConfidence>("EXACT");
 
   const fieldErrors = state.status === "error" ? state.fieldErrors : {};
-  const timeIsUsable = timeConfidence !== "UNKNOWN";
 
   return (
     <div className="flex flex-col gap-8">
@@ -55,83 +46,7 @@ export function BirthDataForm() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <Field label="Birth date" error={fieldErrors["birth.birth_date"]}>
-            <input
-              type="date"
-              name="birth_date"
-              required
-              className="input"
-            />
-          </Field>
-
-          <Field label="Time confidence">
-            <select
-              name="time_confidence"
-              value={timeConfidence}
-              onChange={(event) =>
-                setTimeConfidence(event.target.value as BirthTimeConfidence)
-              }
-              className="input"
-            >
-              {TIME_CONFIDENCE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          <Field
-            label="Birth time"
-            error={fieldErrors["birth.birth_time"]}
-            hint={!timeIsUsable ? "Not needed - time is unknown" : undefined}
-          >
-            <input
-              type="time"
-              name="birth_time"
-              step={1}
-              disabled={!timeIsUsable}
-              required={timeIsUsable}
-              className="input disabled:opacity-40"
-            />
-          </Field>
-
-          <Field label="Timezone" hint="Leave blank to detect from coordinates">
-            <input
-              type="text"
-              name="timezone_name"
-              placeholder="e.g. Asia/Kolkata"
-              className="input"
-            />
-          </Field>
-
-          <Field label="Latitude" error={fieldErrors["birth.latitude"]}>
-            <input
-              type="number"
-              name="latitude"
-              step="any"
-              min={-90}
-              max={90}
-              required
-              placeholder="18.9756"
-              className="input"
-            />
-          </Field>
-
-          <Field label="Longitude" error={fieldErrors["birth.longitude"]}>
-            <input
-              type="number"
-              name="longitude"
-              step="any"
-              min={-180}
-              max={180}
-              required
-              placeholder="72.8258"
-              className="input"
-            />
-          </Field>
-        </div>
+        <BirthFieldsFieldset fieldErrors={fieldErrors} />
 
         <button
           type="submit"
@@ -164,26 +79,5 @@ export function BirthDataForm() {
         <TransitResult report={state.report} />
       )}
     </div>
-  );
-}
-
-function Field({
-  label,
-  error,
-  hint,
-  children,
-}: {
-  label: string;
-  error?: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="flex flex-col gap-1 text-sm text-slate-300">
-      <span>{label}</span>
-      {children}
-      {hint && !error && <span className="text-xs text-slate-500">{hint}</span>}
-      {error && <span className="text-xs text-red-400">{error}</span>}
-    </label>
   );
 }

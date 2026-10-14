@@ -281,6 +281,13 @@ export interface AuthTokenResponse {
   token_type: "bearer";
 }
 
+export interface BirthProfileResponse {
+  id: number;
+  birth: BirthData;
+  created_at: string;
+  updated_at: string;
+}
+
 /** The shape every backend error response takes (`app/api/errors.py`). */
 export interface ApiErrorResponse {
   code: string;
