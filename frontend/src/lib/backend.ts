@@ -8,9 +8,11 @@
  * client JavaScript, so nothing here specifies the backend's location either.
  */
 
-import "server-only";
+// import "server-only";
 
 import type {
+  AiChatResponse,
+  AiSystem,
   ApiErrorResponse,
   AuthTokenResponse,
   BirthData,
@@ -204,4 +206,14 @@ export async function deleteJournalEntry(
   id: number,
 ): Promise<void> {
   await request(`/api/v1/journal/${id}`, { method: "DELETE", token });
+}
+
+/** No auth required - product spec §28: the AI Guide, like chart
+ * calculation, is explorable without an account. */
+export async function askAiGuide(
+  birth: BirthData,
+  system: AiSystem,
+  question: string,
+): Promise<AiChatResponse> {
+  return post<AiChatResponse>("/api/v1/ai/chat", { birth, system, question });
 }
