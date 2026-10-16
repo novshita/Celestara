@@ -12,7 +12,7 @@ The experience is designed to feel like entering a living celestial observatory:
 
 ## 🚧 Project Status
 
-**Backend calculation layer in progress.** The deterministic astrology engine is being built first, in line with the priority order below — calculation accuracy before everything else. The AI interpretation layer and the Next.js frontend have not been started.
+**Backend calculation and AI layers both underway.** The deterministic astrology engine came first, in line with the priority order below — calculation accuracy before everything else. The AI Guide is now a single grounded Q&A turn (no RAG, no saved conversation history yet - both are separate, later features).
 
 | Area | Status |
 |---|---|
@@ -23,7 +23,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌍 Transit / Gochar engine | ✅ Implemented |
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
-| 🤖 AI interpretation layer | ⬜ Not started |
+| 🤖 AI Guide (single-turn Q&A, Claude) | ✅ Implemented - no RAG or saved history yet |
 | 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal |
 
 | 📄 Document | What it covers |
@@ -68,6 +68,22 @@ TOKEN=$(curl -X POST localhost:8000/api/v1/auth/login \
 curl localhost:8000/api/v1/profile -H "Authorization: Bearer $TOKEN"
 ```
 
+### 🤖 AI Guide
+
+`/api/v1/ai/chat` requires `ANTHROPIC_API_KEY` to be set (see
+`backend/.env.example`) - without it the endpoint returns `503
+AI_UNAVAILABLE` rather than crashing. No account needed; one question in,
+one grounded answer out, no history kept yet:
+
+```bash
+curl -X POST localhost:8000/api/v1/ai/chat \
+  -d '{
+    "birth": {"birth_date": "1990-08-15", "birth_time": "14:30:00", "time_confidence": "EXACT", "latitude": 18.9756, "longitude": 72.8258, "timezone_name": "Asia/Kolkata"},
+    "system": "vedic",
+    "question": "What does my Moon'"'"'s nakshatra suggest about my temperament?"
+  }'
+```
+
 ### 🌐 API Endpoints
 
 All calculation endpoints are namespaced under `/api/v1`.
@@ -88,6 +104,7 @@ All calculation endpoints are namespaced under `/api/v1`.
 | `GET`/`POST` | `/api/v1/journal` | List / create journal entries |
 | `GET`/`PUT`/`DELETE` | `/api/v1/journal/{id}` | Read, edit, or remove an entry |
 | `DELETE` | `/api/v1/account/data` | Permanently delete the account and all its data |
+| `POST` | `/api/v1/ai/chat` | Ask the AI Guide a question grounded in one calculated chart |
 
 ---
 
@@ -210,7 +227,7 @@ Not a side-by-side chart viewer — a **unified visualization** that shows the r
 | 🐍 Backend | FastAPI + Python + Pydantic | ✅ In place |
 | 🗄️ Database | SQLite (dev) → PostgreSQL + pgvector (planned for prod) | ✅ In place |
 | 🌟 Calculation | Swiss Ephemeris behind a service boundary | ✅ In place |
-| 🧩 AI | Multi-provider model abstraction | ⬜ Planned |
+| 🧩 AI | Claude (`anthropic` SDK), one provider so far | ✅ Single-turn Q&A in place |
 | 📚 Knowledge | RAG over curated astrology material | ⬜ Planned |
 
 ---
