@@ -302,6 +302,16 @@ export interface JournalEntryListResponse {
   entries: JournalEntry[];
 }
 
+// --- AI Guide --------------------------------------------------------------
+
+export type AiSystem = "vedic" | "western" | "compare";
+
+export interface AiChatResponse {
+  answer: string;
+  system_used: AiSystem;
+  model: string;
+}
+
 /** The shape every backend error response takes (`app/api/errors.py`). */
 export interface ApiErrorResponse {
   code: string;

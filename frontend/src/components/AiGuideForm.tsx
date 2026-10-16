@@ -1,0 +1,95 @@
+"use client";
+
+import { useActionState } from "react";
+
+import { askAiGuideAction, type AiChatFormState } from "@/app/ai-actions";
+import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
+import { Field } from "@/components/Field";
+import type { AiSystem } from "@/lib/types";
+
+const INITIAL_STATE: AiChatFormState = { status: "idle" };
+
+const SYSTEM_OPTIONS: { value: AiSystem; label: string }[] = [
+  { value: "vedic", label: "Vedic (Rashi / D1)" },
+  { value: "western", label: "Western (Tropical)" },
+  { value: "compare", label: "Compare both" },
+];
+
+export function AiGuideForm() {
+  const [state, formAction, isPending] = useActionState(
+    askAiGuideAction,
+    INITIAL_STATE,
+  );
+  const fieldErrors = state.status === "error" ? state.fieldErrors : {};
+
+  return (
+    <section className="flex flex-col gap-6 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
+      <div>
+        <h2 className="text-lg font-semibold text-amber-300">
+          Ask the AI Guide
+        </h2>
+        <p className="text-sm text-slate-500">
+          The calculated chart below is given to the AI as-is - it
+          interprets, it never recalculates. Offered for reflection, not as
+          scientifically validated prediction, and not a substitute for
+          medical, legal, or financial advice.
+        </p>
+      </div>
+
+      <form action={formAction} className="flex flex-col gap-5">
+        <div className="flex gap-4 text-sm text-slate-300">
+          {SYSTEM_OPTIONS.map((option) => (
+            <label key={option.value} className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="system"
+                value={option.value}
+                defaultChecked={option.value === "vedic"}
+                className="accent-amber-400"
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+
+        <BirthFieldsFieldset fieldErrors={fieldErrors} />
+
+        <Field label="Your question" error={fieldErrors["question"]}>
+          <textarea
+            name="question"
+            required
+            rows={3}
+            maxLength={2000}
+            placeholder="What does my Moon's nakshatra suggest about my temperament?"
+            className="input"
+          />
+        </Field>
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="self-start rounded-md bg-amber-400 px-5 py-2 font-medium text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isPending ? "Asking…" : "Ask"}
+        </button>
+
+        {state.status === "error" && (
+          <p role="alert" className="text-sm text-red-400">
+            {state.message}
+          </p>
+        )}
+      </form>
+
+      {state.status === "success" && (
+        <div className="flex flex-col gap-2 rounded-md border border-amber-900/40 bg-amber-950/20 p-4">
+          <p className="whitespace-pre-wrap text-sm text-slate-100">
+            {state.answer}
+          </p>
+          <span className="text-xs text-slate-500">
+            {state.systemUsed} · {state.model}
+          </span>
+        </div>
+      )}
+    </section>
+  );
+}

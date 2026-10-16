@@ -24,7 +24,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI Guide (single-turn Q&A, Claude) | ✅ Implemented - no RAG or saved history yet |
-| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal |
+| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide |
 
 | 📄 Document | What it covers |
 |---|---|
@@ -127,11 +127,14 @@ and read entirely server-side (Next.js Server Actions and Server
 Components - the token is never exposed to client JavaScript). Logged in,
 you can save your one birth profile (product spec §28) so you don't have
 to retype it every time, and keep journal entries (product spec §16:
-reflective, not predictive) with full create/edit/delete. The AI Guide and
-the celestial visualization layer are still to come; see
-`frontend/.env.example` for the one setting it reads (`BACKEND_URL`, only
-needed if the backend isn't on
-its default port).
+reflective, not predictive) with full create/edit/delete. You can also ask
+the AI Guide a question grounded in a calculated chart - no account
+needed, same as the chart form - but it requires the backend to have
+`ANTHROPIC_API_KEY` set, or the form will show the backend's "AI guide
+isn't answering right now" message. The celestial visualization layer is
+still to come; see `frontend/.env.example` for the one setting this app
+reads (`BACKEND_URL`, only needed if the backend isn't on its default
+port).
 
 The API call happens in a [Server Function](https://nextjs.org/docs/app/getting-started/mutating-data)
 (`frontend/src/app/actions.ts`), not in the browser - the backend never

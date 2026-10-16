@@ -1,4 +1,5 @@
 import { AccountBar } from "@/components/AccountBar";
+import { AiGuideForm } from "@/components/AiGuideForm";
 import { BirthDataForm } from "@/components/BirthDataForm";
 import { JournalSection } from "@/components/JournalSection";
 import { ProfileSection } from "@/components/ProfileSection";
@@ -22,6 +23,8 @@ export default function Home() {
       <JournalSection />
 
       <BirthDataForm />
+
+      <AiGuideForm />
     </main>
   );
 }
