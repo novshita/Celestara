@@ -16,6 +16,8 @@ import type {
   BirthData,
   BirthProfileResponse,
   CompareChartResponse,
+  JournalEntry,
+  JournalEntryListResponse,
   TransitReportResponse,
   UserResponse,
   VedicChartResponse,
@@ -78,6 +80,15 @@ async function post<T>(
 ): Promise<T> {
   const response = await request(path, {
     method: "POST",
+    body: JSON.stringify(body),
+    token,
+  });
+  return response.json() as Promise<T>;
+}
+
+async function put<T>(path: string, body: unknown, token?: string): Promise<T> {
+  const response = await request(path, {
+    method: "PUT",
     body: JSON.stringify(body),
     token,
   });
@@ -161,4 +172,36 @@ export async function saveProfile(
     token,
   });
   return response.json() as Promise<BirthProfileResponse>;
+}
+
+export async function listJournalEntries(token: string): Promise<JournalEntry[]> {
+  const response = await request("/api/v1/journal", { method: "GET", token });
+  const body = (await response.json()) as JournalEntryListResponse;
+  return body.entries;
+}
+
+export async function createJournalEntry(
+  token: string,
+  title: string,
+  body: string,
+): Promise<JournalEntry> {
+  return post<JournalEntry>("/api/v1/journal", { title, body }, token);
+}
+
+export async function updateJournalEntry(
+  token: string,
+  id: number,
+  title: string,
+  body: string,
+): Promise<JournalEntry> {
+  return put<JournalEntry>(`/api/v1/journal/${id}`, { title, body }, token);
+}
+
+/** 204 response, no body - doesn't go through `post()`/`put()`, which both
+ * expect a JSON body back. */
+export async function deleteJournalEntry(
+  token: string,
+  id: number,
+): Promise<void> {
+  await request(`/api/v1/journal/${id}`, { method: "DELETE", token });
 }

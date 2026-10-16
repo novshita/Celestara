@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Field } from "@/components/Field";
 import type { BirthData, BirthTimeConfidence } from "@/lib/types";
 
 const TIME_CONFIDENCE_OPTIONS: { value: BirthTimeConfidence; label: string }[] = [
@@ -9,27 +10,6 @@ const TIME_CONFIDENCE_OPTIONS: { value: BirthTimeConfidence; label: string }[] =
   { value: "ESTIMATED", label: "Estimated - approximately" },
   { value: "UNKNOWN", label: "Unknown - I don't know it" },
 ];
-
-export function Field({
-  label,
-  error,
-  hint,
-  children,
-}: {
-  label: string;
-  error?: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="flex flex-col gap-1 text-sm text-slate-300">
-      <span>{label}</span>
-      {children}
-      {hint && !error && <span className="text-xs text-slate-500">{hint}</span>}
-      {error && <span className="text-xs text-red-400">{error}</span>}
-    </label>
-  );
-}
 
 /**
  * The six birth-data inputs, shared between the calculation form

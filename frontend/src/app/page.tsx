@@ -1,5 +1,6 @@
 import { AccountBar } from "@/components/AccountBar";
 import { BirthDataForm } from "@/components/BirthDataForm";
+import { JournalSection } from "@/components/JournalSection";
 import { ProfileSection } from "@/components/ProfileSection";
 
 export default function Home() {
@@ -17,6 +18,8 @@ export default function Home() {
       <AccountBar />
 
       <ProfileSection />
+
+      <JournalSection />
 
       <BirthDataForm />
     </main>
