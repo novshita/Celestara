@@ -10,6 +10,7 @@ shape to send.
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -439,3 +440,51 @@ class JournalEntryResponse(BaseModel):
 
 class JournalEntryListResponse(BaseModel):
     entries: tuple[JournalEntryResponse, ...]
+
+
+# --- AI Guide ----------------------------------------------------------
+
+
+class AiChatRequest(BaseModel):
+    """One grounded question about one calculated chart.
+
+    No conversation id and no history: this is a single turn, not a chat
+    session - see `app/services/ai/service.py` for why that's deliberate for
+    now rather than an oversight.
+    """
+
+    birth: BirthData
+    system: Literal["vedic", "western", "compare"] = "vedic"
+    question: str = Field(min_length=1, max_length=2000)
+    config: CalculationConfig | None = None
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "summary": "Ask about the Vedic chart",
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "birth_time": "14:30:00",
+                            "time_confidence": "EXACT",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                            "timezone_name": "Asia/Kolkata",
+                        },
+                        "system": "vedic",
+                        "question": "What does my Moon's nakshatra suggest "
+                        "about my emotional temperament?",
+                    },
+                },
+            ]
+        }
+    }
+
+
+class AiChatResponse(BaseModel):
+    """The AI's answer, plus enough to reproduce how it was grounded."""
+
+    answer: str
+    system_used: Literal["vedic", "western", "compare"]
+    model: str

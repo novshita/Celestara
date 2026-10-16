@@ -22,6 +22,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.domain.birth_data import InvalidBirthDataError
+from app.services.ai.service import AIProviderError
 from app.services.astrology.common.ephemeris import EphemerisError
 from app.services.astrology.vedic.dasha import DashaUnavailableError
 from app.services.auth.service import (
@@ -48,6 +49,7 @@ class ErrorCode(str, Enum):
     INVALID_CREDENTIALS = "INVALID_CREDENTIALS"
     AUTH_REQUIRED = "AUTH_REQUIRED"
     NOT_FOUND = "NOT_FOUND"
+    AI_UNAVAILABLE = "AI_UNAVAILABLE"
 
 
 class ErrorResponse(BaseModel):
@@ -222,6 +224,22 @@ def register_error_handlers(app: FastAPI) -> None:
             "No journal entry with this id was found.",
         )
 
+    @app.exception_handler(AIProviderError)
+    async def _ai_unavailable(
+        request: Request, exc: AIProviderError
+    ) -> JSONResponse:
+        """The AI provider itself failed - rate limited, unreachable, or
+        erroring. Never forwarded: could contain provider-internal detail
+        (engineering spec §33), logged instead for someone to investigate.
+        """
+        logger.error("AI provider failure [request_id=%s]: %s", _request_id(request), exc)
+        return _response(
+            request,
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            ErrorCode.AI_UNAVAILABLE,
+            "The AI guide isn't answering right now. Please try again shortly.",
+        )
+
     @app.exception_handler(Exception)
     async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
         """Last resort: never let a stack trace reach the client."""
@@ -349,5 +367,14 @@ NOT_FOUND_RESPONSES: dict[int | str, dict[str, object]] = {
         "No matching resource was found",
         ErrorCode.NOT_FOUND,
         "No journal entry with this id was found.",
+    ),
+}
+
+AI_CHAT_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
+    **BIRTH_DATA_ERROR_RESPONSES,
+    503: error_response(
+        "The AI provider could not be reached",
+        ErrorCode.AI_UNAVAILABLE,
+        "The AI guide isn't answering right now. Please try again shortly.",
     ),
 }
