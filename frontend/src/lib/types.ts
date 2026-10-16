@@ -288,6 +288,20 @@ export interface BirthProfileResponse {
   updated_at: string;
 }
 
+// --- Journal ---------------------------------------------------------------
+
+export interface JournalEntry {
+  id: number;
+  title: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JournalEntryListResponse {
+  entries: JournalEntry[];
+}
+
 /** The shape every backend error response takes (`app/api/errors.py`). */
 export interface ApiErrorResponse {
   code: string;
