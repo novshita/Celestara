@@ -312,6 +312,14 @@ export interface AiChatResponse {
   model: string;
 }
 
+// --- Readings --------------------------------------------------------------
+
+export interface DailyReadingResponse {
+  reading: string;
+  model: string;
+  generated_for: string;
+}
+
 /** The shape every backend error response takes (`app/api/errors.py`). */
 export interface ApiErrorResponse {
   code: string;
