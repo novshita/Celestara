@@ -488,3 +488,43 @@ class AiChatResponse(BaseModel):
     answer: str
     system_used: Literal["vedic", "western", "compare"]
     model: str
+
+
+# --- Readings ------------------------------------------------------------
+
+
+class DailyReadingRequest(BaseModel):
+    """A general daily reading, grounded in today's transits against the
+    natal chart (product spec §13). Vedic only for now - the Compare/Western
+    equivalents are a later reading category, not this one."""
+
+    birth: BirthData
+    config: CalculationConfig | None = None
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "value": {
+                        "birth": {
+                            "birth_date": "1990-08-15",
+                            "birth_time": "14:30:00",
+                            "time_confidence": "EXACT",
+                            "latitude": 18.9756,
+                            "longitude": 72.8258,
+                            "timezone_name": "Asia/Kolkata",
+                        },
+                    },
+                },
+            ]
+        }
+    }
+
+
+class DailyReadingResponse(BaseModel):
+    reading: str
+    model: str
+    generated_for: datetime
+    """The UTC moment the transits were calculated for - the same quantised
+    "now" `/transits` itself would report, so the reading can be shown
+    alongside its grounding data without a mismatched timestamp."""

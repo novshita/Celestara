@@ -18,6 +18,7 @@ returns.
 from __future__ import annotations
 
 from app.domain.compare import ChartComparison
+from app.domain.transit import TransitReport
 from app.domain.vedic import VedicChart
 from app.domain.western import WesternChart
 
@@ -141,4 +142,40 @@ def format_compare_context(comparison: ChartComparison) -> str:
             comparison.metadata.unavailable,
         )
     )
+    return "\n".join(lines)
+
+
+def format_daily_reading_context(report: TransitReport) -> str:
+    """For `generate_daily_reading` - the natal chart's bearing (Ascendant,
+    Moon rashi) plus each graha's current transit against it, exactly as a
+    user would see at `/transits/vedic` for the same birth record."""
+    lines = [
+        "System: Vedic (sidereal) - today's transits (Gochar) related to "
+        "the natal chart.",
+        f"Moment: {report.snapshot.moment.isoformat()} (UTC).",
+    ]
+
+    if report.natal_ascendant_rashi:
+        lines.append(f"Natal Ascendant: {report.natal_ascendant_rashi}.")
+    if report.natal_moon_rashi:
+        lines.append(f"Natal Moon rashi: {report.natal_moon_rashi}.")
+
+    lines.append("Transits:")
+    for item in report.transits:
+        retro = " (retrograde)" if item.transit.retrograde else ""
+        returned = " - returned to its natal rashi" if item.in_natal_rashi else ""
+        bhava = (
+            f", currently crossing bhava {item.bhava_from_ascendant} from "
+            f"the Ascendant"
+            if item.bhava_from_ascendant is not None
+            else ""
+        )
+        lines.append(
+            f"- {item.graha}: natal {item.natal_rashi}, now transiting "
+            f"{item.transit.rashi}{retro}, "
+            f"{item.separation_from_natal:.1f} degrees from its natal "
+            f"position{bhava}{returned}."
+        )
+
+    lines.append(_caveats((), report.unavailable))
     return "\n".join(lines)

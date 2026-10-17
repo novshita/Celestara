@@ -24,6 +24,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI Guide (single-turn Q&A, Claude) | ✅ Implemented - no RAG or saved history yet |
+| 📖 Daily reading (grounded in live transits) | ✅ Implemented - general reading only, no topics/follow-ups yet |
 | 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide |
 
 | 📄 Document | What it covers |
@@ -70,10 +71,10 @@ curl localhost:8000/api/v1/profile -H "Authorization: Bearer $TOKEN"
 
 ### 🤖 AI Guide
 
-`/api/v1/ai/chat` requires `ANTHROPIC_API_KEY` to be set (see
-`backend/.env.example`) - without it the endpoint returns `503
-AI_UNAVAILABLE` rather than crashing. No account needed; one question in,
-one grounded answer out, no history kept yet:
+Both `/api/v1/ai/chat` and `/api/v1/readings/daily` require
+`ANTHROPIC_API_KEY` to be set (see `backend/.env.example`) - without it
+they return `503 AI_UNAVAILABLE` rather than crashing. No account needed
+for either:
 
 ```bash
 curl -X POST localhost:8000/api/v1/ai/chat \
@@ -82,7 +83,14 @@ curl -X POST localhost:8000/api/v1/ai/chat \
     "system": "vedic",
     "question": "What does my Moon'"'"'s nakshatra suggest about my temperament?"
   }'
+
+curl -X POST localhost:8000/api/v1/readings/daily \
+  -d '{"birth": {"birth_date": "1990-08-15", "birth_time": "14:30:00", "time_confidence": "EXACT", "latitude": 18.9756, "longitude": 72.8258, "timezone_name": "Asia/Kolkata"}}'
 ```
+
+The daily reading is always grounded in today's transits (recalculated on
+every call, never cached or templated) against the natal chart - the same
+transit calculation `/transits/vedic` uses.
 
 ### 🌐 API Endpoints
 
@@ -105,6 +113,7 @@ All calculation endpoints are namespaced under `/api/v1`.
 | `GET`/`PUT`/`DELETE` | `/api/v1/journal/{id}` | Read, edit, or remove an entry |
 | `DELETE` | `/api/v1/account/data` | Permanently delete the account and all its data |
 | `POST` | `/api/v1/ai/chat` | Ask the AI Guide a question grounded in one calculated chart |
+| `POST` | `/api/v1/readings/daily` | Generate a daily reading grounded in today's transits |
 
 ---
 

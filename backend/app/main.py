@@ -17,7 +17,18 @@ from fastapi import FastAPI, Request
 from fastapi.responses import Response
 
 from app.api.errors import new_request_id, register_error_handlers
-from app.api.routes import account, ai, auth, charts, dashas, health, journal, profile, transits
+from app.api.routes import (
+    account,
+    ai,
+    auth,
+    charts,
+    dashas,
+    health,
+    journal,
+    profile,
+    readings,
+    transits,
+)
 from app.core.logging import configure_logging
 from app.db.models import Base
 from app.db.session import engine
@@ -93,3 +104,4 @@ app.include_router(profile.router, prefix=API_PREFIX)
 app.include_router(journal.router, prefix=API_PREFIX)
 app.include_router(account.router, prefix=API_PREFIX)
 app.include_router(ai.router, prefix=API_PREFIX)
+app.include_router(readings.router, prefix=API_PREFIX)
