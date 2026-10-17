@@ -18,6 +18,7 @@ import type {
   BirthData,
   BirthProfileResponse,
   CompareChartResponse,
+  DailyReadingResponse,
   JournalEntry,
   JournalEntryListResponse,
   TransitReportResponse,
@@ -216,4 +217,13 @@ export async function askAiGuide(
   question: string,
 ): Promise<AiChatResponse> {
   return post<AiChatResponse>("/api/v1/ai/chat", { birth, system, question });
+}
+
+/** No auth required, same as `askAiGuide` - and always grounded in today's
+ * transits, recalculated on every call (product spec §13: never a static
+ * template). */
+export async function getDailyReading(
+  birth: BirthData,
+): Promise<DailyReadingResponse> {
+  return post<DailyReadingResponse>("/api/v1/readings/daily", { birth });
 }

@@ -25,7 +25,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI Guide (single-turn Q&A, Claude) | ✅ Implemented - no RAG or saved history yet |
 | 📖 Daily reading (grounded in live transits) | ✅ Implemented - general reading only, no topics/follow-ups yet |
-| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide |
+| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide, daily reading |
 
 | 📄 Document | What it covers |
 |---|---|
@@ -137,12 +137,13 @@ Components - the token is never exposed to client JavaScript). Logged in,
 you can save your one birth profile (product spec §28) so you don't have
 to retype it every time, and keep journal entries (product spec §16:
 reflective, not predictive) with full create/edit/delete. You can also ask
-the AI Guide a question grounded in a calculated chart - no account
-needed, same as the chart form - but it requires the backend to have
-`ANTHROPIC_API_KEY` set, or the form will show the backend's "AI guide
-isn't answering right now" message. The celestial visualization layer is
-still to come; see `frontend/.env.example` for the one setting this app
-reads (`BACKEND_URL`, only needed if the backend isn't on its default
+the AI Guide a question grounded in a calculated chart, or get a daily
+reading grounded in today's transits - neither needs an account, same as
+the chart form - but both require the backend to have `ANTHROPIC_API_KEY`
+set, or the forms will show the backend's "AI guide isn't answering right
+now" message. The celestial visualization layer is still to come; see
+`frontend/.env.example` for the one setting this app reads (`BACKEND_URL`,
+only needed if the backend isn't on its default
 port).
 
 The API call happens in a [Server Function](https://nextjs.org/docs/app/getting-started/mutating-data)
