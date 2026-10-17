@@ -1,21 +1,23 @@
-"""The AI Guide: a single grounded question-and-answer turn.
+"""The AI layer: grounded question-answering and generated readings.
 
 Deliberately the smallest useful slice of engineering spec §13-16's AI
 orchestration layer. No RAG (§17) and no persisted conversation (§19's
 `Conversation`/`ConversationMessage`/`Memory`) yet - both are separate,
 later features once the decisions they need (a knowledge source to index;
-a conversation data model) have actually been made. This endpoint only
-grounds one question in one already-calculated chart and answers it.
+a conversation data model) have actually been made. Everything here grounds
+one request in already-calculated data and produces one piece of text -
+nothing is stored, and nothing recomputes a position.
 
 Product spec §1: "The system calculates. The AI interprets. The user
-decides." This module is the second sentence only - it never recomputes a
-position, and the chart it is given is exactly what `/charts/*` would have
+decides." This module is the second sentence only - the chart or transit
+data it is given is exactly what `/charts/*` or `/transits/*` would have
 returned for the same birth data.
 """
 
 from __future__ import annotations
 
 import os
+from datetime import datetime
 
 import anthropic
 
@@ -23,10 +25,12 @@ from app.core.config import DEFAULT_CALCULATION_CONFIG, CalculationConfig
 from app.domain.birth_data import BirthData
 from app.services.ai.context import (
     format_compare_context,
+    format_daily_reading_context,
     format_vedic_context,
     format_western_context,
 )
 from app.services.astrology.compare.service import calculate_comparison
+from app.services.astrology.transit.service import calculate_transits
 from app.services.astrology.vedic.d1 import calculate_d1_chart
 from app.services.astrology.western.chart import calculate_western_chart
 
@@ -68,7 +72,8 @@ plainly rather than filling the gap yourself.
 6. Stay inside astrology and this person's chart - you are not a \
 general-purpose chatbot.
 
-Answer the question using only the calculated facts given below.\
+Follow the task instructions in each message, using only the calculated \
+facts given there.\
 """
 
 
@@ -105,25 +110,14 @@ def _build_context(
     return format_vedic_context(calculate_d1_chart(birth, config))
 
 
-def answer_question(
-    birth: BirthData,
-    system: str,
-    question: str,
-    config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
-) -> str:
-    """Ground `question` in the requested chart system and ask Claude.
+def _call_claude(user_content: str, declined_message: str) -> str:
+    """Send one grounded prompt to Claude and return its text.
 
-    Raises whatever the underlying chart calculation raises (the same
-    `InvalidBirthDataError`/`EphemerisError` paths as `/charts/*`) for a bad
-    birth record, and `AIProviderError` if the model itself cannot be
-    reached - the two are deliberately not conflated, since the first means
-    the request was bad and the second means an upstream dependency is down.
+    Shared by every AI-layer entry point (chat, readings, and whatever is
+    added next): the failure handling, model selection, and refusal
+    fallback are identical regardless of what task the user content asks
+    for - only the prompt itself differs per caller.
     """
-    chart_context = _build_context(system, birth, config)
-    user_content = (
-        f"CALCULATED FACTS\n{chart_context}\n\nUSER QUESTION\n{question}"
-    )
-
     try:
         response = _client().messages.create(
             model=current_model(),
@@ -148,11 +142,74 @@ def answer_question(
         raise AIProviderError("AI provider call failed") from exc
 
     if response.stop_reason == "refusal":
-        return (
-            "I'm not able to answer that one. Feel free to rephrase the "
-            "question, or ask something else about this chart."
-        )
+        return declined_message
 
     return next(
         (block.text for block in response.content if block.type == "text"), ""
     )
+
+
+def answer_question(
+    birth: BirthData,
+    system: str,
+    question: str,
+    config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+) -> str:
+    """Ground `question` in the requested chart system and ask Claude.
+
+    Raises whatever the underlying chart calculation raises (the same
+    `InvalidBirthDataError`/`EphemerisError` paths as `/charts/*`) for a bad
+    birth record, and `AIProviderError` if the model itself cannot be
+    reached - the two are deliberately not conflated, since the first means
+    the request was bad and the second means an upstream dependency is down.
+    """
+    chart_context = _build_context(system, birth, config)
+    user_content = (
+        f"TASK\nAnswer the user's question using only the calculated facts "
+        f"below.\n\nCALCULATED FACTS\n{chart_context}\n\n"
+        f"USER QUESTION\n{question}"
+    )
+    return _call_claude(
+        user_content,
+        declined_message=(
+            "I'm not able to answer that one. Feel free to rephrase the "
+            "question, or ask something else about this chart."
+        ),
+    )
+
+
+def generate_daily_reading(
+    birth: BirthData,
+    config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+) -> tuple[str, datetime]:
+    """A general daily reading grounded in today's transits against the
+    natal chart - product spec §13: "Daily readings use current calculated
+    planetary/transit data," and "should not generate readings from static
+    templates alone when current transit data is relevant." The transit
+    calculation is identical to `/transits/vedic` - same function, same
+    "now" moment resolution - so this is never grounded in stale data.
+
+    Returns `(reading, generated_for)`: the second lets the API response
+    report exactly which quantised moment the reading was grounded in,
+    without recomputing the transit snapshot a second time.
+
+    This is the "general daily reading" from spec §13's list; topic
+    selection and follow-up questions are separate, later features.
+    """
+    report = calculate_transits(birth, config=config)
+    context = format_daily_reading_context(report)
+    user_content = (
+        "TASK\nWrite a short daily reading (3-5 sentences) for this person, "
+        "grounded only in the calculated facts below. Mention one or two "
+        "transits that stand out today rather than listing everything. "
+        "Keep the tone calm and reflective, not predictive.\n\n"
+        f"CALCULATED FACTS\n{context}"
+    )
+    reading = _call_claude(
+        user_content,
+        declined_message=(
+            "I'm not able to generate a reading right now. Please try "
+            "again shortly."
+        ),
+    )
+    return reading, report.snapshot.moment
