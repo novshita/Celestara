@@ -8,7 +8,7 @@
  * client JavaScript, so nothing here specifies the backend's location either.
  */
 
-// import "server-only";
+import "server-only";
 
 import type {
   AiChatResponse,
@@ -18,9 +18,10 @@ import type {
   BirthData,
   BirthProfileResponse,
   CompareChartResponse,
-  DailyReadingResponse,
   JournalEntry,
   JournalEntryListResponse,
+  ReadingPeriod,
+  ReadingResponse,
   TransitReportResponse,
   UserResponse,
   VedicChartResponse,
@@ -221,9 +222,11 @@ export async function askAiGuide(
 
 /** No auth required, same as `askAiGuide` - and always grounded in today's
  * transits, recalculated on every call (product spec §13: never a static
- * template). */
-export async function getDailyReading(
+ * template). All three periods share one request/response shape; only the
+ * path differs. */
+export async function getReading(
   birth: BirthData,
-): Promise<DailyReadingResponse> {
-  return post<DailyReadingResponse>("/api/v1/readings/daily", { birth });
+  period: ReadingPeriod,
+): Promise<ReadingResponse> {
+  return post<ReadingResponse>(`/api/v1/readings/${period}`, { birth });
 }

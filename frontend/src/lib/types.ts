@@ -314,7 +314,9 @@ export interface AiChatResponse {
 
 // --- Readings --------------------------------------------------------------
 
-export interface DailyReadingResponse {
+export type ReadingPeriod = "daily" | "weekly" | "monthly";
+
+export interface ReadingResponse {
   reading: string;
   model: string;
   generated_for: string;

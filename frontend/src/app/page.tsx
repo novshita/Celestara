@@ -1,9 +1,9 @@
 import { AccountBar } from "@/components/AccountBar";
 import { AiGuideForm } from "@/components/AiGuideForm";
 import { BirthDataForm } from "@/components/BirthDataForm";
-import { DailyReadingForm } from "@/components/DailyReadingForm";
 import { JournalSection } from "@/components/JournalSection";
 import { ProfileSection } from "@/components/ProfileSection";
+import { ReadingForm } from "@/components/ReadingForm";
 
 export default function Home() {
   return (
@@ -25,7 +25,7 @@ export default function Home() {
 
       <BirthDataForm />
 
-      <DailyReadingForm />
+      <ReadingForm />
 
       <AiGuideForm />
     </main>

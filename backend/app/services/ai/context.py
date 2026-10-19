@@ -145,10 +145,13 @@ def format_compare_context(comparison: ChartComparison) -> str:
     return "\n".join(lines)
 
 
-def format_daily_reading_context(report: TransitReport) -> str:
-    """For `generate_daily_reading` - the natal chart's bearing (Ascendant,
-    Moon rashi) plus each graha's current transit against it, exactly as a
-    user would see at `/transits/vedic` for the same birth record."""
+def format_transit_reading_context(report: TransitReport) -> str:
+    """For the daily/weekly/monthly reading generators - the natal chart's
+    bearing (Ascendant, Moon rashi) plus each graha's current transit
+    against it, exactly as a user would see at `/transits/vedic` for the
+    same birth record. All three reading periods ground in the same
+    present-moment transit snapshot; only the task instruction asking
+    Claude to write for "today"/"this week"/"this month" differs."""
     lines = [
         "System: Vedic (sidereal) - today's transits (Gochar) related to "
         "the natal chart.",

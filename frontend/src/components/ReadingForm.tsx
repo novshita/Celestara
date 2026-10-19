@@ -3,12 +3,19 @@
 import { useActionState } from "react";
 
 import {
-  requestDailyReadingAction,
-  type DailyReadingFormState,
+  requestReadingAction,
+  type ReadingFormState,
 } from "@/app/reading-actions";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
+import type { ReadingPeriod } from "@/lib/types";
 
-const INITIAL_STATE: DailyReadingFormState = { status: "idle" };
+const INITIAL_STATE: ReadingFormState = { status: "idle" };
+
+const PERIOD_OPTIONS: { value: ReadingPeriod; label: string }[] = [
+  { value: "daily", label: "Today" },
+  { value: "weekly", label: "This week" },
+  { value: "monthly", label: "This month" },
+];
 
 function formatMoment(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -20,9 +27,9 @@ function formatMoment(iso: string): string {
   });
 }
 
-export function DailyReadingForm() {
+export function ReadingForm() {
   const [state, formAction, isPending] = useActionState(
-    requestDailyReadingAction,
+    requestReadingAction,
     INITIAL_STATE,
   );
   const fieldErrors = state.status === "error" ? state.fieldErrors : {};
@@ -30,17 +37,31 @@ export function DailyReadingForm() {
   return (
     <section className="flex flex-col gap-6 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
       <div>
-        <h2 className="text-lg font-semibold text-amber-300">
-          Today&apos;s Reading
-        </h2>
+        <h2 className="text-lg font-semibold text-amber-300">Reading</h2>
         <p className="text-sm text-slate-500">
           Grounded in today&apos;s calculated transits against your chart -
-          recalculated every time, never a static template. Offered for
-          reflection, not prediction.
+          recalculated every time, never a static template. The week/month
+          views reflect on today&apos;s configuration, not a simulated
+          forecast. Offered for reflection, not prediction.
         </p>
       </div>
 
       <form action={formAction} className="flex flex-col gap-5">
+        <div className="flex gap-4 text-sm text-slate-300">
+          {PERIOD_OPTIONS.map((option) => (
+            <label key={option.value} className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="period"
+                value={option.value}
+                defaultChecked={option.value === "daily"}
+                className="accent-amber-400"
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+
         <BirthFieldsFieldset fieldErrors={fieldErrors} />
 
         <button
@@ -48,7 +69,7 @@ export function DailyReadingForm() {
           disabled={isPending}
           className="self-start rounded-md bg-amber-400 px-5 py-2 font-medium text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isPending ? "Reading the sky…" : "Get today's reading"}
+          {isPending ? "Reading the sky…" : "Get my reading"}
         </button>
 
         {state.status === "error" && (
