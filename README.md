@@ -24,8 +24,8 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI Guide (single-turn Q&A, Claude) | ✅ Implemented - no RAG or saved history yet |
-| 📖 Daily reading (grounded in live transits) | ✅ Implemented - general reading only, no topics/follow-ups yet |
-| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide, daily reading |
+| 📖 Daily/weekly/monthly readings (grounded in live transits) | ✅ Implemented - general reading only, no topics/follow-ups yet |
+| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide, readings |
 
 | 📄 Document | What it covers |
 |---|---|
@@ -71,10 +71,10 @@ curl localhost:8000/api/v1/profile -H "Authorization: Bearer $TOKEN"
 
 ### 🤖 AI Guide
 
-Both `/api/v1/ai/chat` and `/api/v1/readings/daily` require
-`ANTHROPIC_API_KEY` to be set (see `backend/.env.example`) - without it
-they return `503 AI_UNAVAILABLE` rather than crashing. No account needed
-for either:
+`/api/v1/ai/chat` and `/api/v1/readings/{daily,weekly,monthly}` all
+require `ANTHROPIC_API_KEY` to be set (see `backend/.env.example`) -
+without it they return `503 AI_UNAVAILABLE` rather than crashing. No
+account needed for any of them:
 
 ```bash
 curl -X POST localhost:8000/api/v1/ai/chat \
@@ -84,13 +84,16 @@ curl -X POST localhost:8000/api/v1/ai/chat \
     "question": "What does my Moon'"'"'s nakshatra suggest about my temperament?"
   }'
 
-curl -X POST localhost:8000/api/v1/readings/daily \
+curl -X POST localhost:8000/api/v1/readings/weekly \
   -d '{"birth": {"birth_date": "1990-08-15", "birth_time": "14:30:00", "time_confidence": "EXACT", "latitude": 18.9756, "longitude": 72.8258, "timezone_name": "Asia/Kolkata"}}'
 ```
 
-The daily reading is always grounded in today's transits (recalculated on
-every call, never cached or templated) against the natal chart - the same
-transit calculation `/transits/vedic` uses.
+All three reading periods are grounded in today's transits (recalculated
+on every call, never cached or templated) against the natal chart - the
+same transit calculation `/transits/vedic` uses. Weekly and monthly are
+reflections on *today's* configuration, not a simulated forecast across
+the period ahead - the prompt says so explicitly, rather than quietly
+implying analysis that isn't happening.
 
 ### 🌐 API Endpoints
 
@@ -114,6 +117,8 @@ All calculation endpoints are namespaced under `/api/v1`.
 | `DELETE` | `/api/v1/account/data` | Permanently delete the account and all its data |
 | `POST` | `/api/v1/ai/chat` | Ask the AI Guide a question grounded in one calculated chart |
 | `POST` | `/api/v1/readings/daily` | Generate a daily reading grounded in today's transits |
+| `POST` | `/api/v1/readings/weekly` | Generate a weekly reading grounded in today's transits |
+| `POST` | `/api/v1/readings/monthly` | Generate a monthly reading grounded in today's transits |
 
 ---
 

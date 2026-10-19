@@ -25,7 +25,7 @@ from app.core.config import DEFAULT_CALCULATION_CONFIG, CalculationConfig
 from app.domain.birth_data import BirthData
 from app.services.ai.context import (
     format_compare_context,
-    format_daily_reading_context,
+    format_transit_reading_context,
     format_vedic_context,
     format_western_context,
 )
@@ -178,38 +178,88 @@ def answer_question(
     )
 
 
-def generate_daily_reading(
-    birth: BirthData,
-    config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+#: Shared declined-message for every reading period - distinguished from
+#: the chat one since there's no question to rephrase, only a retry.
+_READING_DECLINED_MESSAGE = (
+    "I'm not able to generate a reading right now. Please try again shortly."
+)
+
+#: One task instruction per period. All three ground in the identical
+#: present-moment transit snapshot (`calculate_transits` doesn't take a
+#: date range - see its docstring); only what Claude is asked to write
+#: about that snapshot changes; a true week/month-ahead reading would need
+#: to sample transits across a date range, which is a larger, separate
+#: feature. Framed honestly to Claude as "today's configuration" rather
+#: than implying multi-day analysis that isn't happening.
+_READING_TASKS: dict[str, str] = {
+    "daily": (
+        "Write a short daily reading (3-5 sentences) for this person, "
+        "grounded only in the calculated facts below. Mention one or two "
+        "transits that stand out today rather than listing everything. "
+        "Keep the tone calm and reflective, not predictive."
+    ),
+    "weekly": (
+        "Write a short reading for the week ahead (4-6 sentences) for this "
+        "person, grounded only in the calculated facts below - today's "
+        "transiting positions, which will stay close to these signs and "
+        "bhavas for the next several days. Mention one or two transits "
+        "that stand out and how they might color the week. Keep the tone "
+        "calm and reflective, not predictive, and do not claim to know "
+        "what changes later in the week."
+    ),
+    "monthly": (
+        "Write a short reading for the month ahead (4-6 sentences) for "
+        "this person, grounded only in the calculated facts below - "
+        "today's transiting positions, which indicate the broader themes "
+        "in play as the month begins. Mention one or two transits that "
+        "stand out. Keep the tone calm and reflective, not predictive, "
+        "and do not claim to know what changes later in the month."
+    ),
+}
+
+
+def _generate_transit_reading(
+    birth: BirthData, config: CalculationConfig, period: str
 ) -> tuple[str, datetime]:
-    """A general daily reading grounded in today's transits against the
-    natal chart - product spec §13: "Daily readings use current calculated
-    planetary/transit data," and "should not generate readings from static
-    templates alone when current transit data is relevant." The transit
-    calculation is identical to `/transits/vedic` - same function, same
-    "now" moment resolution - so this is never grounded in stale data.
+    """Shared by `generate_daily_reading`/`generate_weekly_reading`/
+    `generate_monthly_reading` - product spec §13: "Daily readings use
+    current calculated planetary/transit data," and "should not generate
+    readings from static templates alone when current transit data is
+    relevant." The transit calculation is identical to `/transits/vedic` -
+    same function, same "now" moment resolution - so none of the three is
+    ever grounded in stale data.
 
     Returns `(reading, generated_for)`: the second lets the API response
     report exactly which quantised moment the reading was grounded in,
     without recomputing the transit snapshot a second time.
-
-    This is the "general daily reading" from spec §13's list; topic
-    selection and follow-up questions are separate, later features.
     """
     report = calculate_transits(birth, config=config)
-    context = format_daily_reading_context(report)
-    user_content = (
-        "TASK\nWrite a short daily reading (3-5 sentences) for this person, "
-        "grounded only in the calculated facts below. Mention one or two "
-        "transits that stand out today rather than listing everything. "
-        "Keep the tone calm and reflective, not predictive.\n\n"
-        f"CALCULATED FACTS\n{context}"
-    )
-    reading = _call_claude(
-        user_content,
-        declined_message=(
-            "I'm not able to generate a reading right now. Please try "
-            "again shortly."
-        ),
-    )
+    context = format_transit_reading_context(report)
+    user_content = f"TASK\n{_READING_TASKS[period]}\n\nCALCULATED FACTS\n{context}"
+    reading = _call_claude(user_content, declined_message=_READING_DECLINED_MESSAGE)
     return reading, report.snapshot.moment
+
+
+def generate_daily_reading(
+    birth: BirthData,
+    config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+) -> tuple[str, datetime]:
+    """The "general daily reading" from product spec §13's list; topic
+    selection and follow-up questions are separate, later features."""
+    return _generate_transit_reading(birth, config, "daily")
+
+
+def generate_weekly_reading(
+    birth: BirthData,
+    config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+) -> tuple[str, datetime]:
+    """The weekly reading from product spec §13's list."""
+    return _generate_transit_reading(birth, config, "weekly")
+
+
+def generate_monthly_reading(
+    birth: BirthData,
+    config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+) -> tuple[str, datetime]:
+    """The monthly reading from product spec §13's list."""
+    return _generate_transit_reading(birth, config, "monthly")

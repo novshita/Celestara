@@ -493,10 +493,12 @@ class AiChatResponse(BaseModel):
 # --- Readings ------------------------------------------------------------
 
 
-class DailyReadingRequest(BaseModel):
-    """A general daily reading, grounded in today's transits against the
-    natal chart (product spec §13). Vedic only for now - the Compare/Western
-    equivalents are a later reading category, not this one."""
+class ReadingRequest(BaseModel):
+    """A daily, weekly, or monthly reading (product spec §13), grounded in
+    today's transits against the natal chart - all three periods share this
+    request shape; only which endpoint you call differs. Vedic only for
+    now - the Compare/Western equivalents are a later reading category, not
+    this one."""
 
     birth: BirthData
     config: CalculationConfig | None = None
@@ -521,7 +523,7 @@ class DailyReadingRequest(BaseModel):
     }
 
 
-class DailyReadingResponse(BaseModel):
+class ReadingResponse(BaseModel):
     reading: str
     model: str
     generated_for: datetime
