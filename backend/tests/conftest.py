@@ -15,6 +15,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.core.config import DEFAULT_CALCULATION_CONFIG, CalculationConfig
+from app.core.rate_limit import ai_rate_limiter
 from app.db.models import Base
 from app.db.session import get_db
 from app.domain.birth_data import BirthData, BirthTimeConfidence
@@ -28,6 +29,16 @@ MUMBAI_LON = 72.8258
 
 #: 1990-08-15 14:30 IST == 09:00 UTC.
 REFERENCE_JD_UT = 2448118.875
+
+
+@pytest.fixture(autouse=True)
+def _fresh_ai_rate_limiter():
+    """The limiter is a process-wide singleton and every test client shares
+    one address, so without this a test's AI calls would count against the
+    next test's allowance. Tests that exercise the limit itself set their own
+    `AI_RATE_LIMIT_PER_MINUTE` via `monkeypatch`."""
+    ai_rate_limiter.reset()
+    yield
 
 
 @pytest.fixture

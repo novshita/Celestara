@@ -95,6 +95,17 @@ reflections on *today's* configuration, not a simulated forecast across
 the period ahead - the prompt says so explicitly, rather than quietly
 implying analysis that isn't happening.
 
+These endpoints are open to unauthenticated callers and every call costs
+money, so they are rate limited: 10 requests per minute per client, shared
+across all of them, answered with `429 RATE_LIMITED` and a `Retry-After`
+header (`AI_RATE_LIMIT_PER_MINUTE`, `0` to disable). The limit is
+in-memory - per process, reset on restart - which is enough for one
+instance; several workers would need a shared store. Because the frontend
+calls the API from its own server, all end users currently share one
+client address and therefore one allowance; see
+`RATE_LIMIT_TRUST_FORWARDED_FOR` in `backend/.env.example` for how to
+separate them behind a trusted proxy.
+
 ### 🌐 API Endpoints
 
 All calculation endpoints are namespaced under `/api/v1`.
