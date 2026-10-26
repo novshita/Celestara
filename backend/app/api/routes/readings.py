@@ -16,11 +16,12 @@ need a different, larger feature (sampling transits across a date range).
 
 from __future__ import annotations
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
 from app.api.errors import AI_CHAT_ERROR_RESPONSES
 from app.api.schemas import ReadingRequest, ReadingResponse
 from app.core.config import DEFAULT_CALCULATION_CONFIG
+from app.core.rate_limit import enforce_ai_rate_limit
 from app.services.ai.service import (
     current_model,
     generate_daily_reading,
@@ -28,7 +29,11 @@ from app.services.ai.service import (
     generate_weekly_reading,
 )
 
-router = APIRouter(prefix="/readings", tags=["readings"])
+router = APIRouter(
+    prefix="/readings",
+    tags=["readings"],
+    dependencies=[Depends(enforce_ai_rate_limit)],
+)
 
 
 @router.post(

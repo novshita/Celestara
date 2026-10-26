@@ -21,6 +21,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from app.core.rate_limit import RateLimitedError
 from app.domain.birth_data import InvalidBirthDataError
 from app.services.ai.service import AIProviderError
 from app.services.astrology.common.ephemeris import EphemerisError
@@ -50,6 +51,7 @@ class ErrorCode(str, Enum):
     AUTH_REQUIRED = "AUTH_REQUIRED"
     NOT_FOUND = "NOT_FOUND"
     AI_UNAVAILABLE = "AI_UNAVAILABLE"
+    RATE_LIMITED = "RATE_LIMITED"
 
 
 class ErrorResponse(BaseModel):
@@ -76,6 +78,7 @@ def _response(
     code: ErrorCode,
     message: str,
     field_errors: tuple[dict[str, str], ...] = (),
+    headers: dict[str, str] | None = None,
 ) -> JSONResponse:
     body = ErrorResponse(
         code=code,
@@ -83,7 +86,11 @@ def _response(
         field_errors=field_errors,
         request_id=_request_id(request),
     )
-    return JSONResponse(status_code=status_code, content=body.model_dump(mode="json"))
+    return JSONResponse(
+        status_code=status_code,
+        content=body.model_dump(mode="json"),
+        headers=headers,
+    )
 
 
 def register_error_handlers(app: FastAPI) -> None:
@@ -222,6 +229,26 @@ def register_error_handlers(app: FastAPI) -> None:
             status.HTTP_404_NOT_FOUND,
             ErrorCode.NOT_FOUND,
             "No journal entry with this id was found.",
+        )
+
+    @app.exception_handler(RateLimitedError)
+    async def _rate_limited(
+        request: Request, exc: RateLimitedError
+    ) -> JSONResponse:
+        """The caller has spent its AI allowance for now.
+
+        The wait is part of the message (safe to show, and it is the one
+        thing a person can act on) and also sent as `Retry-After`, which is
+        what a well-behaved client keys off.
+        """
+        seconds = exc.retry_after_seconds
+        return _response(
+            request,
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            ErrorCode.RATE_LIMITED,
+            f"Too many requests. Please wait {seconds} second"
+            f"{'' if seconds == 1 else 's'} and try again.",
+            headers={"Retry-After": str(seconds)},
         )
 
     @app.exception_handler(AIProviderError)
@@ -372,6 +399,11 @@ NOT_FOUND_RESPONSES: dict[int | str, dict[str, object]] = {
 
 AI_CHAT_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
     **BIRTH_DATA_ERROR_RESPONSES,
+    429: error_response(
+        "This client has used its AI allowance for the current minute",
+        ErrorCode.RATE_LIMITED,
+        "Too many requests. Please wait 12 seconds and try again.",
+    ),
     503: error_response(
         "The AI provider could not be reached",
         ErrorCode.AI_UNAVAILABLE,

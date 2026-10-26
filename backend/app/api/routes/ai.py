@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
 from app.api.errors import AI_CHAT_ERROR_RESPONSES
 from app.api.schemas import AiChatRequest, AiChatResponse
 from app.core.config import DEFAULT_CALCULATION_CONFIG
+from app.core.rate_limit import enforce_ai_rate_limit
 from app.services.ai.service import answer_question, current_model
 
-router = APIRouter(prefix="/ai", tags=["ai"])
+router = APIRouter(
+    prefix="/ai", tags=["ai"], dependencies=[Depends(enforce_ai_rate_limit)]
+)
 
 
 @router.post(
