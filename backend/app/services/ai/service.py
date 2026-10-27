@@ -17,17 +17,30 @@ returned for the same birth data.
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 from datetime import datetime
 
 import anthropic
 
 from app.core.config import DEFAULT_CALCULATION_CONFIG, CalculationConfig
+from app.domain.ai import Intent
 from app.domain.birth_data import BirthData
 from app.services.ai.context import (
     format_compare_context,
     format_transit_reading_context,
     format_vedic_context,
     format_western_context,
+)
+from app.services.ai.intent import classify_intent
+from app.services.ai.safety import (
+    CRISIS_RESPONSE,
+    SAFE_FALLBACK_CHAT,
+    SAFE_FALLBACK_READING,
+    UNSUPPORTED_RESPONSE,
+    assess_question,
+    check_output,
+    notice_for,
+    safety_context,
 )
 from app.services.astrology.compare.service import calculate_comparison
 from app.services.astrology.transit.service import calculate_transits
@@ -72,8 +85,9 @@ plainly rather than filling the gap yourself.
 6. Stay inside astrology and this person's chart - you are not a \
 general-purpose chatbot.
 
-Follow the task instructions in each message, using only the calculated \
-facts given there.\
+If a SAFETY CONTEXT section is present it takes priority over how the \
+question is phrased. Follow the task instructions in each message, using \
+only the calculated facts given there.\
 """
 
 
@@ -149,32 +163,90 @@ def _call_claude(user_content: str, declined_message: str) -> str:
     )
 
 
+@dataclass(frozen=True)
+class ChatResult:
+    """What `answer_question` decided and produced.
+
+    `model_used` is False for the two answers that never reach the model - a
+    crisis and an off-topic request - so the API can say so honestly instead
+    of naming a model that wrote nothing.
+    """
+
+    answer: str
+    intent: Intent
+    notice: str | None
+    safety_flags: tuple[str, ...]
+    model_used: bool
+
+
 def answer_question(
     birth: BirthData,
     system: str,
     question: str,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
-) -> str:
-    """Ground `question` in the requested chart system and ask Claude.
+) -> ChatResult:
+    """Ground `question` in the requested chart system and ask Claude, with
+    the safety pipeline (engineering spec §30) around the model call.
 
     Raises whatever the underlying chart calculation raises (the same
     `InvalidBirthDataError`/`EphemerisError` paths as `/charts/*`) for a bad
     birth record, and `AIProviderError` if the model itself cannot be
     reached - the two are deliberately not conflated, since the first means
     the request was bad and the second means an upstream dependency is down.
+
+    The two short-circuits run before any chart is calculated. A crisis must
+    never be held up by, or turned into, a birth-data error; an off-topic
+    request has no use for a chart.
     """
+    assessment = assess_question(question)
+    intent = classify_intent(question, system, assessment)
+
+    if assessment.crisis:
+        return ChatResult(
+            answer=CRISIS_RESPONSE,
+            intent=Intent.HIGH_STAKES,
+            notice=None,
+            safety_flags=("crisis",),
+            model_used=False,
+        )
+
+    if intent is Intent.UNSUPPORTED:
+        return ChatResult(
+            answer=UNSUPPORTED_RESPONSE,
+            intent=intent,
+            notice=None,
+            safety_flags=(),
+            model_used=False,
+        )
+
     chart_context = _build_context(system, birth, config)
+    safety_block = safety_context(assessment)
+    safety_section = f"SAFETY CONTEXT\n{safety_block}\n\n" if safety_block else ""
     user_content = (
         f"TASK\nAnswer the user's question using only the calculated facts "
-        f"below.\n\nCALCULATED FACTS\n{chart_context}\n\n"
+        f"below.\n\n{safety_section}CALCULATED FACTS\n{chart_context}\n\n"
         f"USER QUESTION\n{question}"
     )
-    return _call_claude(
+    answer = _call_claude(
         user_content,
         declined_message=(
             "I'm not able to answer that one. Feel free to rephrase the "
             "question, or ask something else about this chart."
         ),
+    )
+
+    # Post-generation: whatever the model said, an answer that asserts
+    # certainty or tells someone how to decide gets replaced, not shown.
+    flags = check_output(answer)
+    if flags:
+        answer = SAFE_FALLBACK_CHAT
+
+    return ChatResult(
+        answer=answer,
+        intent=intent,
+        notice=notice_for(assessment),
+        safety_flags=flags,
+        model_used=True,
     )
 
 
@@ -218,9 +290,19 @@ _READING_TASKS: dict[str, str] = {
 }
 
 
+@dataclass(frozen=True)
+class ReadingResult:
+    """A generated reading, the moment it was grounded in, and whether the
+    safety backstop had to replace it."""
+
+    reading: str
+    generated_for: datetime
+    safety_flags: tuple[str, ...]
+
+
 def _generate_transit_reading(
     birth: BirthData, config: CalculationConfig, period: str
-) -> tuple[str, datetime]:
+) -> ReadingResult:
     """Shared by `generate_daily_reading`/`generate_weekly_reading`/
     `generate_monthly_reading` - product spec §13: "Daily readings use
     current calculated planetary/transit data," and "should not generate
@@ -229,21 +311,34 @@ def _generate_transit_reading(
     same function, same "now" moment resolution - so none of the three is
     ever grounded in stale data.
 
-    Returns `(reading, generated_for)`: the second lets the API response
-    report exactly which quantised moment the reading was grounded in,
-    without recomputing the transit snapshot a second time.
+    `generated_for` lets the API response report exactly which quantised
+    moment the reading was grounded in, without recomputing the transit
+    snapshot a second time.
+
+    There is no user text to screen before generation - the task is fixed -
+    but the output backstop still applies: a reading that asserts certainty
+    breaks the same rule a chat answer would.
     """
     report = calculate_transits(birth, config=config)
     context = format_transit_reading_context(report)
     user_content = f"TASK\n{_READING_TASKS[period]}\n\nCALCULATED FACTS\n{context}"
     reading = _call_claude(user_content, declined_message=_READING_DECLINED_MESSAGE)
-    return reading, report.snapshot.moment
+
+    flags = check_output(reading)
+    if flags:
+        reading = SAFE_FALLBACK_READING
+
+    return ReadingResult(
+        reading=reading,
+        generated_for=report.snapshot.moment,
+        safety_flags=flags,
+    )
 
 
 def generate_daily_reading(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
-) -> tuple[str, datetime]:
+) -> ReadingResult:
     """The "general daily reading" from product spec §13's list; topic
     selection and follow-up questions are separate, later features."""
     return _generate_transit_reading(birth, config, "daily")
@@ -252,7 +347,7 @@ def generate_daily_reading(
 def generate_weekly_reading(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
-) -> tuple[str, datetime]:
+) -> ReadingResult:
     """The weekly reading from product spec §13's list."""
     return _generate_transit_reading(birth, config, "weekly")
 
@@ -260,6 +355,6 @@ def generate_weekly_reading(
 def generate_monthly_reading(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
-) -> tuple[str, datetime]:
+) -> ReadingResult:
     """The monthly reading from product spec §13's list."""
     return _generate_transit_reading(birth, config, "monthly")

@@ -141,11 +141,13 @@ def _client_key(request: Request) -> str:
 
 
 def enforce_ai_rate_limit(request: Request) -> None:
-    """FastAPI dependency for every route that spends AI provider money.
+    """Charge one request against the caller's AI allowance, or raise.
 
-    Runs before the request body is validated, so malformed requests use up
-    allowance too - they cost nothing, but they are also the cheapest way to
-    hammer an endpoint.
+    Used as a router dependency by the readings, where it runs before the
+    body is validated - so malformed requests use up allowance too; they
+    cost nothing, but they are also the cheapest way to hammer an endpoint.
+    `/ai/chat` calls it from the handler instead, after its crisis check,
+    so a crisis message is never rate limited (see that route).
     """
     limit = _limit_per_minute()
     if limit <= 0:

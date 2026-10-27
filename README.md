@@ -104,7 +104,33 @@ instance; several workers would need a shared store. Because the frontend
 calls the API from its own server, all end users currently share one
 client address and therefore one allowance; see
 `RATE_LIMIT_TRUST_FORWARDED_FOR` in `backend/.env.example` for how to
-separate them behind a trusted proxy.
+separate them behind a trusted proxy. A crisis message to `/ai/chat` is
+exempt from the limit.
+
+**Safety.** Every chat question is assessed before any model call, and
+every answer and reading is checked after it (`backend/app/services/ai/`):
+
+- *Crisis* (self-harm, suicide): answered with fixed supportive text and no
+  model call - and no chart calculation, so it works even when the AI
+  provider is down. Reported as `intent: high_stakes`, `model: null`,
+  `safety_flags: ["crisis"]`.
+- *Medical, legal, financial, major life decisions, certainty-seeking*:
+  the model gets a SAFETY CONTEXT telling it to reflect rather than
+  predict and to point to a professional, and the response carries a
+  `notice` to show the user.
+- *Off-topic* requests (code, recipes, arithmetic...): declined with fixed
+  text and no model call, `intent: unsupported`.
+- *Output backstop*: model text that asserts certainty ("you will
+  definitely...") or directs a risky action ("you should stop taking your
+  medication") is replaced with a fixed fallback and flagged in
+  `safety_flags`. Negation is understood within a clause, so "I can't
+  guarantee..." passes.
+
+`intent` (the §14 classes) is returned on every chat response. Only
+`high_stakes` and `unsupported` change behaviour today; the rest are
+informational. All of this is deterministic keyword matching: free,
+testable and reproducible, but English-only and evadable by rephrasing -
+a backstop, not a guarantee.
 
 ### 🌐 API Endpoints
 

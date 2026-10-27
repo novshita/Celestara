@@ -52,9 +52,12 @@ def daily_reading(request: ReadingRequest) -> ReadingResponse:
     from product spec §13.
     """
     config = request.config or DEFAULT_CALCULATION_CONFIG
-    reading, generated_for = generate_daily_reading(request.birth, config)
+    result = generate_daily_reading(request.birth, config)
     return ReadingResponse(
-        reading=reading, model=current_model(), generated_for=generated_for
+        reading=result.reading,
+        model=current_model(),
+        generated_for=result.generated_for,
+        safety_flags=list(result.safety_flags),
     )
 
 
@@ -74,9 +77,12 @@ def weekly_reading(request: ReadingRequest) -> ReadingResponse:
     product spec §13.
     """
     config = request.config or DEFAULT_CALCULATION_CONFIG
-    reading, generated_for = generate_weekly_reading(request.birth, config)
+    result = generate_weekly_reading(request.birth, config)
     return ReadingResponse(
-        reading=reading, model=current_model(), generated_for=generated_for
+        reading=result.reading,
+        model=current_model(),
+        generated_for=result.generated_for,
+        safety_flags=list(result.safety_flags),
     )
 
 
@@ -96,7 +102,10 @@ def monthly_reading(request: ReadingRequest) -> ReadingResponse:
     product spec §13.
     """
     config = request.config or DEFAULT_CALCULATION_CONFIG
-    reading, generated_for = generate_monthly_reading(request.birth, config)
+    result = generate_monthly_reading(request.birth, config)
     return ReadingResponse(
-        reading=reading, model=current_model(), generated_for=generated_for
+        reading=result.reading,
+        model=current_model(),
+        generated_for=result.generated_for,
+        safety_flags=list(result.safety_flags),
     )

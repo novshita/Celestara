@@ -15,6 +15,7 @@ from typing import Literal
 from pydantic import BaseModel, EmailStr, Field
 
 from app.core.config import CalculationConfig
+from app.domain.ai import Intent
 from app.domain.birth_data import BirthData
 from app.domain.compare import ChartComparison
 from app.domain.dasha import DashaPeriod, DashaTimeline
@@ -487,7 +488,25 @@ class AiChatResponse(BaseModel):
 
     answer: str
     system_used: Literal["vedic", "western", "compare"]
-    model: str
+
+    model: str | None
+    """The model that wrote the answer, or None when no model was involved:
+    a crisis and an off-topic request are answered with fixed text."""
+
+    intent: Intent
+    """What the question was classified as (engineering spec §14)."""
+
+    notice: str | None = None
+    """Authored text a client must show alongside the answer, set for
+    high-stakes questions (product spec §22). Deliberately separate from
+    `answer`: it is not the AI's words and must not depend on them, so a
+    client that hides it is hiding a safety message, not an explanation."""
+
+    safety_flags: list[str] = []
+    """Why the answer is not what the model first said - `certainty_claim`
+    or `risky_directive` when the output backstop replaced it, `crisis` when
+    the question was answered without the model. Empty for an ordinary
+    answer."""
 
 
 # --- Readings ------------------------------------------------------------
@@ -527,6 +546,9 @@ class ReadingResponse(BaseModel):
     reading: str
     model: str
     generated_for: datetime
+    safety_flags: list[str] = []
+    """`certainty_claim` or `risky_directive` if the output backstop had to
+    replace what the model wrote with a fixed fallback; empty otherwise."""
     """The UTC moment the transits were calculated for - the same quantised
     "now" `/transits` itself would report, so the reading can be shown
     alongside its grounding data without a mismatched timestamp."""

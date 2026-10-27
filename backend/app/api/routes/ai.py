@@ -2,17 +2,16 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Request, status
 
 from app.api.errors import AI_CHAT_ERROR_RESPONSES
 from app.api.schemas import AiChatRequest, AiChatResponse
 from app.core.config import DEFAULT_CALCULATION_CONFIG
 from app.core.rate_limit import enforce_ai_rate_limit
+from app.services.ai.safety import assess_question
 from app.services.ai.service import answer_question, current_model
 
-router = APIRouter(
-    prefix="/ai", tags=["ai"], dependencies=[Depends(enforce_ai_rate_limit)]
-)
+router = APIRouter(prefix="/ai", tags=["ai"])
 
 
 @router.post(
@@ -22,7 +21,7 @@ router = APIRouter(
     summary="Ask the AI Guide a question grounded in a calculated chart",
     responses=AI_CHAT_ERROR_RESPONSES,
 )
-def chat(request: AiChatRequest) -> AiChatResponse:
+def chat(request: AiChatRequest, http_request: Request) -> AiChatResponse:
     """Calculate the requested chart system, then ask Claude to answer the
     question using only those calculated facts.
 
@@ -36,8 +35,21 @@ def chat(request: AiChatRequest) -> AiChatResponse:
     be reached; everything else is the same birth-data validation the
     chart endpoints already enforce.
     """
+    # Enforced here rather than as a router dependency, after the crisis
+    # check: a crisis is answered with fixed text, costs nothing, and must
+    # never come back as "too many requests" to someone in distress - which
+    # would be possible, since callers share an allowance until the frontend
+    # forwards per-user addresses. Everything else is limited as before.
+    if not assess_question(request.question).crisis:
+        enforce_ai_rate_limit(http_request)
+
     config = request.config or DEFAULT_CALCULATION_CONFIG
-    answer = answer_question(request.birth, request.system, request.question, config)
+    result = answer_question(request.birth, request.system, request.question, config)
     return AiChatResponse(
-        answer=answer, system_used=request.system, model=current_model()
+        answer=result.answer,
+        system_used=request.system,
+        model=current_model() if result.model_used else None,
+        intent=result.intent,
+        notice=result.notice,
+        safety_flags=list(result.safety_flags),
     )
