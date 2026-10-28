@@ -27,6 +27,7 @@ from app.domain.ai import Intent, ReadingTopic
 from app.domain.birth_data import BirthData
 from app.services.ai.context import (
     format_compare_context,
+    format_period_transit_context,
     format_topic_focus,
     format_transit_reading_context,
     format_vedic_context,
@@ -44,6 +45,7 @@ from app.services.ai.safety import (
     safety_context,
 )
 from app.services.astrology.compare.service import calculate_comparison
+from app.services.astrology.transit.period import calculate_period_transits
 from app.services.astrology.transit.service import calculate_transits
 from app.services.astrology.vedic.d1 import calculate_d1_chart
 from app.services.astrology.western.chart import calculate_western_chart
@@ -257,13 +259,12 @@ _READING_DECLINED_MESSAGE = (
     "I'm not able to generate a reading right now. Please try again shortly."
 )
 
-#: One task instruction per period. All three ground in the identical
-#: present-moment transit snapshot (`calculate_transits` doesn't take a
-#: date range - see its docstring); only what Claude is asked to write
-#: about that snapshot changes; a true week/month-ahead reading would need
-#: to sample transits across a date range, which is a larger, separate
-#: feature. Framed honestly to Claude as "today's configuration" rather
-#: than implying multi-day analysis that isn't happening.
+#: One task instruction per period. Daily reads today's positions; weekly
+#: and monthly are given what actually changes across the period (rashi
+#: changes and retrograde/direct turns, from `calculate_period_transits`),
+#: and are told to stay within it rather than guess at anything further.
+_PERIOD_DAYS = {"weekly": 7, "monthly": 30}
+
 _READING_TASKS: dict[str, str] = {
     "daily": (
         "Write a short daily reading (3-5 sentences) for this person, "
@@ -273,20 +274,24 @@ _READING_TASKS: dict[str, str] = {
     ),
     "weekly": (
         "Write a short reading for the week ahead (4-6 sentences) for this "
-        "person, grounded only in the calculated facts below - today's "
-        "transiting positions, which will stay close to these signs and "
-        "bhavas for the next several days. Mention one or two transits "
-        "that stand out and how they might color the week. Keep the tone "
-        "calm and reflective, not predictive, and do not claim to know "
-        "what changes later in the week."
+        "person, grounded only in the calculated facts below: today's "
+        "transiting positions and the changes listed for the coming days. "
+        "Build it around those changes, in the order they happen, saying "
+        "roughly when each falls. If there are none, say the week is "
+        "steady and describe the standing positions instead. Never mention "
+        "a change that is not listed. Keep the tone calm and reflective, "
+        "not predictive."
     ),
     "monthly": (
         "Write a short reading for the month ahead (4-6 sentences) for "
-        "this person, grounded only in the calculated facts below - "
-        "today's transiting positions, which indicate the broader themes "
-        "in play as the month begins. Mention one or two transits that "
-        "stand out. Keep the tone calm and reflective, not predictive, "
-        "and do not claim to know what changes later in the month."
+        "this person, grounded only in the calculated facts below: today's "
+        "transiting positions and the changes listed for the coming month. "
+        "Build it around the most significant of those changes (the "
+        "slower grahas matter most), in the order they happen, saying "
+        "roughly when each falls. If there are none, say the month is "
+        "steady and describe the standing positions instead. Never "
+        "mention a change that is not listed. Keep the tone calm and "
+        "reflective, not predictive."
     ),
 }
 
@@ -316,16 +321,29 @@ def _generate_transit_reading(
     same function, same "now" moment resolution - so none of the three is
     ever grounded in stale data.
 
+    Weekly and monthly additionally look ahead 7 and 30 days for rashi
+    changes and retrograde/direct turns, so they describe what really
+    changes rather than restating today's snapshot.
+
     `generated_for` lets the API response report exactly which quantised
-    moment the reading was grounded in, without recomputing the transit
-    snapshot a second time.
+    moment the reading was grounded in (the start of the period), without
+    recomputing the transit snapshot a second time.
 
     There is no user text to screen before generation - the task is fixed -
     but the output backstop still applies: a reading that asserts certainty
     breaks the same rule a chat answer would.
     """
-    report = calculate_transits(birth, config=config)
-    context = format_transit_reading_context(report)
+    if period in _PERIOD_DAYS:
+        period_report = calculate_period_transits(
+            birth, _PERIOD_DAYS[period], config=config
+        )
+        context = format_period_transit_context(period_report)
+        generated_for = period_report.start.snapshot.moment
+    else:
+        report = calculate_transits(birth, config=config)
+        context = format_transit_reading_context(report)
+        generated_for = report.snapshot.moment
+
     task = _READING_TASKS[period]
     if topic is not None:
         # A topic reading needs the natal bhavas the focus talks about, which
@@ -334,7 +352,7 @@ def _generate_transit_reading(
         context += "\n\nNatal chart:\n" + format_vedic_context(
             calculate_d1_chart(birth, config)
         )
-    return _finish_reading(task, context, report.snapshot.moment)
+    return _finish_reading(task, context, generated_for)
 
 
 def _finish_reading(

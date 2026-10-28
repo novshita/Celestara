@@ -6,12 +6,11 @@ contracts" (§18), and a birth record is request content, not something to
 encode into a query string (and never into one that might be logged, per
 §20's prohibition on birth data reaching logs).
 
-All three periods below ground in the identical present-moment transit
-snapshot rather than simulating transits across the period ahead - product
-spec §13 requires current calculated data, not a static template, and
-that's satisfied by reading today's configuration honestly rather than
-pretending to forecast a week or month of planetary movement, which would
-need a different, larger feature (sampling transits across a date range).
+The daily reading grounds in today's transit snapshot. The weekly and
+monthly ones also look ahead - 7 and 30 days - for the rashi changes and
+retrograde/direct turns that actually fall in the period, so product spec
+§13's "current calculated data" holds for them too rather than restating
+today's sky.
 """
 
 from __future__ import annotations
@@ -66,12 +65,13 @@ def daily_reading(request: ReadingRequest) -> ReadingResponse:
     "/weekly",
     response_model=ReadingResponse,
     status_code=status.HTTP_200_OK,
-    summary="Generate a weekly reading grounded in today's transits",
+    summary="Generate a weekly reading grounded in the coming week's transits",
     responses=AI_CHAT_ERROR_RESPONSES,
 )
 def weekly_reading(request: ReadingRequest) -> ReadingResponse:
     """Calculate today's transits against the natal chart, then ask Claude
-    for a short reading for the week ahead grounded in only those facts.
+    for a short reading for the week ahead, grounded in today's positions and the changes
+    calculated for the next 7 days.
 
     Pass `topic` to focus it on a life area.
     """
@@ -89,12 +89,13 @@ def weekly_reading(request: ReadingRequest) -> ReadingResponse:
     "/monthly",
     response_model=ReadingResponse,
     status_code=status.HTTP_200_OK,
-    summary="Generate a monthly reading grounded in today's transits",
+    summary="Generate a monthly reading grounded in the coming month's transits",
     responses=AI_CHAT_ERROR_RESPONSES,
 )
 def monthly_reading(request: ReadingRequest) -> ReadingResponse:
     """Calculate today's transits against the natal chart, then ask Claude
-    for a short reading for the month ahead grounded in only those facts.
+    for a short reading for the month ahead, grounded in today's positions and the changes
+    calculated for the next 30 days.
 
     Pass `topic` to focus it on a life area.
     """

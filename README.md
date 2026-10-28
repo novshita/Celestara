@@ -105,12 +105,16 @@ chart alone and returns `generated_for: null`, since no transits are used.
 The focus only tells the model where to look in facts it already has; it
 adds no calculation.
 
-All three reading periods are grounded in today's transits (recalculated
-on every call, never cached or templated) against the natal chart - the
-same transit calculation `/transits/vedic` uses. Weekly and monthly are
-reflections on *today's* configuration, not a simulated forecast across
-the period ahead - the prompt says so explicitly, rather than quietly
-implying analysis that isn't happening.
+The daily reading is grounded in today's transits (recalculated on every
+call, never cached or templated) against the natal chart - the same
+transit calculation `/transits/vedic` uses. Weekly and monthly readings
+also look ahead 7 and 30 days: the sky is sampled daily and each rashi
+change or retrograde/direct turn is located to the minute by bisection
+(`backend/app/services/astrology/transit/period.py`), then given to the
+model with its natal bhava. The model is told to build the reading around
+those changes and to mention none that are not listed. The Moon is left
+out of the events - it changes rashi every couple of days and would bury
+the slower, more meaningful ones. A quiet period is reported as quiet.
 
 These endpoints are open to unauthenticated callers and every call costs
 money, so they are rate limited: 10 requests per minute per client, shared

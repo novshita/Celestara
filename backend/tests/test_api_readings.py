@@ -180,13 +180,30 @@ def test_task_mentions_the_right_period(
     assert expected_phrase in content
 
 
-def test_weekly_and_monthly_do_not_claim_to_forecast(client, mock_claude):
-    """The honesty guard: both longer periods ground in today's transits,
-    not a simulation of the period ahead, and the task instruction must say
-    so rather than silently implying otherwise."""
+def test_weekly_and_monthly_may_only_mention_listed_changes(client, mock_claude):
+    """The honesty guard: the longer periods are grounded in the changes the
+    calculation found, and the model is told not to go beyond them."""
     for period in ("weekly", "monthly"):
         _get_reading(client, mock_claude, period)
         content = mock_claude.messages.create.call_args.kwargs["messages"][0][
             "content"
         ]
-        assert "do not claim to know what changes later" in content
+        assert "Never mention a change that is not listed" in content
+        assert "Changes during the period" in content
+
+
+@pytest.mark.parametrize(("period", "days"), [("weekly", 7), ("monthly", 30)])
+def test_period_readings_look_ahead_the_right_number_of_days(
+    client, mock_claude, period, days
+):
+    _get_reading(client, mock_claude, period)
+
+    content = mock_claude.messages.create.call_args.kwargs["messages"][0]["content"]
+    assert f"the next {days} days" in content
+
+
+def test_daily_reading_does_not_look_ahead(client, mock_claude):
+    _get_reading(client, mock_claude, "daily")
+
+    content = mock_claude.messages.create.call_args.kwargs["messages"][0]["content"]
+    assert "Changes during the period" not in content
