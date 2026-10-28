@@ -12,10 +12,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.core.config import CalculationConfig
-from app.domain.ai import Intent
+from app.domain.ai import Intent, ReadingTopic
 from app.domain.birth_data import BirthData
 from app.domain.compare import ChartComparison
 from app.domain.dasha import DashaPeriod, DashaTimeline
@@ -521,6 +521,19 @@ class ReadingRequest(BaseModel):
 
     birth: BirthData
     config: CalculationConfig | None = None
+    topic: ReadingTopic | None = None
+    """Optional life-area focus for a daily, weekly or monthly reading.
+    `birth_chart` is not a focus - it is its own reading, at
+    `/readings/topic/birth_chart` - and is rejected here."""
+
+    @field_validator("topic")
+    @classmethod
+    def _topic_is_a_focus(cls, value: ReadingTopic | None) -> ReadingTopic | None:
+        if value is ReadingTopic.BIRTH_CHART:
+            raise ValueError(
+                "birth_chart is not a topic focus; use /readings/topic/birth_chart"
+            )
+        return value
 
     model_config = {
         "json_schema_extra": {
@@ -542,13 +555,21 @@ class ReadingRequest(BaseModel):
     }
 
 
+class TopicReadingRequest(BaseModel):
+    """A category reading; the category is in the path."""
+
+    birth: BirthData
+    config: CalculationConfig | None = None
+
+
 class ReadingResponse(BaseModel):
     reading: str
     model: str
-    generated_for: datetime
+    generated_for: datetime | None
+    """The UTC moment the transits were calculated for - the same quantised
+    "now" `/transits` itself would report, so the reading can be shown
+    alongside its grounding data without a mismatched timestamp. `null` for
+    a birth-chart reading, which uses no transits."""
     safety_flags: list[str] = []
     """`certainty_claim` or `risky_directive` if the output backstop had to
     replace what the model wrote with a fixed fallback; empty otherwise."""
-    """The UTC moment the transits were calculated for - the same quantised
-    "now" `/transits` itself would report, so the reading can be shown
-    alongside its grounding data without a mismatched timestamp."""

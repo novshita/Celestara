@@ -88,6 +88,23 @@ curl -X POST localhost:8000/api/v1/readings/weekly \
   -d '{"birth": {"birth_date": "1990-08-15", "birth_time": "14:30:00", "time_confidence": "EXACT", "latitude": 18.9756, "longitude": 72.8258, "timezone_name": "Asia/Kolkata"}}'
 ```
 
+Readings can also be focused on a life area. Pass `"topic": "career"`
+(or `love`, `relationships`, `growth`) to the daily, weekly or monthly
+endpoints, or use the category readings from product spec §13:
+
+```bash
+curl -X POST localhost:8000/api/v1/readings/topic/career \
+  -d '{"birth": {"birth_date": "1990-08-15", "birth_time": "14:30:00", "time_confidence": "EXACT", "latitude": 18.9756, "longitude": 72.8258, "timezone_name": "Asia/Kolkata"}}'
+```
+
+`/readings/topic/{birth_chart,career,love,relationships,growth}`: the four
+life areas read the natal chart together with today's transits, pointed at
+the bhavas and grahas traditionally tied to that area (for example the 10th
+bhava for career, the 5th and 7th for love). `birth_chart` reads the natal
+chart alone and returns `generated_for: null`, since no transits are used.
+The focus only tells the model where to look in facts it already has; it
+adds no calculation.
+
 All three reading periods are grounded in today's transits (recalculated
 on every call, never cached or templated) against the natal chart - the
 same transit calculation `/transits/vedic` uses. Weekly and monthly are

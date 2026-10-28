@@ -17,6 +17,7 @@ returns.
 
 from __future__ import annotations
 
+from app.domain.ai import ReadingTopic
 from app.domain.compare import ChartComparison
 from app.domain.transit import TransitReport
 from app.domain.vedic import VedicChart
@@ -182,3 +183,45 @@ def format_transit_reading_context(report: TransitReport) -> str:
 
     lines.append(_caveats((), report.unavailable))
     return "\n".join(lines)
+
+
+#: Traditional significations per life area: the bhavas (houses, counted
+#: from the Ascendant) and grahas a Jyotish reader looks at first. This
+#: only tells the model where to look in facts it already has - it adds no
+#: calculation, and the model is told to say so if a bhava is unavailable.
+_TOPIC_FOCUS: dict[ReadingTopic, tuple[str, str, str]] = {
+    ReadingTopic.CAREER: (
+        "career and vocation",
+        "bhavas 10 (work and public standing), 6 (daily work), 2 (earnings) "
+        "and 11 (gains)",
+        "Sun, Saturn, Mercury and Jupiter",
+    ),
+    ReadingTopic.LOVE: (
+        "love and romance",
+        "bhavas 5 (romance) and 7 (partnership)",
+        "Venus, Moon and Mars",
+    ),
+    ReadingTopic.RELATIONSHIPS: (
+        "relationships with partners, family and friends",
+        "bhavas 7 (partnership), 4 (home and family), 3 (siblings) and 11 "
+        "(friends)",
+        "Venus, Moon, Mercury and Jupiter",
+    ),
+    ReadingTopic.GROWTH: (
+        "personal growth and purpose",
+        "bhavas 1 (self), 5 (creativity), 9 (meaning and learning) and 12 "
+        "(letting go)",
+        "Jupiter, Saturn, Ketu and the Moon",
+    ),
+}
+
+
+def format_topic_focus(topic: ReadingTopic) -> str:
+    """The FOCUS section of a topic reading's prompt."""
+    area, bhavas, grahas = _TOPIC_FOCUS[topic]
+    return (
+        f"Focus on {area}. Traditionally this looks first at {bhavas}, and "
+        f"at {grahas}. Use only those of them that appear in the calculated "
+        "facts, and say so plainly if a bhava you would need is not "
+        "available (for example because the birth time is unknown)."
+    )

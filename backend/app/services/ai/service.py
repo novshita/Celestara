@@ -23,10 +23,11 @@ from datetime import datetime
 import anthropic
 
 from app.core.config import DEFAULT_CALCULATION_CONFIG, CalculationConfig
-from app.domain.ai import Intent
+from app.domain.ai import Intent, ReadingTopic
 from app.domain.birth_data import BirthData
 from app.services.ai.context import (
     format_compare_context,
+    format_topic_focus,
     format_transit_reading_context,
     format_vedic_context,
     format_western_context,
@@ -292,16 +293,20 @@ _READING_TASKS: dict[str, str] = {
 
 @dataclass(frozen=True)
 class ReadingResult:
-    """A generated reading, the moment it was grounded in, and whether the
-    safety backstop had to replace it."""
+    """A generated reading, the moment it was grounded in (None for a
+    birth-chart reading, which is grounded in no moment but the birth), and
+    whether the safety backstop had to replace it."""
 
     reading: str
-    generated_for: datetime
+    generated_for: datetime | None
     safety_flags: tuple[str, ...]
 
 
 def _generate_transit_reading(
-    birth: BirthData, config: CalculationConfig, period: str
+    birth: BirthData,
+    config: CalculationConfig,
+    period: str,
+    topic: ReadingTopic | None = None,
 ) -> ReadingResult:
     """Shared by `generate_daily_reading`/`generate_weekly_reading`/
     `generate_monthly_reading` - product spec §13: "Daily readings use
@@ -321,40 +326,97 @@ def _generate_transit_reading(
     """
     report = calculate_transits(birth, config=config)
     context = format_transit_reading_context(report)
-    user_content = f"TASK\n{_READING_TASKS[period]}\n\nCALCULATED FACTS\n{context}"
+    task = _READING_TASKS[period]
+    if topic is not None:
+        # A topic reading needs the natal bhavas the focus talks about, which
+        # the transit snapshot only carries in part.
+        task += "\n\n" + format_topic_focus(topic)
+        context += "\n\nNatal chart:\n" + format_vedic_context(
+            calculate_d1_chart(birth, config)
+        )
+    return _finish_reading(task, context, report.snapshot.moment)
+
+
+def _finish_reading(
+    task: str, context: str, generated_for: datetime | None
+) -> ReadingResult:
+    """Generate from a prepared task and facts, then apply the backstop."""
+    user_content = f"TASK\n{task}\n\nCALCULATED FACTS\n{context}"
     reading = _call_claude(user_content, declined_message=_READING_DECLINED_MESSAGE)
 
     flags = check_output(reading)
     if flags:
         reading = SAFE_FALLBACK_READING
 
-    return ReadingResult(
-        reading=reading,
-        generated_for=report.snapshot.moment,
-        safety_flags=flags,
-    )
+    return ReadingResult(reading=reading, generated_for=generated_for, safety_flags=flags)
 
 
 def generate_daily_reading(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+    topic: ReadingTopic | None = None,
 ) -> ReadingResult:
-    """The "general daily reading" from product spec §13's list; topic
-    selection and follow-up questions are separate, later features."""
-    return _generate_transit_reading(birth, config, "daily")
+    """The daily reading from product spec §13's list, optionally focused
+    on a topic. Follow-up questions are a separate, later feature."""
+    return _generate_transit_reading(birth, config, "daily", topic)
 
 
 def generate_weekly_reading(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+    topic: ReadingTopic | None = None,
 ) -> ReadingResult:
     """The weekly reading from product spec §13's list."""
-    return _generate_transit_reading(birth, config, "weekly")
+    return _generate_transit_reading(birth, config, "weekly", topic)
 
 
 def generate_monthly_reading(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+    topic: ReadingTopic | None = None,
 ) -> ReadingResult:
     """The monthly reading from product spec §13's list."""
-    return _generate_transit_reading(birth, config, "monthly")
+    return _generate_transit_reading(birth, config, "monthly", topic)
+
+
+_CATEGORY_TASK = (
+    "Write a short reading (4-6 sentences) on the focus given below, "
+    "grounded only in the calculated facts below: this person's natal "
+    "chart and today's transits. Mention one or two placements that "
+    "stand out. Keep the tone calm and reflective, not predictive."
+)
+
+_BIRTH_CHART_TASK = (
+    "Write a short reading (5-7 sentences) of this person's birth chart "
+    "as a whole, grounded only in the calculated facts below: the "
+    "Ascendant, the Moon, the Sun, and one or two other placements that "
+    "stand out. Describe temperament and themes, not events. Keep the "
+    "tone calm and reflective, not predictive."
+)
+
+
+def generate_topic_reading(
+    birth: BirthData,
+    topic: ReadingTopic,
+    config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
+) -> ReadingResult:
+    """A category reading from product spec §13's list: birth chart,
+    career, love, relationships, or personal growth.
+
+    Birth chart reads the natal chart alone. The four life areas read the
+    natal chart together with today's transits, focused on the bhavas and
+    grahas traditionally tied to that area.
+    """
+    if topic is ReadingTopic.BIRTH_CHART:
+        context = format_vedic_context(calculate_d1_chart(birth, config))
+        return _finish_reading(_BIRTH_CHART_TASK, context, None)
+
+    report = calculate_transits(birth, config=config)
+    context = (
+        "Natal chart:\n"
+        + format_vedic_context(calculate_d1_chart(birth, config))
+        + "\n\nCurrent transits:\n"
+        + format_transit_reading_context(report)
+    )
+    task = _CATEGORY_TASK + "\n\n" + format_topic_focus(topic)
+    return _finish_reading(task, context, report.snapshot.moment)
