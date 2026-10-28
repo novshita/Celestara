@@ -43,3 +43,19 @@ class SafetyCategory(str, Enum):
     """Asks astrology to say what *will* happen - spec §21's own example is
     "Will I definitely get this job?". Not a professional-advice domain, but
     the answer must still avoid certainty and reframe toward reflection."""
+
+
+class ReadingTopic(str, Enum):
+    """The life-area focus of a reading (product spec §13).
+
+    CAREER, LOVE, RELATIONSHIPS and GROWTH can focus any reading, including
+    the daily, weekly and monthly ones ("select a topic"). BIRTH_CHART is
+    the one category that is not a focus: it reads the natal chart alone,
+    with no transits, so it only exists as its own reading.
+    """
+
+    BIRTH_CHART = "birth_chart"
+    CAREER = "career"
+    LOVE = "love"
+    RELATIONSHIPS = "relationships"
+    GROWTH = "growth"
