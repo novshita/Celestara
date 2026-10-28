@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from app.domain.ai import ReadingTopic
 from app.domain.compare import ChartComparison
-from app.domain.transit import TransitReport
+from app.domain.transit import PeriodTransitReport, TransitEvent, TransitReport
 from app.domain.vedic import VedicChart
 from app.domain.western import WesternChart
 
@@ -225,3 +225,42 @@ def format_topic_focus(topic: ReadingTopic) -> str:
         "facts, and say so plainly if a bhava you would need is not "
         "available (for example because the birth time is unknown)."
     )
+
+
+def _format_event(event: TransitEvent) -> str:
+    when = event.moment.strftime("%Y-%m-%d %H:%M")
+    if event.kind == "ingress":
+        what = f"moves from {event.from_rashi} into {event.rashi}"
+    elif event.kind == "station_retrograde":
+        what = f"turns retrograde in {event.rashi}"
+    else:
+        what = f"turns direct in {event.rashi}"
+
+    where = []
+    if event.bhava_from_ascendant is not None:
+        where.append(f"natal bhava {event.bhava_from_ascendant} from the Ascendant")
+    if event.bhava_from_moon is not None:
+        where.append(f"bhava {event.bhava_from_moon} from the natal Moon")
+    suffix = f" ({'; '.join(where)})" if where else ""
+    return f"- {when} UTC: {event.graha} {what}{suffix}."
+
+
+def format_period_transit_context(report: PeriodTransitReport) -> str:
+    """For the weekly and monthly readings: today's positions, plus what
+    changes between now and the end of the period."""
+    lines = [
+        format_transit_reading_context(report.start),
+        "",
+        f"Period: the next {report.days} days, to "
+        f"{report.end.strftime('%Y-%m-%d %H:%M')} UTC.",
+        "Changes during the period (the Moon is left out; it changes rashi "
+        "every couple of days):",
+    ]
+    if report.events:
+        lines.extend(_format_event(event) for event in report.events)
+    else:
+        lines.append(
+            "- None: no graha other than the Moon changes rashi or turns "
+            "retrograde or direct in this period."
+        )
+    return "\n".join(lines)

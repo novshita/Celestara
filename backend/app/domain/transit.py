@@ -13,6 +13,7 @@ data and must never be cached across users.
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -124,3 +125,48 @@ class TransitReport(BaseModel):
             if item.graha == graha:
                 return item
         raise KeyError(f"no transit for {graha!r}")
+
+
+class TransitEvent(BaseModel):
+    """Something that changes during a period: a graha moving into a new
+    rashi, or turning retrograde or direct."""
+
+    model_config = {"frozen": True}
+
+    kind: Literal["ingress", "station_retrograde", "station_direct"]
+    graha: str
+    moment: datetime
+    """When it happens, in UTC, found to within a minute."""
+
+    rashi: str
+    """The rashi the graha moves into (ingress) or turns in (station)."""
+
+    from_rashi: str | None = None
+    """The rashi left behind. Set for an ingress only."""
+
+    bhava_from_ascendant: int | None = Field(default=None, ge=1, le=12)
+    """The natal bhava of `rashi`. None when the birth time is unknown."""
+
+    bhava_from_moon: int | None = Field(default=None, ge=1, le=12)
+    """The same count from the natal Moon's rashi. None when it is not
+    certain."""
+
+
+class PeriodTransitReport(BaseModel):
+    """Transits across a span of days, related to one person's chart.
+    Personal data, like `TransitReport`."""
+
+    model_config = {"frozen": True}
+
+    start: TransitReport
+    """Where everything is at the start of the period."""
+
+    end: datetime
+    days: int
+
+    events: tuple[TransitEvent, ...]
+    """Chronological. Covers every graha except the Moon, whose fast cycle
+    (a new rashi every couple of days) would bury the slower, more
+    meaningful changes - the Moon's position at the start is in `start`."""
+
+    unavailable: tuple[str, ...] = ()
