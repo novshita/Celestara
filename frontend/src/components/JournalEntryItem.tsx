@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 
 import {
   deleteEntryAction,
@@ -30,11 +30,15 @@ export function JournalEntryItem({ entry }: { entry: JournalEntry }) {
   // A successful save re-fetches entries (via `refresh()` in the action) but
   // does not unmount this component, so its own `isEditing` state would
   // otherwise stay stuck open - this is what closes the edit form again.
-  useEffect(() => {
+  // Done while rendering rather than in an effect, which is React's
+  // recommended way to reset state when a value changes.
+  const [seenState, setSeenState] = useState(state);
+  if (state !== seenState) {
+    setSeenState(state);
     if (state.status === "success") {
       setIsEditing(false);
     }
-  }, [state]);
+  }
 
   const fieldErrors = state.status === "error" ? state.fieldErrors : {};
 
