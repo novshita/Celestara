@@ -24,7 +24,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI Guide (single-turn Q&A, Claude) | ✅ Implemented - no RAG or saved history yet |
-| 📖 Daily/weekly/monthly readings (grounded in live transits) | ✅ Implemented - general reading only, no topics/follow-ups yet |
+| 📖 Daily/weekly/monthly readings + birth chart, career, love, relationships, growth | ✅ Implemented - weekly/monthly look ahead for real changes; no follow-up questions yet |
 | 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide, readings |
 
 | 📄 Document | What it covers |
@@ -179,6 +179,24 @@ All calculation endpoints are namespaced under `/api/v1`.
 | `POST` | `/api/v1/readings/monthly` | Generate a monthly reading grounded in today's transits |
 
 ---
+
+### 🗄️ Database migrations
+
+The schema is managed with Alembic (`backend/app/db/migrations`). The API
+applies any pending migration when it starts, so a fresh clone still just
+runs. A database created before migrations existed is recognised and kept
+as it is, not rebuilt. To change the schema: edit `app/db/models.py`, then
+from `backend/` run:
+
+```bash
+alembic revision --autogenerate -m "describe the change"
+alembic upgrade head
+```
+
+Read the generated file before committing it. A test fails if the models and
+the migrations disagree, so a model change without a migration cannot reach
+`main`. With several workers, set `AUTO_MIGRATE=false` and run
+`alembic upgrade head` once before starting them.
 
 ### 🐳 Docker
 
