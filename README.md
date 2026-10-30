@@ -180,6 +180,28 @@ All calculation endpoints are namespaced under `/api/v1`.
 
 ---
 
+### 🐳 Docker
+
+The whole app runs with one command:
+
+```bash
+docker compose up --build   # then open http://localhost:3000
+```
+
+Put `ANTHROPIC_API_KEY` in a `.env` file next to `docker-compose.yml` (or
+export it) to enable the AI endpoints; without it they answer `503` and
+everything else works. The backend's SQLite database lives on the
+`celestara-data` volume, so it survives `docker compose down` (use `down -v`
+to wipe it). Each image also builds on its own: `docker build backend` and
+`docker build frontend`.
+
+Notes: `pyswisseph` has no prebuilt wheel for every platform (Linux on ARM,
+for one), so the backend image compiles it in a build stage and ships
+without the compiler. The containers run as non-root, and the backend image
+has a health check on `/health`. Continuous integration
+(`.github/workflows/ci.yml`) runs the backend tests on Python 3.12, the
+frontend lint and build, and builds both images on every pull request.
+
 ## 🖥️ Running the Frontend
 
 Requires **Node.js 20+**. Start the backend first (above) - the frontend

@@ -1,0 +1,29 @@
+# Runs the whole app: `docker compose up --build`, then open
+# http://localhost:3000. Put ANTHROPIC_API_KEY (and any other backend
+# setting from backend/.env.example) in a .env file next to this one, or
+# export it in your shell; without a key everything works except the AI
+# endpoints, which answer 503.
+services:
+  backend:
+    build: ./backend
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-opus-5-5}
+    volumes:
+      - celestara-data:/data
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    environment:
+      # Server-side only; the browser never talks to the backend directly.
+      BACKEND_URL: http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+volumes:
+  celestara-data:
