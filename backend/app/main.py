@@ -11,6 +11,7 @@ FastAPI generates from the Pydantic models.
 from __future__ import annotations
 
 import logging
+import os
 import time
 
 from fastapi import FastAPI, Request
@@ -30,19 +31,18 @@ from app.api.routes import (
     transits,
 )
 from app.core.logging import configure_logging
-from app.db.models import Base
-from app.db.session import engine
+from app.db.migrate import upgrade_to_head
 
 configure_logging()
 
 logger = logging.getLogger("celestara.api.access")
 
-# Creates any tables that do not exist yet; never alters or drops an existing
-# one, so it is safe to run on every startup. This is a stand-in for real
-# migrations (Alembic, tracking one schema version at a time) and should be
-# replaced before this schema needs its first change in a deployment that
-# already holds data - `create_all` cannot express "add this column".
-Base.metadata.create_all(bind=engine)
+# Applies any pending schema migrations (app/db/migrations). Set
+# AUTO_MIGRATE=false to skip this and run `alembic upgrade head` yourself
+# instead - needed when several workers start at once, since two of them
+# migrating simultaneously would race.
+if os.getenv("AUTO_MIGRATE", "true").lower() not in {"0", "false", "no"}:
+    upgrade_to_head()
 
 API_PREFIX = "/api/v1"
 

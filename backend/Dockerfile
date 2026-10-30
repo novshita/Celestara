@@ -30,6 +30,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 COPY --from=build /opt/venv /opt/venv
 
 WORKDIR /app
+COPY alembic.ini ./
 COPY app ./app
 
 # The default database is a SQLite file; keep it on a volume so it outlives
