@@ -2,12 +2,21 @@
 
 import { askAiGuide, BackendError } from "@/lib/backend";
 import { buildBirthData } from "@/lib/birthFormData";
-import type { AiSystem } from "@/lib/types";
+import type { AiIntent, AiSystem, SafetyFlag } from "@/lib/types";
 
 export type AiChatFormState =
   | { status: "idle" }
   | { status: "error"; message: string; fieldErrors: Record<string, string> }
-  | { status: "success"; answer: string; systemUsed: AiSystem; model: string };
+  | {
+      status: "success";
+      answer: string;
+      systemUsed: AiSystem;
+      /** `null` when the answer was fixed text that never reached the model. */
+      model: string | null;
+      intent: AiIntent;
+      notice: string | null;
+      safetyFlags: SafetyFlag[];
+    };
 
 /**
  * Server Action backing the AI Guide form. Same shape as `submitBirthData`
@@ -24,12 +33,17 @@ export async function askAiGuideAction(
   const question = formData.get("question") as string;
 
   try {
-    const { answer, system_used, model } = await askAiGuide(
-      birth,
-      system,
-      question,
-    );
-    return { status: "success", answer, systemUsed: system_used, model };
+    const { answer, system_used, model, intent, notice, safety_flags } =
+      await askAiGuide(birth, system, question);
+    return {
+      status: "success",
+      answer,
+      systemUsed: system_used,
+      model,
+      intent,
+      notice,
+      safetyFlags: safety_flags,
+    };
   } catch (error) {
     if (error instanceof BackendError) {
       const fieldErrors = Object.fromEntries(
