@@ -25,7 +25,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
 | 🤖 AI Guide (single-turn Q&A, Claude) | ✅ Implemented - no RAG or saved history yet |
 | 📖 Daily/weekly/monthly readings + birth chart, career, love, relationships, growth | ✅ Implemented - weekly/monthly look ahead for real changes; no follow-up questions yet |
-| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide, readings |
+| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide (with safety notices), readings with period, focus and birth-chart options |
 
 | 📄 Document | What it covers |
 |---|---|
@@ -123,9 +123,10 @@ header (`AI_RATE_LIMIT_PER_MINUTE`, `0` to disable). The limit is
 in-memory - per process, reset on restart - which is enough for one
 instance; several workers would need a shared store. Because the frontend
 calls the API from its own server, all end users currently share one
-client address and therefore one allowance; see
-`RATE_LIMIT_TRUST_FORWARDED_FOR` in `backend/.env.example` for how to
-separate them behind a trusted proxy. A crisis message to `/ai/chat` is
+client address and therefore one allowance. Behind exactly one trusted
+proxy, set `FORWARD_CLIENT_IP=true` on the frontend and
+`RATE_LIMIT_TRUST_FORWARDED_FOR=true` on the backend to count each person
+separately (see both `.env.example` files). A crisis message to `/ai/chat` is
 exempt from the limit.
 
 **Safety.** Every chat question is assessed before any model call, and

@@ -306,20 +306,54 @@ export interface JournalEntryListResponse {
 
 export type AiSystem = "vedic" | "western" | "compare";
 
+/** What the question was classified as (engineering spec §14). */
+export type AiIntent =
+  | "birth_chart_explanation"
+  | "vedic_question"
+  | "western_question"
+  | "compare_question"
+  | "planet_exploration"
+  | "transit_question"
+  | "dasha_question"
+  | "reading_request"
+  | "general_education"
+  | "high_stakes"
+  | "unsupported";
+
+/** Why the safety pipeline replaced or short-circuited an answer. */
+export type SafetyFlag = "crisis" | "certainty_claim" | "risky_directive";
+
 export interface AiChatResponse {
   answer: string;
   system_used: AiSystem;
-  model: string;
+  /** `null` when the answer was fixed text that never reached the model: a
+   * crisis response, or an off-topic request that was declined. */
+  model: string | null;
+  intent: AiIntent;
+  /** Something the user should read alongside the answer (e.g. to consult a
+   * professional for a medical, legal or financial question). */
+  notice: string | null;
+  safety_flags: SafetyFlag[];
 }
 
 // --- Readings --------------------------------------------------------------
 
 export type ReadingPeriod = "daily" | "weekly" | "monthly";
 
+/** A life-area focus for a reading. */
+export type ReadingFocus = "career" | "love" | "relationships" | "growth";
+
+/** The birth-chart reading is its own category: natal chart only, no
+ * transits, so it is never a focus on a period reading. */
+export type ReadingKind = ReadingPeriod | "birth_chart";
+
 export interface ReadingResponse {
   reading: string;
   model: string;
-  generated_for: string;
+  /** The moment the transits were calculated for; `null` for a birth-chart
+   * reading, which uses none. */
+  generated_for: string | null;
+  safety_flags: SafetyFlag[];
 }
 
 /** The shape every backend error response takes (`app/api/errors.py`). */

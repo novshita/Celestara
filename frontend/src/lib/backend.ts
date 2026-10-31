@@ -10,6 +10,8 @@
 
 import "server-only";
 
+import { headers as requestHeaders } from "next/headers";
+
 import type {
   AiChatResponse,
   AiSystem,
@@ -20,6 +22,7 @@ import type {
   CompareChartResponse,
   JournalEntry,
   JournalEntryListResponse,
+  ReadingFocus,
   ReadingPeriod,
   ReadingResponse,
   TransitReportResponse,
@@ -81,11 +84,13 @@ async function post<T>(
   path: string,
   body: unknown,
   token?: string,
+  headers?: Record<string, string>,
 ): Promise<T> {
   const response = await request(path, {
     method: "POST",
     body: JSON.stringify(body),
     token,
+    headers,
   });
   return response.json() as Promise<T>;
 }
@@ -210,6 +215,26 @@ export async function deleteJournalEntry(
   await request(`/api/v1/journal/${id}`, { method: "DELETE", token });
 }
 
+/**
+ * Tells the backend which end user an AI request is for, so its per-client
+ * rate limit counts people separately. Without this, every user of this
+ * site reaches the backend from this server's one address and shares a
+ * single allowance.
+ *
+ * Opt-in (`FORWARD_CLIENT_IP=true`), and only correct behind exactly one
+ * trusted proxy that appends the real client address to `X-Forwarded-For`:
+ * the header is passed through untouched, and the backend (with
+ * `RATE_LIMIT_TRUST_FORWARDED_FOR=true`) reads its last entry. With no
+ * proxy in front, a caller could send any value, so it stays off.
+ */
+async function clientForwardingHeaders(): Promise<Record<string, string>> {
+  if (process.env.FORWARD_CLIENT_IP?.toLowerCase() !== "true") {
+    return {};
+  }
+  const forwarded = (await requestHeaders()).get("x-forwarded-for");
+  return forwarded ? { "X-Forwarded-For": forwarded } : {};
+}
+
 /** No auth required - product spec §28: the AI Guide, like chart
  * calculation, is explorable without an account. */
 export async function askAiGuide(
@@ -217,16 +242,39 @@ export async function askAiGuide(
   system: AiSystem,
   question: string,
 ): Promise<AiChatResponse> {
-  return post<AiChatResponse>("/api/v1/ai/chat", { birth, system, question });
+  return post<AiChatResponse>(
+    "/api/v1/ai/chat",
+    { birth, system, question },
+    undefined,
+    await clientForwardingHeaders(),
+  );
 }
 
 /** No auth required, same as `askAiGuide` - and always grounded in today's
  * transits, recalculated on every call (product spec §13: never a static
- * template). All three periods share one request/response shape; only the
- * path differs. */
+ * template). Weekly and monthly also look ahead for the changes that fall in
+ * the period. `focus` narrows any of them to a life area. */
 export async function getReading(
   birth: BirthData,
   period: ReadingPeriod,
+  focus?: ReadingFocus,
 ): Promise<ReadingResponse> {
-  return post<ReadingResponse>(`/api/v1/readings/${period}`, { birth });
+  return post<ReadingResponse>(
+    `/api/v1/readings/${period}`,
+    focus ? { birth, topic: focus } : { birth },
+    undefined,
+    await clientForwardingHeaders(),
+  );
+}
+
+/** The birth-chart reading: natal chart only, no transits. */
+export async function getBirthChartReading(
+  birth: BirthData,
+): Promise<ReadingResponse> {
+  return post<ReadingResponse>(
+    "/api/v1/readings/topic/birth_chart",
+    { birth },
+    undefined,
+    await clientForwardingHeaders(),
+  );
 }
