@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { askAiGuideAction, type AiChatFormState } from "@/app/ai-actions";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
 import { Field } from "@/components/Field";
-import type { AiSystem } from "@/lib/types";
+import type { AiSystem, BirthData } from "@/lib/types";
 
 const INITIAL_STATE: AiChatFormState = { status: "idle" };
 
@@ -15,7 +15,7 @@ const SYSTEM_OPTIONS: { value: AiSystem; label: string }[] = [
   { value: "compare", label: "Compare both" },
 ];
 
-export function AiGuideForm() {
+export function AiGuideForm({ defaults }: { defaults?: BirthData }) {
   const [state, formAction, isPending] = useActionState(
     askAiGuideAction,
     INITIAL_STATE,
@@ -52,7 +52,7 @@ export function AiGuideForm() {
           ))}
         </div>
 
-        <BirthFieldsFieldset fieldErrors={fieldErrors} />
+        <BirthFieldsFieldset fieldErrors={fieldErrors} defaults={defaults} />
 
         <Field label="Your question" error={fieldErrors["question"]}>
           <textarea

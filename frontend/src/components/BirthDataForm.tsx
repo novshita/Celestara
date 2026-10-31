@@ -9,6 +9,7 @@ import { DashaResult } from "@/components/DashaResult";
 import { TransitResult } from "@/components/TransitResult";
 import { VedicChartResult } from "@/components/VedicChartResult";
 import { WesternChartResult } from "@/components/WesternChartResult";
+import type { BirthData } from "@/lib/types";
 
 const INITIAL_STATE: ChartFormState = { status: "idle" };
 
@@ -20,7 +21,7 @@ const SYSTEM_OPTIONS: { value: ChartSystem; label: string }[] = [
   { value: "transit", label: "Current transits (Gochar)" },
 ];
 
-export function BirthDataForm() {
+export function BirthDataForm({ defaults }: { defaults?: BirthData }) {
   const [state, formAction, isPending] = useActionState(
     submitBirthData,
     INITIAL_STATE,
@@ -46,7 +47,7 @@ export function BirthDataForm() {
           ))}
         </div>
 
-        <BirthFieldsFieldset fieldErrors={fieldErrors} />
+        <BirthFieldsFieldset fieldErrors={fieldErrors} defaults={defaults} />
 
         <button
           type="submit"

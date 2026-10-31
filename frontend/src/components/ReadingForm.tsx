@@ -7,7 +7,7 @@ import {
   type ReadingFormState,
 } from "@/app/reading-actions";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
-import type { ReadingFocus, ReadingKind } from "@/lib/types";
+import type { BirthData, ReadingFocus, ReadingKind } from "@/lib/types";
 
 const INITIAL_STATE: ReadingFormState = { status: "idle" };
 
@@ -43,7 +43,7 @@ function formatMoment(iso: string): string {
   });
 }
 
-export function ReadingForm() {
+export function ReadingForm({ defaults }: { defaults?: BirthData }) {
   const [state, formAction, isPending] = useActionState(
     requestReadingAction,
     INITIAL_STATE,
@@ -99,7 +99,7 @@ export function ReadingForm() {
           </select>
         </label>
 
-        <BirthFieldsFieldset fieldErrors={fieldErrors} />
+        <BirthFieldsFieldset fieldErrors={fieldErrors} defaults={defaults} />
 
         <button
           type="submit"
