@@ -1,18 +1,18 @@
 # Celestara web app. Build from the frontend/ directory:
 #   docker build -t celestara-frontend frontend
-FROM node:22-slim AS deps
+FROM node:25-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM node:22-slim AS build
+FROM node:25-slim AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-FROM node:22-slim AS run
+FROM node:25-slim AS run
 # The server needs only `node`. The npm bundled in the base image is a
 # separate dependency tree that vulnerability scans flag and nothing here
 # uses at runtime, so it is removed.
