@@ -9,10 +9,9 @@ const INITIAL_STATE: AuthFormState = { status: "idle" };
 type Mode = "login" | "register";
 
 /**
- * Product spec §28: the user can explore without an account. This panel is
- * shown alongside, not in place of, the calculation form - creating an
- * account only becomes necessary for the persisted features (profile,
- * journal) that build on top of it later.
+ * Product spec §28: the user can explore without an account. This panel only
+ * appears where an account is actually needed (`LoginRequired`, on the
+ * Journal and Profile pages), never in the way of the rest of the site.
  */
 export function AuthForms() {
   const [mode, setMode] = useState<Mode>("login");

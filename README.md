@@ -249,30 +249,27 @@ npm install
 npm run dev     # http://localhost:3000
 ```
 
-A birth-data form calculates a Vedic, Western, Compare, Vimshottari Dasha,
-or current-transits view against the running backend - every calculation
-endpoint the backend exposes. You can also register and log in; the
-session is a bearer token from the backend held in an httpOnly cookie, set
-and read entirely server-side (Next.js Server Actions and Server
-Components - the token is never exposed to client JavaScript). Logged in,
-you can save your one birth profile (product spec §28) so you don't have
-to retype it every time, and keep journal entries (product spec §16:
-reflective, not predictive) with full create/edit/delete. You can also ask
-the AI Guide a question grounded in a calculated chart, or get a daily
-reading grounded in today's transits - neither needs an account, same as
-the chart form - but both require the backend to have `ANTHROPIC_API_KEY`
-set, or the forms will show the backend's "AI guide isn't answering right
-now" message. The celestial visualization layer is still to come; see
-`frontend/.env.example` for the one setting this app reads (`BACKEND_URL`,
-only needed if the backend isn't on its default
-port).
+The site has the four primary pages from product spec §10:
 
-The API call happens in a [Server Function](https://nextjs.org/docs/app/getting-started/mutating-data)
-(`frontend/src/app/actions.ts`), not in the browser - the backend never
-needs CORS configuration because it only ever talks to the Next.js server,
-not directly to a user's browser.
+- **Home** (`/`): readings (today, this week, this month or your birth chart,
+  optionally focused on career, love, relationships or growth) and the AI
+  Guide. Neither needs an account, but both need the backend to have
+  `ANTHROPIC_API_KEY` set, or they show the backend's "AI guide isn't
+  answering right now" message.
+- **Birth Chart** (`/chart`): a birth-data form that calculates a Vedic,
+  Western, Compare, Vimshottari Dasha or current-transits view against the
+  running backend - every calculation endpoint it exposes.
+- **Journal** (`/journal`) and **Profile** (`/profile`): need an account.
+  Logged out they show the log-in / create-account form. Logged in, you can
+  save your one birth profile (product spec §28) and keep journal entries
+  (product spec §16: reflective, not predictive) with full create/edit/delete.
 
----
+The session is a bearer token from the backend held in an httpOnly cookie,
+set and read entirely server-side (Next.js Server Actions and Server
+Components - the token is never exposed to client JavaScript). The celestial
+visualization layer is still to come. See `frontend/.env.example` for the
+settings this app reads (`BACKEND_URL`, only needed if the backend isn't on
+its default port, and `FORWARD_CLIENT_IP`).
 
 ## 🪐 What It Does
 

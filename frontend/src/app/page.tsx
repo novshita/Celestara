@@ -1,33 +1,34 @@
-import { AccountBar } from "@/components/AccountBar";
+import Link from "next/link";
+
 import { AiGuideForm } from "@/components/AiGuideForm";
-import { BirthDataForm } from "@/components/BirthDataForm";
-import { JournalSection } from "@/components/JournalSection";
-import { ProfileSection } from "@/components/ProfileSection";
+import { PageHeading } from "@/components/PageHeading";
 import { ReadingForm } from "@/components/ReadingForm";
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-16">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold text-amber-300">🌌 Celestara</h1>
-        <p className="text-slate-400">
-          Enter a birth record to calculate its Vedic, Western, compared
-          chart, Vimshottari Dasha timeline, or current transits. The
-          system calculates; nothing here interprets.
-        </p>
-      </header>
+    <>
+      <PageHeading title="Your celestial universe">
+        Calculate your Vedic and Western charts, read the sky as it is now,
+        and ask questions of a guide that interprets only what has been
+        calculated. For reflection, not prediction.
+      </PageHeading>
 
-      <AccountBar />
-
-      <ProfileSection />
-
-      <JournalSection />
-
-      <BirthDataForm />
+      <Link
+        href="/chart"
+        className="flex flex-col gap-1 rounded-lg border border-slate-800 bg-slate-900/60 p-5 transition hover:border-amber-400/50"
+      >
+        <span className="font-medium text-amber-300">
+          Start with your birth chart →
+        </span>
+        <span className="text-sm text-slate-400">
+          Vedic, Western, a side-by-side comparison, your Dasha timeline and
+          the current transits.
+        </span>
+      </Link>
 
       <ReadingForm />
 
       <AiGuideForm />
-    </main>
+    </>
   );
 }
