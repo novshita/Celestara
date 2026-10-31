@@ -12,7 +12,7 @@ The experience is designed to feel like entering a living celestial observatory:
 
 ## 🚧 Project Status
 
-**Backend calculation and AI layers both underway.** The deterministic astrology engine came first, in line with the priority order below — calculation accuracy before everything else. The AI Guide is now a single grounded Q&A turn (no RAG, no saved conversation history yet - both are separate, later features).
+**Backend calculation and AI layers both underway.** The deterministic astrology engine came first, in line with the priority order below — calculation accuracy before everything else. The AI Guide answers grounded in the calculated chart, curated knowledge and - for logged-in users - their saved conversations and chosen memories.
 
 | Area | Status |
 |---|---|
@@ -23,8 +23,10 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🌍 Transit / Gochar engine | ✅ Implemented |
 | 🌐 FastAPI endpoints | ✅ Implemented |
 | 🔐 Accounts, birth profile, journal | ✅ Implemented |
-| 🤖 AI Guide (single-turn Q&A, Claude) | ✅ Implemented - no RAG or saved history yet |
-| 📖 Daily/weekly/monthly readings + birth chart, career, love, relationships, growth | ✅ Implemented - weekly/monthly look ahead for real changes; no follow-up questions yet |
+| 🤖 AI Guide (Claude) | ✅ Implemented - curated knowledge (keyword retrieval), saved conversations, user-controlled memory, explanation depth, and the factors behind every answer |
+| 🪐 Planet exploration | ✅ Implemented - one call per planet: placement, current transit or aspects, and its description |
+| 🔒 Privacy controls | ✅ Implemented - delete memory, conversations, or everything in one call |
+| 📖 Daily/weekly/monthly readings + birth chart, career, love, relationships, growth | ✅ Implemented - weekly/monthly look ahead for real changes; follow-ups go through saved conversations |
 | 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide (with safety notices), readings with period, focus and birth-chart options |
 
 | 📄 Document | What it covers |
@@ -154,6 +156,51 @@ informational. All of this is deterministic keyword matching: free,
 testable and reproducible, but English-only and evadable by rephrasing -
 a backstop, not a guarantee.
 
+**What an answer is grounded in.** Beyond the natal chart, a chat answer is
+given what its question calls for: the current transits for a transit
+question, the Vimshottari Dasha for a Dasha question (a Western-only answer
+is never given Vedic transits or Dasha, and says they are not available).
+Curated knowledge is retrieved for the question from a versioned set of
+short entries in `backend/app/services/knowledge/corpus` - plain files, so
+every change is a reviewed diff - using BM25 keyword ranking behind an
+interface that vector search can replace later. The model is told that
+knowledge, memory and conversation text are reference material, never
+instructions, and anything from outside the application is flattened to a
+single line so it cannot fake a section heading.
+
+**What every response reports.** `factors` lists the calculated facts used
+(by kind: natal chart, transits, period changes, Dasha, and anything
+unavailable), the knowledge entries retrieved (id, title and version), and how
+much memory and earlier conversation was supplied - the chain from
+question to chart facts to knowledge to answer (product spec §23).
+
+**Explanation depth.** `depth` is `beginner` (default) or `technical`, set per
+request or saved as a preference (`PUT /api/v1/preferences`, which also
+saves a calculation configuration). A request wins over the saved value.
+
+**With an account** (send the bearer token; everything still works without
+one, statelessly):
+
+- Answered questions are saved as conversations a follow-up can continue
+  (`conversation_id`); `GET/DELETE /api/v1/conversations` lists, reads and
+  deletes them. A crisis message and a declined off-topic request are never
+  saved.
+- Memory is only what you explicitly ask the guide to keep
+  (`/api/v1/memory`, 50 at most); nothing in a conversation becomes memory
+  by itself, and you can forget one or all.
+- An invalid or expired token is a `401`, not a quiet downgrade to anonymous,
+  so nobody believes a conversation is being saved when it is not.
+- Each answer leaves an audit record (engineering spec §22) holding the
+  intent, model, safety flags, timing and which *kinds* of fact and which
+  knowledge entries were used - never the question, the answer or a chart
+  value. Crisis messages are not recorded at all. Everything tied to an
+  account goes when the account is deleted.
+
+**Planet exploration.** `POST /api/v1/explore/planet` returns, for one planet
+in one chart: its placement, its current transit (Vedic) or the aspects it
+makes (Western), and its curated description. No model is involved, so it
+needs no account and is not rate limited.
+
 ### 🌐 API Endpoints
 
 All calculation endpoints are namespaced under `/api/v1`.
@@ -175,9 +222,14 @@ All calculation endpoints are namespaced under `/api/v1`.
 | `GET`/`PUT`/`DELETE` | `/api/v1/journal/{id}` | Read, edit, or remove an entry |
 | `DELETE` | `/api/v1/account/data` | Permanently delete the account and all its data |
 | `POST` | `/api/v1/ai/chat` | Ask the AI Guide a question grounded in one calculated chart |
+| `POST` | `/api/v1/explore/planet` | One planet in one chart: placement, transit or aspects, description |
+| `GET`/`PUT` | `/api/v1/preferences` | Explanation depth and saved calculation configuration |
+| `GET`/`POST`/`DELETE` | `/api/v1/memory`, `/api/v1/memory/{id}` | The memories you asked the guide to keep |
+| `GET`/`DELETE` | `/api/v1/conversations`, `/api/v1/conversations/{id}` | Saved AI Guide conversations |
 | `POST` | `/api/v1/readings/daily` | Generate a daily reading grounded in today's transits |
-| `POST` | `/api/v1/readings/weekly` | Generate a weekly reading grounded in today's transits |
-| `POST` | `/api/v1/readings/monthly` | Generate a monthly reading grounded in today's transits |
+| `POST` | `/api/v1/readings/weekly` | Generate a weekly reading grounded in the coming week's transits |
+| `POST` | `/api/v1/readings/monthly` | Generate a monthly reading grounded in the coming month's transits |
+| `POST` | `/api/v1/readings/topic/{topic}` | Birth chart, career, love, relationships or growth reading |
 
 ---
 
@@ -204,7 +256,8 @@ the migrations disagree, so a model change without a migration cannot reach
 **Metrics.** Set `METRICS_ENABLED=true` and the backend serves Prometheus
 metrics at `/metrics` (add `METRICS_TOKEN` to require a bearer token): request
 counts and latency by route, AI provider calls, failures and latency, safety
-actions (crisis, off-topic, replaced output) and rate-limited requests. Only
+actions (crisis, off-topic, replaced output), knowledge retrieval latency and
+rate-limited requests. Only
 counts and timings are recorded - routes appear as templates such as
 `/api/v1/journal/{entry_id}`, never with real ids, and no question, birth
 record or other request content ever reaches a metric. Every request is also
