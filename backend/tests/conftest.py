@@ -77,19 +77,16 @@ def unknown_time_birth() -> BirthData:
     )
 
 
-@pytest.fixture
-def client() -> TestClient:
-    """A TestClient backed by a fresh in-memory database.
+@pytest.fixture(autouse=True)
+def session_factory():
+    """A fresh in-memory database for every test, wired in as the app's
+    database, so no test ever touches the real one - important now that AI
+    answers write an audit record even for anonymous callers.
 
-    Every test gets its own engine and tables, so tests never see another
-    test's rows without needing to reset state by hand. `StaticPool` keeps
-    the single in-memory connection alive across the multiple threads
+    Yields the `sessionmaker`, so a test can look at what was stored. `StaticPool`
+    keeps the single in-memory connection alive across the multiple threads
     FastAPI's `TestClient` uses; without it, each connection would see an
     empty (and separate) `:memory:` database.
-
-    Chart/dasha/transit/compare test modules define their own `client`
-    fixture locally (a plain `TestClient(app)`, no database) which shadows
-    this one - they never touch `app.db`, so they have no need of it.
     """
     engine = create_engine(
         "sqlite:///:memory:",
@@ -97,10 +94,10 @@ def client() -> TestClient:
         poolclass=StaticPool,
     )
     Base.metadata.create_all(bind=engine)
-    TestingSessionLocal = sessionmaker(autoflush=False, autocommit=False, bind=engine)
+    factory = sessionmaker(autoflush=False, autocommit=False, bind=engine)
 
     def override_get_db():
-        db = TestingSessionLocal()
+        db = factory()
         try:
             yield db
         finally:
@@ -108,7 +105,33 @@ def client() -> TestClient:
 
     app.dependency_overrides[get_db] = override_get_db
     try:
-        yield TestClient(app)
+        yield factory
     finally:
         app.dependency_overrides.clear()
         Base.metadata.drop_all(bind=engine)
+        engine.dispose()
+
+
+@pytest.fixture
+def client(session_factory) -> TestClient:
+    """A TestClient backed by this test's fresh in-memory database.
+
+    Chart/dasha/transit/compare test modules define their own `client`
+    fixture locally (a plain `TestClient(app)`) which shadows this one - they
+    need no database of their own, but still share the isolated one above.
+    """
+    return TestClient(app)
+
+
+@pytest.fixture
+def make_user(client):
+    """Registers a user and returns the headers that authenticate them, so a
+    test can have several distinct users."""
+
+    def _make(email: str = "astronaut@example.com") -> dict:
+        credentials = {"email": email, "password": "correct horse battery"}
+        client.post("/api/v1/auth/register", json=credentials)
+        token = client.post("/api/v1/auth/login", json=credentials).json()["access_token"]
+        return {"Authorization": f"Bearer {token}"}
+
+    return _make

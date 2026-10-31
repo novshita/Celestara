@@ -31,7 +31,10 @@ from app.services.auth.service import (
     InvalidCredentialsError,
     InvalidSessionError,
 )
+from app.services.conversations.service import ConversationNotFoundError
+from app.services.exploration.service import UnknownBodyError
 from app.services.journal.service import JournalEntryNotFoundError
+from app.services.memory.service import MemoryLimitError, MemoryNotFoundError
 from app.services.profile.service import ProfileNotFoundError
 
 logger = logging.getLogger("celestara.api")
@@ -52,6 +55,7 @@ class ErrorCode(str, Enum):
     NOT_FOUND = "NOT_FOUND"
     AI_UNAVAILABLE = "AI_UNAVAILABLE"
     RATE_LIMITED = "RATE_LIMITED"
+    LIMIT_REACHED = "LIMIT_REACHED"
 
 
 class ErrorResponse(BaseModel):
@@ -231,6 +235,46 @@ def register_error_handlers(app: FastAPI) -> None:
             "No journal entry with this id was found.",
         )
 
+    @app.exception_handler(UnknownBodyError)
+    async def _unknown_body(request: Request, exc: UnknownBodyError) -> JSONResponse:
+        return _response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            ErrorCode.NOT_FOUND,
+            "This chart has no planet by that name.",
+        )
+
+    @app.exception_handler(MemoryNotFoundError)
+    async def _memory_not_found(
+        request: Request, exc: MemoryNotFoundError
+    ) -> JSONResponse:
+        return _response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            ErrorCode.NOT_FOUND,
+            "No memory with this id was found.",
+        )
+
+    @app.exception_handler(ConversationNotFoundError)
+    async def _conversation_not_found(
+        request: Request, exc: ConversationNotFoundError
+    ) -> JSONResponse:
+        return _response(
+            request,
+            status.HTTP_404_NOT_FOUND,
+            ErrorCode.NOT_FOUND,
+            "No conversation with this id was found.",
+        )
+
+    @app.exception_handler(MemoryLimitError)
+    async def _memory_limit(request: Request, exc: MemoryLimitError) -> JSONResponse:
+        return _response(
+            request,
+            status.HTTP_409_CONFLICT,
+            ErrorCode.LIMIT_REACHED,
+            "You can keep up to 50 memories. Delete one to add another.",
+        )
+
     @app.exception_handler(RateLimitedError)
     async def _rate_limited(
         request: Request, exc: RateLimitedError
@@ -394,6 +438,38 @@ NOT_FOUND_RESPONSES: dict[int | str, dict[str, object]] = {
         "No matching resource was found",
         ErrorCode.NOT_FOUND,
         "No journal entry with this id was found.",
+    ),
+}
+
+EXPLORE_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
+    **BIRTH_DATA_ERROR_RESPONSES,
+    404: error_response(
+        "The chart has no planet by that name",
+        ErrorCode.NOT_FOUND,
+        "This chart has no planet by that name.",
+    ),
+}
+
+MEMORY_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
+    **AUTH_REQUIRED_RESPONSES,
+    404: error_response(
+        "No matching memory was found",
+        ErrorCode.NOT_FOUND,
+        "No memory with this id was found.",
+    ),
+    409: error_response(
+        "The user already keeps the maximum number of memories",
+        ErrorCode.LIMIT_REACHED,
+        "You can keep up to 50 memories. Delete one to add another.",
+    ),
+}
+
+CONVERSATION_ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
+    **AUTH_REQUIRED_RESPONSES,
+    404: error_response(
+        "No matching conversation was found",
+        ErrorCode.NOT_FOUND,
+        "No conversation with this id was found.",
     ),
 }
 

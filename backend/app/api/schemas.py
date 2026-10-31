@@ -15,13 +15,13 @@ from typing import Literal
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.core.config import CalculationConfig
-from app.domain.ai import Intent, ReadingTopic
+from app.domain.ai import ExplanationDepth, Intent, ReadingTopic
 from app.domain.birth_data import BirthData
 from app.domain.compare import ChartComparison
 from app.domain.dasha import DashaPeriod, DashaTimeline
-from app.domain.transit import TransitReport, TransitSnapshot
-from app.domain.vedic import VedicChart
-from app.domain.western import WesternChart
+from app.domain.transit import GrahaTransit, TransitReport, TransitSnapshot
+from app.domain.vedic import GrahaPlacement, VedicChart
+from app.domain.western import Aspect, PlanetPosition, WesternChart
 
 
 class VedicChartRequest(BaseModel):
@@ -443,21 +443,67 @@ class JournalEntryListResponse(BaseModel):
     entries: tuple[JournalEntryResponse, ...]
 
 
+# --- Transparency (product spec §23) ---------------------------------------------
+
+
+class FactGroupResponse(BaseModel):
+    """A set of calculated facts the answer was built from."""
+
+    model_config = {"from_attributes": True}
+
+    kind: Literal["natal_chart", "transits", "period_changes", "dasha", "unavailable"]
+    facts: tuple[str, ...]
+
+
+class KnowledgeReferenceResponse(BaseModel):
+    """A curated knowledge entry that was retrieved for the answer."""
+
+    model_config = {"from_attributes": True}
+
+    id: str
+    title: str
+    category: str
+    version: int
+
+
+class AnswerFactorsResponse(BaseModel):
+    """What an answer was built from, so it can be traced back (product spec
+    §23). The four layers the spec asks to keep apart map to: `calculated`
+    (the chart facts), `knowledge` (the traditional interpretation), the
+    answer text itself (the AI's explanation), and `memory_used` plus
+    `history_turns` (what was specific to this person)."""
+
+    model_config = {"from_attributes": True}
+
+    calculated: tuple[FactGroupResponse, ...] = ()
+    knowledge: tuple[KnowledgeReferenceResponse, ...] = ()
+    memory_used: int = 0
+    history_turns: int = 0
+
+
 # --- AI Guide ----------------------------------------------------------
 
 
 class AiChatRequest(BaseModel):
     """One grounded question about one calculated chart.
 
-    No conversation id and no history: this is a single turn, not a chat
-    session - see `app/services/ai/service.py` for why that's deliberate for
-    now rather than an oversight.
+    Anonymous visitors get a single stateless turn. A logged-in user (send
+    the bearer token) also gets saved conversations, follow-up questions that
+    see the earlier turns, their saved explanation depth and configuration,
+    and the memories they chose to keep.
     """
 
     birth: BirthData
     system: Literal["vedic", "western", "compare"] = "vedic"
     question: str = Field(min_length=1, max_length=2000)
     config: CalculationConfig | None = None
+    depth: ExplanationDepth | None = None
+    """How technical to be. Falls back to the user's saved preference, then
+    to `beginner`."""
+    conversation_id: int | None = Field(default=None, ge=1)
+    """Continue a saved conversation (logged-in users only). Omit to start a
+    new one - a logged-in user's answered questions are saved; an anonymous
+    visitor's never are."""
 
     model_config = {
         "json_schema_extra": {
@@ -508,6 +554,18 @@ class AiChatResponse(BaseModel):
     the question was answered without the model. Empty for an ordinary
     answer."""
 
+    depth: ExplanationDepth
+    """The explanation depth that was used."""
+
+    conversation_id: int | None = None
+    """The saved conversation this exchange belongs to, so the next question
+    can continue it. `null` for an anonymous visitor, and for an answer that
+    never reached the model (a crisis or off-topic request), which is not
+    saved."""
+
+    factors: AnswerFactorsResponse = AnswerFactorsResponse()
+    """What the answer was built from (product spec §23)."""
+
 
 # --- Readings ------------------------------------------------------------
 
@@ -521,6 +579,8 @@ class ReadingRequest(BaseModel):
 
     birth: BirthData
     config: CalculationConfig | None = None
+    depth: ExplanationDepth | None = None
+    """How technical to be; see `AiChatRequest.depth`."""
     topic: ReadingTopic | None = None
     """Optional life-area focus for a daily, weekly or monthly reading.
     `birth_chart` is not a focus - it is its own reading, at
@@ -560,6 +620,7 @@ class TopicReadingRequest(BaseModel):
 
     birth: BirthData
     config: CalculationConfig | None = None
+    depth: ExplanationDepth | None = None
 
 
 class ReadingResponse(BaseModel):
@@ -573,3 +634,126 @@ class ReadingResponse(BaseModel):
     safety_flags: list[str] = []
     """`certainty_claim` or `risky_directive` if the output backstop had to
     replace what the model wrote with a fixed fallback; empty otherwise."""
+    depth: ExplanationDepth
+    factors: AnswerFactorsResponse = AnswerFactorsResponse()
+    """What the reading was built from (product spec §23)."""
+
+
+# --- Preferences -------------------------------------------------------------
+
+
+class PreferencesRequest(BaseModel):
+    """Replaces the user's saved preferences."""
+
+    explanation_depth: ExplanationDepth = ExplanationDepth.BEGINNER
+    calculation_config: CalculationConfig | None = None
+    """`null` returns to the application default."""
+
+    @field_validator("calculation_config")
+    @classmethod
+    def _no_server_paths(cls, value: CalculationConfig | None) -> CalculationConfig | None:
+        # `ephemeris_path` points at a directory on the server. It is a
+        # deployment setting, not something a user should be able to store.
+        if value is not None and value.ephemeris_path is not None:
+            raise ValueError("ephemeris_path is a server setting and cannot be saved")
+        return value
+
+
+class PreferencesResponse(BaseModel):
+    explanation_depth: ExplanationDepth
+    calculation_config: CalculationConfig | None
+
+
+# --- Memory --------------------------------------------------------------------
+
+
+class MemoryRequest(BaseModel):
+    """Something the user wants the guide to remember. Only ever created by
+    an explicit request - nothing becomes a memory on its own."""
+
+    kind: Literal["preference", "note"]
+    content: str = Field(min_length=1, max_length=500)
+
+
+class MemoryResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: int
+    kind: Literal["preference", "note"]
+    content: str
+    created_at: datetime
+
+
+class MemoryListResponse(BaseModel):
+    memories: tuple[MemoryResponse, ...]
+
+
+# --- Conversations ---------------------------------------------------------------
+
+
+class ConversationSummaryResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: int
+    title: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class ConversationListResponse(BaseModel):
+    conversations: tuple[ConversationSummaryResponse, ...]
+
+
+class ConversationMessageResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: int
+    role: Literal["user", "assistant"]
+    content: str
+    created_at: datetime
+
+
+class ConversationDetailResponse(ConversationSummaryResponse):
+    messages: tuple[ConversationMessageResponse, ...]
+
+
+# --- Planet exploration ------------------------------------------------------------
+
+
+class PlanetExplorationRequest(BaseModel):
+    birth: BirthData
+    system: Literal["vedic", "western"] = "vedic"
+    body: str = Field(min_length=1, max_length=20, examples=["Saturn"])
+    """The planet or graha's name, in any case."""
+    config: CalculationConfig | None = None
+
+
+class PlanetAboutResponse(BaseModel):
+    """The curated description of a planet (from the versioned knowledge
+    base): the traditional view, not a calculation."""
+
+    model_config = {"from_attributes": True}
+
+    id: str
+    title: str
+    version: int
+    text: str
+
+
+class PlanetExplorationResponse(BaseModel):
+    """Everything known about one planet in one chart."""
+
+    system: Literal["vedic", "western"]
+    body: str
+
+    placement: GrahaPlacement | None = None
+    """Vedic: the graha's place in the D1 chart."""
+    transit: GrahaTransit | None = None
+    """Vedic: where the graha is now, against the natal chart."""
+
+    position: PlanetPosition | None = None
+    """Western: the planet's place in the tropical chart."""
+    aspects: tuple[Aspect, ...] = ()
+    """Western: every aspect this planet makes."""
+
+    about: PlanetAboutResponse | None = None
