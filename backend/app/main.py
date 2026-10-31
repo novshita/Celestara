@@ -26,11 +26,13 @@ from app.api.routes import (
     dashas,
     health,
     journal,
+    metrics,
     profile,
     readings,
     transits,
 )
 from app.core.logging import configure_logging
+from app.core.metrics import HTTP_DURATION, HTTP_REQUESTS, route_label
 from app.db.migrate import upgrade_to_head
 
 configure_logging()
@@ -77,8 +79,20 @@ async def attach_request_id(request: Request, call_next) -> Response:
     request.state.request_id = request_id
 
     started = time.perf_counter()
-    response = await call_next(request)
-    duration_ms = (time.perf_counter() - started) * 1000.0
+    status_code = 500
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+    finally:
+        # Recorded even when the request blew up, as a 500: a failure that
+        # never produced a response is still a failure.
+        elapsed = time.perf_counter() - started
+        # The route *template* ("/journal/{entry_id}"), never the raw path,
+        # so ids cannot become labels - and 404s all share one.
+        route = route_label(request)
+        HTTP_REQUESTS.labels(request.method, route, str(status_code)).inc()
+        HTTP_DURATION.labels(request.method, route).observe(elapsed)
+    duration_ms = elapsed * 1000.0
 
     logger.info(
         "%s %s -> %d [request_id=%s] %.1fms",
@@ -96,6 +110,8 @@ async def attach_request_id(request: Request, call_next) -> Response:
 register_error_handlers(app)
 
 app.include_router(health.router)
+if metrics.metrics_enabled():
+    app.include_router(metrics.router)
 app.include_router(charts.router, prefix=API_PREFIX)
 app.include_router(dashas.router, prefix=API_PREFIX)
 app.include_router(transits.router, prefix=API_PREFIX)
