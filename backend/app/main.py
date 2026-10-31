@@ -23,10 +23,14 @@ from app.api.routes import (
     ai,
     auth,
     charts,
+    conversations,
     dashas,
+    explore,
     health,
     journal,
+    memory,
     metrics,
+    preferences,
     profile,
     readings,
     transits,
@@ -119,5 +123,9 @@ app.include_router(auth.router, prefix=API_PREFIX)
 app.include_router(profile.router, prefix=API_PREFIX)
 app.include_router(journal.router, prefix=API_PREFIX)
 app.include_router(account.router, prefix=API_PREFIX)
+app.include_router(preferences.router, prefix=API_PREFIX)
+app.include_router(memory.router, prefix=API_PREFIX)
+app.include_router(conversations.router, prefix=API_PREFIX)
+app.include_router(explore.router, prefix=API_PREFIX)
 app.include_router(ai.router, prefix=API_PREFIX)
 app.include_router(readings.router, prefix=API_PREFIX)

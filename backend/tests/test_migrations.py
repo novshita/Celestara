@@ -8,13 +8,24 @@ from __future__ import annotations
 
 import pytest
 from alembic.autogenerate import compare_metadata
+from alembic.config import Config
 from alembic.migration import MigrationContext
+from alembic.script import ScriptDirectory
 from sqlalchemy import create_engine, inspect, text
 
-from app.db.migrate import BASELINE_REVISION, upgrade_to_head
+from app.db.migrate import _MIGRATIONS_DIR, BASELINE_REVISION, upgrade_to_head
 from app.db.models import Base
 
-TABLES = {"users", "auth_sessions", "birth_profiles", "journal_entries"}
+#: The tables the baseline revision creates - what every database made before
+#: migrations existed contains, and nothing newer.
+BASELINE_TABLES = ["users", "auth_sessions", "birth_profiles", "journal_entries"]
+TABLES = set(Base.metadata.tables)
+
+
+def _head() -> str:
+    config = Config()
+    config.set_main_option("script_location", str(_MIGRATIONS_DIR))
+    return ScriptDirectory.from_config(config).get_current_head()
 
 
 @pytest.fixture
@@ -37,14 +48,14 @@ def test_a_new_database_gets_the_full_schema(engine):
     upgrade_to_head(engine)
 
     assert TABLES <= _tables(engine)
-    assert _version(engine) == BASELINE_REVISION
+    assert _version(engine) == _head()
 
 
 def test_running_it_again_changes_nothing(engine):
     upgrade_to_head(engine)
     upgrade_to_head(engine)
 
-    assert _version(engine) == BASELINE_REVISION
+    assert _version(engine) == _head()
     assert TABLES <= _tables(engine)
 
 
@@ -58,8 +69,11 @@ def test_migrations_produce_exactly_the_schema_the_models_declare(engine):
 
 
 def test_a_pre_migration_database_keeps_its_data_and_is_stamped(engine):
-    # What every database made before migrations existed looks like.
-    Base.metadata.create_all(bind=engine)
+    # What every database made before migrations existed looks like: the
+    # baseline tables, built by `create_all`, with no version record.
+    Base.metadata.create_all(
+        bind=engine, tables=[Base.metadata.tables[name] for name in BASELINE_TABLES]
+    )
     with engine.begin() as connection:
         connection.execute(
             text("INSERT INTO users (email, password_hash) VALUES ('a@example.com', 'x')")
@@ -70,7 +84,9 @@ def test_a_pre_migration_database_keeps_its_data_and_is_stamped(engine):
 
     with engine.connect() as connection:
         assert connection.execute(text("SELECT email FROM users")).scalar_one() == "a@example.com"
-    assert _version(engine) == BASELINE_REVISION
+    # Stamped at the baseline, then carried forward to the newest revision.
+    assert _version(engine) == _head()
+    assert TABLES <= _tables(engine)
 
 
 def test_a_partial_database_is_not_mistaken_for_a_pre_migration_one(engine):
@@ -83,11 +99,8 @@ def test_a_partial_database_is_not_mistaken_for_a_pre_migration_one(engine):
         upgrade_to_head(engine)
 
 
-def test_the_baseline_can_be_downgraded(engine):
+def test_every_revision_can_be_downgraded_to_nothing(engine):
     from alembic import command
-    from alembic.config import Config
-
-    from app.db.migrate import _MIGRATIONS_DIR
 
     upgrade_to_head(engine)
     config = Config()
@@ -97,3 +110,7 @@ def test_the_baseline_can_be_downgraded(engine):
         command.downgrade(config, "base")
 
     assert not (TABLES & _tables(engine))
+
+
+def test_the_baseline_revision_is_still_the_first():
+    assert BASELINE_REVISION == "0001"

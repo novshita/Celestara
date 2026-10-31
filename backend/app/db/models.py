@@ -2,11 +2,11 @@
 
 These are the persisted counterparts of a subset of engineering spec §19's
 conceptual data model: `User`, `Profile` (as `BirthProfile`), `JournalEntry`,
-plus an `AuthSession` table backing the auth layer. `Conversation`,
-`Memory`, `Reading` and the knowledge-base entities are deliberately not
-here yet - they belong to the AI layer, which has not been built, and
-modelling them now would mean guessing at a shape driven by decisions
-(provider, RAG chunking) that have not been made.
+an `AuthSession` table backing the auth layer, and for the AI layer
+`UserPreferences`, `Conversation`/`ConversationMessage`, `Memory` and
+`AiAuditRecord`. There is no table for the knowledge base: it is versioned
+files in the repository (`app/services/knowledge/corpus`), not rows, so every
+change to it is a reviewed diff. Generated readings are not stored either.
 
 Kept separate from the Pydantic domain models in `app/domain/`: those
 describe calculation inputs/outputs and are frozen value objects, while these
@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import datetime as dt
 
-from sqlalchemy import DateTime, ForeignKey, Text, UniqueConstraint, func
+from sqlalchemy import DateTime, ForeignKey, Integer, Text, UniqueConstraint, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -50,6 +50,18 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
     sessions: Mapped[list[AuthSession]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    preferences: Mapped[UserPreferences | None] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+    conversations: Mapped[list[Conversation]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    memories: Mapped[list[Memory]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    ai_audit_records: Mapped[list[AiAuditRecord]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
 
@@ -130,3 +142,142 @@ class AuthSession(Base):
     expires_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True))
 
     user: Mapped[User] = relationship(back_populates="sessions")
+
+
+class UserPreferences(Base):
+    """Settings a user keeps across visits (product spec §24, §29)."""
+
+    __tablename__ = "user_preferences"
+    __table_args__ = (UniqueConstraint("user_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    explanation_depth: Mapped[str] = mapped_column(default="beginner")
+    """`beginner` or `technical`, stored as text so a new level is a
+    domain-layer change only (the same reason as `time_confidence`)."""
+
+    calculation_config: Mapped[str | None] = mapped_column(Text, default=None)
+    """A `CalculationConfig` as JSON, validated on the way in. None means
+    the application default."""
+
+    created_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    user: Mapped[User] = relationship(back_populates="preferences")
+
+
+class Conversation(Base):
+    """A saved AI Guide conversation. Only logged-in users get these;
+    anonymous visitors stay stateless (product spec §19)."""
+
+    __tablename__ = "conversations"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+
+    title: Mapped[str]
+    """The opening question, shortened - what the user would recognise it by."""
+
+    created_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    user: Mapped[User] = relationship(back_populates="conversations")
+    messages: Mapped[list[ConversationMessage]] = relationship(
+        back_populates="conversation",
+        cascade="all, delete-orphan",
+        order_by="ConversationMessage.id",
+    )
+
+
+class ConversationMessage(Base):
+    __tablename__ = "conversation_messages"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    conversation_id: Mapped[int] = mapped_column(
+        ForeignKey("conversations.id"), index=True
+    )
+
+    role: Mapped[str]
+    """`user` or `assistant`."""
+    content: Mapped[str] = mapped_column(Text)
+
+    created_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    conversation: Mapped[Conversation] = relationship(back_populates="messages")
+
+
+class Memory(Base):
+    """Something the user chose to have the guide remember (product spec
+    §19). Only ever created by an explicit request from the user: nothing in
+    a conversation becomes memory on its own."""
+
+    __tablename__ = "memories"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+
+    kind: Mapped[str]
+    """`preference` or `note`."""
+    content: Mapped[str] = mapped_column(Text)
+
+    created_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    user: Mapped[User] = relationship(back_populates="memories")
+
+
+class AiAuditRecord(Base):
+    """How one AI answer was produced (engineering spec §22).
+
+    Deliberately holds no personal content: not the question, not the
+    answer, not a single chart value. It records which *kinds* of fact
+    grounded the answer (`natal_chart`, `transits`...), which curated
+    knowledge entries were retrieved, how many memories and prior turns were
+    supplied, the intent, model, safety flags and timing - enough to explain
+    and debug an answer without becoming a second copy of what the user said
+    (spec §20, §32). `user_id` is null for an anonymous request; a logged-in
+    user's records go with their account.
+    """
+
+    __tablename__ = "ai_audit_records"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id"), index=True, default=None
+    )
+
+    request_id: Mapped[str]
+    endpoint: Mapped[str]
+    """`chat` or the reading's period."""
+    intent: Mapped[str | None] = mapped_column(default=None)
+    system: Mapped[str | None] = mapped_column(default=None)
+    model: Mapped[str | None] = mapped_column(default=None)
+    """None when the answer was fixed text that never reached the model."""
+    depth: Mapped[str]
+
+    factor_kinds: Mapped[str] = mapped_column(default="")
+    """Comma-separated kinds of calculated fact used."""
+    knowledge_ids: Mapped[str] = mapped_column(default="")
+    """Comma-separated ids of retrieved knowledge entries."""
+    safety_flags: Mapped[str] = mapped_column(default="")
+    memory_count: Mapped[int] = mapped_column(Integer, default=0)
+    history_turns: Mapped[int] = mapped_column(Integer, default=0)
+    latency_ms: Mapped[int] = mapped_column(Integer, default=0)
+
+    created_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    user: Mapped[User | None] = relationship(back_populates="ai_audit_records")

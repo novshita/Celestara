@@ -17,8 +17,11 @@ returns.
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from app.domain.ai import ReadingTopic
 from app.domain.compare import ChartComparison
+from app.domain.dasha import DashaTimeline
 from app.domain.transit import PeriodTransitReport, TransitEvent, TransitReport
 from app.domain.vedic import VedicChart
 from app.domain.western import WesternChart
@@ -245,12 +248,9 @@ def _format_event(event: TransitEvent) -> str:
     return f"- {when} UTC: {event.graha} {what}{suffix}."
 
 
-def format_period_transit_context(report: PeriodTransitReport) -> str:
-    """For the weekly and monthly readings: today's positions, plus what
-    changes between now and the end of the period."""
+def format_period_changes(report: PeriodTransitReport) -> str:
+    """What changes during the period: the list of ingresses and stations."""
     lines = [
-        format_transit_reading_context(report.start),
-        "",
         f"Period: the next {report.days} days, to "
         f"{report.end.strftime('%Y-%m-%d %H:%M')} UTC.",
         "Changes during the period (the Moon is left out; it changes rashi "
@@ -262,5 +262,53 @@ def format_period_transit_context(report: PeriodTransitReport) -> str:
         lines.append(
             "- None: no graha other than the Moon changes rashi or turns "
             "retrograde or direct in this period."
+        )
+    return "\n".join(lines)
+
+
+def format_period_transit_context(report: PeriodTransitReport) -> str:
+    """For the weekly and monthly readings: today's positions, plus what
+    changes between now and the end of the period."""
+    return (
+        format_transit_reading_context(report.start)
+        + "\n\n"
+        + format_period_changes(report)
+    )
+
+
+def format_dasha_context(timeline: DashaTimeline, now: datetime) -> str:
+    """Where the person is in the Vimshottari Dasha at `now`: the running
+    Mahadasha and Antardasha, and the next Mahadasha."""
+    moon = timeline.moon_nakshatra
+    lines = [
+        "System: Vedic (sidereal) - Vimshottari Dasha.",
+        f"Seeded from the Moon in {moon.name} pada {moon.pada}; the first "
+        f"Mahadasha is {timeline.starting_lord}, with "
+        f"{timeline.balance_years:.2f} years remaining at birth.",
+    ]
+
+    active = timeline.active_at(now)
+    if active:
+        for period in active[:2]:
+            label = "Mahadasha" if period.level.value == "maha" else "Antardasha"
+            lines.append(
+                f"Current {label}: {period.lord}, "
+                f"{period.start.strftime('%Y-%m-%d')} to "
+                f"{period.end.strftime('%Y-%m-%d')}."
+            )
+        upcoming = [p for p in timeline.periods if p.start > now]
+        if upcoming:
+            nxt = upcoming[0]
+            lines.append(
+                f"Next Mahadasha: {nxt.lord}, from {nxt.start.strftime('%Y-%m-%d')}."
+            )
+    else:
+        lines.append("No Dasha period covers today's date in the calculated timeline.")
+
+    if timeline.uncertainty_days > 0:
+        lines.append(
+            f"Period boundaries could shift by about "
+            f"{timeline.uncertainty_days:.0f} days because the birth time is "
+            "not exact."
         )
     return "\n".join(lines)

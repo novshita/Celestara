@@ -6,6 +6,7 @@ decide them, so they live where neither depends on the other.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -59,3 +60,52 @@ class ReadingTopic(str, Enum):
     LOVE = "love"
     RELATIONSHIPS = "relationships"
     GROWTH = "growth"
+
+
+class ExplanationDepth(str, Enum):
+    """How technical an explanation should be (product spec §24): beginner
+    by default, with technical detail on request or by saved preference."""
+
+    BEGINNER = "beginner"
+    TECHNICAL = "technical"
+
+
+@dataclass(frozen=True)
+class FactGroup:
+    """A set of calculated facts that grounded an answer, of one `kind`:
+    `natal_chart`, `transits`, `period_changes`, `dasha`, or `unavailable`
+    (what could not be calculated, stated so the gap is never filled in)."""
+
+    kind: str
+    facts: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class KnowledgeRef:
+    """A curated knowledge entry that was retrieved for an answer."""
+
+    id: str
+    title: str
+    category: str
+    version: int
+
+
+@dataclass(frozen=True)
+class AnswerFactors:
+    """What an answer was built from (product spec §23): the calculated
+    facts, the curated knowledge, and how much user context was supplied.
+
+    Maps to the four layers the spec asks to keep apart: `calculated` are the
+    chart facts; `knowledge` is the traditional interpretation; the answer
+    text itself is the AI's explanation; and `memory_used` and
+    `history_turns` say how much was specific to this person.
+    """
+
+    calculated: tuple[FactGroup, ...] = ()
+    knowledge: tuple[KnowledgeRef, ...] = ()
+    memory_used: int = 0
+    history_turns: int = 0
+
+    @property
+    def kinds(self) -> tuple[str, ...]:
+        return tuple(group.kind for group in self.calculated)

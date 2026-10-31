@@ -54,6 +54,12 @@ SAFETY_EVENTS = Counter(
     ["event"],
     registry=registry,
 )
+RETRIEVAL_DURATION = Histogram(
+    "celestara_retrieval_duration_seconds",
+    "Time spent finding relevant passages in the curated knowledge base.",
+    buckets=(0.0005, 0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1),
+    registry=registry,
+)
 RATE_LIMITED = Counter(
     "celestara_rate_limited_total",
     "AI requests refused because the caller exceeded the rate limit.",

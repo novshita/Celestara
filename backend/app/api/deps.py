@@ -49,5 +49,26 @@ def get_current_user(
     return get_user_by_token(db, token)
 
 
+def get_optional_user(
+    db: DbSession,
+    credentials: Annotated[
+        HTTPAuthorizationCredentials | None, Depends(bearer_scheme)
+    ],
+) -> User | None:
+    """The logged-in user if a token was sent, `None` for an anonymous
+    caller.
+
+    For the endpoints that work without an account but do more with one (the
+    AI Guide and readings: saved conversations, memory, preferences). A token
+    that *was* sent but is invalid or expired is still a 401, not a quiet
+    downgrade to anonymous: otherwise someone with an expired session would
+    believe their conversation was being saved when it was not.
+    """
+    if credentials is None:
+        return None
+    return get_user_by_token(db, credentials.credentials)
+
+
 CurrentToken = Annotated[str, Depends(get_bearer_token)]
 CurrentUser = Annotated[User, Depends(get_current_user)]
+OptionalUser = Annotated[User | None, Depends(get_optional_user)]

@@ -28,3 +28,8 @@ dev = [
 pythonpath = ["."]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers"
+
+[tool.setuptools.package-data]
+# Data files that live inside packages: the curated knowledge base and the
+# migration support files (the revisions themselves are Python).
+app = ["services/knowledge/corpus/*.md", "db/migrations/script.py.mako"]
