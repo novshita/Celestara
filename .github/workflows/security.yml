@@ -1,0 +1,67 @@
+name: Security
+
+# Dependency and container vulnerability scanning (engineering spec §33).
+# Also runs weekly: a dependency that was clean when it was merged can have
+# an advisory published against it later, with no code change to trigger CI.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the backend and pip-audit
+        working-directory: backend
+        run: pip install . pip-audit
+      - name: Audit installed packages
+        # Audits what was actually resolved, not just what pyproject asks for.
+        run: pip-audit --skip-editable
+
+  node-dependencies:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      # Production dependencies only: this is what ships. Lint and build
+      # tooling has advisories of its own that never reach a user.
+      - run: npm audit --omit=dev --audit-level=high
+
+  container-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build images
+        run: |
+          docker build -t celestara-backend backend
+          docker build -t celestara-frontend frontend
+      - name: Scan images
+        # Critical and high findings that have a fix available. Findings
+        # with no fix yet are ignored: nothing can be done about them but
+        # wait, and failing on them would make this check permanently red.
+        run: |
+          for image in celestara-backend celestara-frontend; do
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+              aquasec/trivy:latest image --quiet --scanners vuln \
+              --severity CRITICAL,HIGH --ignore-unfixed --exit-code 1 "$image"
+          done

@@ -17,6 +17,7 @@ returned for the same birth data.
 from __future__ import annotations
 
 import os
+import time
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -24,6 +25,7 @@ import anthropic
 
 from app.core.config import DEFAULT_CALCULATION_CONFIG, CalculationConfig
 from app.domain.ai import Intent, ReadingTopic
+from app.core.metrics import AI_CALLS, AI_DURATION, SAFETY_EVENTS
 from app.domain.birth_data import BirthData
 from app.services.ai.context import (
     format_compare_context,
@@ -127,16 +129,11 @@ def _build_context(
     return format_vedic_context(calculate_d1_chart(birth, config))
 
 
-def _call_claude(user_content: str, declined_message: str) -> str:
-    """Send one grounded prompt to Claude and return its text.
-
-    Shared by every AI-layer entry point (chat, readings, and whatever is
-    added next): the failure handling, model selection, and refusal
-    fallback are identical regardless of what task the user content asks
-    for - only the prompt itself differs per caller.
-    """
+def _create_message(user_content: str):
+    """The provider call itself, with every SDK failure mode mapped to one
+    `AIProviderError`."""
     try:
-        response = _client().messages.create(
+        return _client().messages.create(
             model=current_model(),
             max_tokens=MAX_ANSWER_TOKENS,
             system=_SYSTEM_PROMPT,
@@ -157,6 +154,25 @@ def _call_claude(user_content: str, declined_message: str) -> str:
         # availability, not this endpoint's internal correctness, so it is
         # still an `AIProviderError` and not a bare 500.
         raise AIProviderError("AI provider call failed") from exc
+
+
+def _call_claude(user_content: str, declined_message: str) -> str:
+    """Send one grounded prompt to Claude and return its text.
+
+    Shared by every AI-layer entry point (chat, readings, and whatever is
+    added next): the failure handling, model selection, and refusal
+    fallback are identical regardless of what task the user content asks
+    for - only the prompt itself differs per caller.
+    """
+    started = time.perf_counter()
+    try:
+        response = _create_message(user_content)
+    except AIProviderError:
+        AI_CALLS.labels("provider_error").inc()
+        raise
+    finally:
+        AI_DURATION.observe(time.perf_counter() - started)
+    AI_CALLS.labels("ok").inc()
 
     if response.stop_reason == "refusal":
         return declined_message
@@ -205,6 +221,7 @@ def answer_question(
     intent = classify_intent(question, system, assessment)
 
     if assessment.crisis:
+        SAFETY_EVENTS.labels("crisis").inc()
         return ChatResult(
             answer=CRISIS_RESPONSE,
             intent=Intent.HIGH_STAKES,
@@ -214,6 +231,7 @@ def answer_question(
         )
 
     if intent is Intent.UNSUPPORTED:
+        SAFETY_EVENTS.labels("unsupported").inc()
         return ChatResult(
             answer=UNSUPPORTED_RESPONSE,
             intent=intent,
@@ -242,6 +260,7 @@ def answer_question(
     # certainty or tells someone how to decide gets replaced, not shown.
     flags = check_output(answer)
     if flags:
+        SAFETY_EVENTS.labels("output_replaced").inc()
         answer = SAFE_FALLBACK_CHAT
 
     return ChatResult(
@@ -364,6 +383,7 @@ def _finish_reading(
 
     flags = check_output(reading)
     if flags:
+        SAFETY_EVENTS.labels("output_replaced").inc()
         reading = SAFE_FALLBACK_READING
 
     return ReadingResult(reading=reading, generated_for=generated_for, safety_flags=flags)

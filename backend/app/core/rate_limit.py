@@ -25,6 +25,8 @@ from collections.abc import Callable
 
 from fastapi import Request
 
+from app.core.metrics import RATE_LIMITED
+
 logger = logging.getLogger("celestara.api")
 
 DEFAULT_AI_LIMIT_PER_MINUTE = 10
@@ -155,4 +157,5 @@ def enforce_ai_rate_limit(request: Request) -> None:
 
     retry_after = ai_rate_limiter.check(_client_key(request), limit, WINDOW_SECONDS)
     if retry_after is not None:
+        RATE_LIMITED.inc()
         raise RateLimitedError(max(1, math.ceil(retry_after)))

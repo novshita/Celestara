@@ -198,6 +198,23 @@ the migrations disagree, so a model change without a migration cannot reach
 `main`. With several workers, set `AUTO_MIGRATE=false` and run
 `alembic upgrade head` once before starting them.
 
+### 📈 Metrics and security scanning
+
+**Metrics.** Set `METRICS_ENABLED=true` and the backend serves Prometheus
+metrics at `/metrics` (add `METRICS_TOKEN` to require a bearer token): request
+counts and latency by route, AI provider calls, failures and latency, safety
+actions (crisis, off-topic, replaced output) and rate-limited requests. Only
+counts and timings are recorded - routes appear as templates such as
+`/api/v1/journal/{entry_id}`, never with real ids, and no question, birth
+record or other request content ever reaches a metric. Every request is also
+logged with a request id.
+
+**Scanning.** `.github/workflows/security.yml` audits the Python and
+production npm dependencies and scans both Docker images for fixable
+critical/high vulnerabilities, on every pull request and weekly (a clean
+dependency can have an advisory published later). Dependabot opens update
+pull requests for pip, npm, Docker and GitHub Actions.
+
 ### 🐳 Docker
 
 The whole app runs with one command:
