@@ -264,6 +264,11 @@ The site has the four primary pages from product spec §10:
   save your one birth profile (product spec §28) and keep journal entries
   (product spec §16: reflective, not predictive) with full create/edit/delete.
 
+Once you have saved a birth profile, the birth forms on Home and Birth Chart
+fill themselves in from it (you can still change them for a one-off). If you
+are logged out, your session has expired or the backend can't be reached, the
+forms are simply empty - pre-filling never gets in the way.
+
 The session is a bearer token from the backend held in an httpOnly cookie,
 set and read entirely server-side (Next.js Server Actions and Server
 Components - the token is never exposed to client JavaScript). The celestial

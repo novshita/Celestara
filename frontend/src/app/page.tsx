@@ -3,8 +3,13 @@ import Link from "next/link";
 import { AiGuideForm } from "@/components/AiGuideForm";
 import { PageHeading } from "@/components/PageHeading";
 import { ReadingForm } from "@/components/ReadingForm";
+import { SavedProfileNote } from "@/components/SavedProfileNote";
+import { birthDefaults, getSavedBirth } from "@/lib/profile";
 
-export default function Home() {
+export default async function Home() {
+  const saved = await getSavedBirth();
+  const defaults = birthDefaults(saved);
+
   return (
     <>
       <PageHeading title="Your celestial universe">
@@ -26,9 +31,11 @@ export default function Home() {
         </span>
       </Link>
 
-      <ReadingForm />
+      <SavedProfileNote saved={saved} />
 
-      <AiGuideForm />
+      <ReadingForm defaults={defaults} />
+
+      <AiGuideForm defaults={defaults} />
     </>
   );
 }
