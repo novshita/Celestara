@@ -20,6 +20,7 @@ import type {
   BirthData,
   BirthProfileResponse,
   CompareChartResponse,
+  ExplanationDepth,
   JournalEntry,
   JournalEntryListResponse,
   ReadingFocus,
@@ -235,17 +236,33 @@ async function clientForwardingHeaders(): Promise<Record<string, string>> {
   return forwarded ? { "X-Forwarded-For": forwarded } : {};
 }
 
+/** The AI endpoints work without an account. With a token the backend also
+ * uses the user's saved preferences and memories and saves the conversation. */
+export interface AiCallOptions {
+  depth?: ExplanationDepth;
+  token?: string;
+}
+
 /** No auth required - product spec §28: the AI Guide, like chart
  * calculation, is explorable without an account. */
 export async function askAiGuide(
   birth: BirthData,
   system: AiSystem,
   question: string,
+  options: AiCallOptions & { conversationId?: number } = {},
 ): Promise<AiChatResponse> {
   return post<AiChatResponse>(
     "/api/v1/ai/chat",
-    { birth, system, question },
-    undefined,
+    {
+      birth,
+      system,
+      question,
+      ...(options.depth ? { depth: options.depth } : {}),
+      ...(options.conversationId
+        ? { conversation_id: options.conversationId }
+        : {}),
+    },
+    options.token,
     await clientForwardingHeaders(),
   );
 }
@@ -258,11 +275,16 @@ export async function getReading(
   birth: BirthData,
   period: ReadingPeriod,
   focus?: ReadingFocus,
+  options: AiCallOptions = {},
 ): Promise<ReadingResponse> {
   return post<ReadingResponse>(
     `/api/v1/readings/${period}`,
-    focus ? { birth, topic: focus } : { birth },
-    undefined,
+    {
+      birth,
+      ...(focus ? { topic: focus } : {}),
+      ...(options.depth ? { depth: options.depth } : {}),
+    },
+    options.token,
     await clientForwardingHeaders(),
   );
 }
@@ -270,11 +292,12 @@ export async function getReading(
 /** The birth-chart reading: natal chart only, no transits. */
 export async function getBirthChartReading(
   birth: BirthData,
+  options: AiCallOptions = {},
 ): Promise<ReadingResponse> {
   return post<ReadingResponse>(
     "/api/v1/readings/topic/birth_chart",
-    { birth },
-    undefined,
+    { birth, ...(options.depth ? { depth: options.depth } : {}) },
+    options.token,
     await clientForwardingHeaders(),
   );
 }

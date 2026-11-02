@@ -1,9 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { askAiGuideAction, type AiChatFormState } from "@/app/ai-actions";
+import { AnswerFactorsPanel } from "@/components/AnswerFactorsPanel";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
+import { DepthSelect } from "@/components/DepthSelect";
 import { Field } from "@/components/Field";
 import type { AiSystem, BirthData } from "@/lib/types";
 
@@ -21,6 +23,15 @@ export function AiGuideForm({ defaults }: { defaults?: BirthData }) {
     INITIAL_STATE,
   );
   const fieldErrors = state.status === "error" ? state.fieldErrors : {};
+
+  // A saved answer names the conversation the next question continues. The
+  // visitor can start afresh, which just means not sending that id: the
+  // state they dismissed is remembered, so the next answer starts a new one.
+  const [dismissed, setDismissed] = useState<typeof state | null>(null);
+  const conversationId =
+    state.status === "success" && state !== dismissed
+      ? state.conversationId
+      : null;
 
   return (
     <section className="flex flex-col gap-6 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
@@ -53,6 +64,25 @@ export function AiGuideForm({ defaults }: { defaults?: BirthData }) {
         </div>
 
         <BirthFieldsFieldset fieldErrors={fieldErrors} defaults={defaults} />
+
+        <DepthSelect />
+
+        {conversationId !== null && (
+          <>
+            <input type="hidden" name="conversation_id" value={conversationId} />
+            <p className="flex items-center gap-3 text-sm text-slate-400">
+              Continuing your saved conversation - the guide remembers what
+              you have asked so far.
+              <button
+                type="button"
+                onClick={() => setDismissed(state)}
+                className="rounded border border-slate-700 px-2 py-0.5 text-xs text-slate-300 hover:border-slate-500"
+              >
+                Start a new one
+              </button>
+            </p>
+          </>
+        )}
 
         <Field label="Your question" error={fieldErrors["question"]}>
           <textarea
@@ -118,6 +148,15 @@ function AiAnswer({
           response is shown instead.
         </p>
       )}
+
+      {state.sessionExpired && (
+        <p className="text-xs text-amber-400">
+          Your session has expired, so you were logged out and this answer was
+          not saved. Log in again to keep your conversations.
+        </p>
+      )}
+
+      <AnswerFactorsPanel factors={state.factors} depth={state.depth} />
 
       <span className="text-xs text-slate-500">
         {state.model === null
