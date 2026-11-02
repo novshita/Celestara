@@ -1,8 +1,17 @@
 "use server";
 
+import { withOptionalSession } from "@/lib/aiSession";
 import { askAiGuide, BackendError } from "@/lib/backend";
 import { buildBirthData } from "@/lib/birthFormData";
-import type { AiIntent, AiSystem, SafetyFlag } from "@/lib/types";
+import type {
+  AiIntent,
+  AiSystem,
+  AnswerFactors,
+  ExplanationDepth,
+  SafetyFlag,
+} from "@/lib/types";
+
+const DEPTHS: readonly ExplanationDepth[] = ["beginner", "technical"];
 
 export type AiChatFormState =
   | { status: "idle" }
@@ -16,6 +25,14 @@ export type AiChatFormState =
       intent: AiIntent;
       notice: string | null;
       safetyFlags: SafetyFlag[];
+      depth: ExplanationDepth;
+      /** The saved conversation to continue with the next question, or
+       * `null` when this exchange was not saved. */
+      conversationId: number | null;
+      factors: AnswerFactors;
+      /** True when the visitor's session had expired: they were logged out
+       * and this answer was given anonymously (so it was not saved). */
+      sessionExpired: boolean;
     };
 
 /**
@@ -32,17 +49,37 @@ export async function askAiGuideAction(
   const system = formData.get("system") as AiSystem;
   const question = formData.get("question") as string;
 
+  // "" means "use my saved default"; anything unrecognised is dropped, not
+  // forwarded for the backend to reject.
+  const rawDepth = formData.get("depth");
+  const depth = DEPTHS.includes(rawDepth as ExplanationDepth)
+    ? (rawDepth as ExplanationDepth)
+    : undefined;
+  const rawConversation = Number.parseInt(
+    (formData.get("conversation_id") as string) ?? "",
+    10,
+  );
+  const conversationId =
+    Number.isInteger(rawConversation) && rawConversation > 0
+      ? rawConversation
+      : undefined;
+
   try {
-    const { answer, system_used, model, intent, notice, safety_flags } =
-      await askAiGuide(birth, system, question);
+    const { result, sessionExpired } = await withOptionalSession((token) =>
+      askAiGuide(birth, system, question, { depth, conversationId, token }),
+    );
     return {
       status: "success",
-      answer,
-      systemUsed: system_used,
-      model,
-      intent,
-      notice,
-      safetyFlags: safety_flags,
+      answer: result.answer,
+      systemUsed: result.system_used,
+      model: result.model,
+      intent: result.intent,
+      notice: result.notice,
+      safetyFlags: result.safety_flags,
+      depth: result.depth,
+      conversationId: result.conversation_id,
+      factors: result.factors,
+      sessionExpired,
     };
   } catch (error) {
     if (error instanceof BackendError) {

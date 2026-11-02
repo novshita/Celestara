@@ -6,7 +6,9 @@ import {
   requestReadingAction,
   type ReadingFormState,
 } from "@/app/reading-actions";
+import { AnswerFactorsPanel } from "@/components/AnswerFactorsPanel";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
+import { DepthSelect } from "@/components/DepthSelect";
 import type { BirthData, ReadingFocus, ReadingKind } from "@/lib/types";
 
 const INITIAL_STATE: ReadingFormState = { status: "idle" };
@@ -101,6 +103,8 @@ export function ReadingForm({ defaults }: { defaults?: BirthData }) {
 
         <BirthFieldsFieldset fieldErrors={fieldErrors} defaults={defaults} />
 
+        <DepthSelect />
+
         <button
           type="submit"
           disabled={isPending}
@@ -121,6 +125,14 @@ export function ReadingForm({ defaults }: { defaults?: BirthData }) {
           <p className="whitespace-pre-wrap text-sm text-slate-100">
             {state.reading}
           </p>
+          {state.sessionExpired && (
+            <p className="text-xs text-amber-400">
+              Your session has expired, so you were logged out and this
+              reading does not use your saved preferences. Log in again to
+              get them back.
+            </p>
+          )}
+          <AnswerFactorsPanel factors={state.factors} depth={state.depth} />
           {state.safetyFlags.length > 0 && (
             <p className="text-xs text-slate-500">
               The original reading could not be shown safely, so this

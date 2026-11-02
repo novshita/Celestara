@@ -306,7 +306,12 @@ The site has the four primary pages from product spec §10:
 
 - **Home** (`/`): readings (today, this week, this month or your birth chart,
   optionally focused on career, love, relationships or growth) and the AI
-  Guide. Neither needs an account, but both need the backend to have
+  Guide. Both have an Explanation choice (beginner or technical, or your saved
+  default) and a collapsed "How this was built" panel showing the calculated
+  facts, the traditional knowledge drawn on, and how much of your own context
+  was used. When you are logged in the AI Guide continues a saved
+  conversation, so a follow-up question sees what you asked before; you can
+  start a new one at any point. Neither needs an account, but both need the backend to have
   `ANTHROPIC_API_KEY` set, or they show the backend's "AI guide isn't
   answering right now" message.
 - **Birth Chart** (`/chart`): a birth-data form that calculates a Vedic,

@@ -1,8 +1,17 @@
 "use server";
 
+import { withOptionalSession } from "@/lib/aiSession";
 import { BackendError, getBirthChartReading, getReading } from "@/lib/backend";
 import { buildBirthData } from "@/lib/birthFormData";
-import type { ReadingFocus, ReadingKind, SafetyFlag } from "@/lib/types";
+import type {
+  AnswerFactors,
+  ExplanationDepth,
+  ReadingFocus,
+  ReadingKind,
+  SafetyFlag,
+} from "@/lib/types";
+
+const DEPTHS: readonly ExplanationDepth[] = ["beginner", "technical"];
 
 export type ReadingFormState =
   | { status: "idle" }
@@ -16,6 +25,11 @@ export type ReadingFormState =
       kind: ReadingKind;
       focus: ReadingFocus | null;
       safetyFlags: SafetyFlag[];
+      depth: ExplanationDepth;
+      factors: AnswerFactors;
+      /** True when the visitor's session had expired and the reading was
+       * given anonymously, without their saved preferences and memories. */
+      sessionExpired: boolean;
     };
 
 const FOCUSES: readonly ReadingFocus[] = [
@@ -45,19 +59,28 @@ export async function requestReadingAction(
       ? (rawFocus as ReadingFocus)
       : null;
 
+  const rawDepth = formData.get("depth");
+  const depth = DEPTHS.includes(rawDepth as ExplanationDepth)
+    ? (rawDepth as ExplanationDepth)
+    : undefined;
+
   try {
-    const { reading, model, generated_for, safety_flags } =
+    const { result, sessionExpired } = await withOptionalSession((token) =>
       kind === "birth_chart"
-        ? await getBirthChartReading(birth)
-        : await getReading(birth, kind, focus ?? undefined);
+        ? getBirthChartReading(birth, { depth, token })
+        : getReading(birth, kind, focus ?? undefined, { depth, token }),
+    );
     return {
       status: "success",
-      reading,
-      model,
-      generatedFor: generated_for,
+      reading: result.reading,
+      model: result.model,
+      generatedFor: result.generated_for,
       kind,
       focus,
-      safetyFlags: safety_flags,
+      safetyFlags: result.safety_flags,
+      depth: result.depth,
+      factors: result.factors,
+      sessionExpired,
     };
   } catch (error) {
     if (error instanceof BackendError) {

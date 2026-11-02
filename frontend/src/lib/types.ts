@@ -323,6 +323,38 @@ export type AiIntent =
 /** Why the safety pipeline replaced or short-circuited an answer. */
 export type SafetyFlag = "crisis" | "certainty_claim" | "risky_directive";
 
+/** How technical an explanation should be (product spec §24). */
+export type ExplanationDepth = "beginner" | "technical";
+
+/** What kind of calculated fact a group holds. `unavailable` states what
+ * could not be calculated, so a gap is shown and never filled in. */
+export type FactKind =
+  | "natal_chart"
+  | "transits"
+  | "period_changes"
+  | "dasha"
+  | "unavailable";
+
+export interface FactGroup {
+  kind: FactKind;
+  facts: string[];
+}
+
+export interface KnowledgeReference {
+  id: string;
+  title: string;
+  category: string;
+  version: number;
+}
+
+/** What an answer or reading was built from (product spec §23). */
+export interface AnswerFactors {
+  calculated: FactGroup[];
+  knowledge: KnowledgeReference[];
+  memory_used: number;
+  history_turns: number;
+}
+
 export interface AiChatResponse {
   answer: string;
   system_used: AiSystem;
@@ -334,6 +366,12 @@ export interface AiChatResponse {
    * professional for a medical, legal or financial question). */
   notice: string | null;
   safety_flags: SafetyFlag[];
+  depth: ExplanationDepth;
+  /** The saved conversation this exchange belongs to, so a follow-up can
+   * continue it. `null` for an anonymous visitor, and for an answer that was
+   * never written by the model (which is not saved). */
+  conversation_id: number | null;
+  factors: AnswerFactors;
 }
 
 // --- Readings --------------------------------------------------------------
@@ -354,6 +392,8 @@ export interface ReadingResponse {
    * reading, which uses none. */
   generated_for: string | null;
   safety_flags: SafetyFlag[];
+  depth: ExplanationDepth;
+  factors: AnswerFactors;
 }
 
 /** The shape every backend error response takes (`app/api/errors.py`). */
