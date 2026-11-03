@@ -326,6 +326,12 @@ The site has the four primary pages from product spec §10:
   saved AI Guide conversations (read or delete), and "Delete my data", which
   asks you to type `DELETE` before erasing the account and everything in it.
 
+With a saved profile, Home also shows a small dashboard under the birth-chart
+link (product spec §9): your current Dasha and Antardasha, where the Moon,
+Jupiter and Saturn are now, and a few suggested questions built from those
+calculated facts. Clicking a question only fills the Guide's box; nothing is
+sent until you press Ask.
+
 Once you have saved a birth profile, the birth forms on Home and Birth Chart
 fill themselves in from it (you can still change them for a one-off). If you
 are logged out, your session has expired or the backend can't be reached, the

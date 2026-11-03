@@ -1,12 +1,23 @@
 import Link from "next/link";
 
 import { AiGuideForm } from "@/components/AiGuideForm";
+import { Dashboard } from "@/components/Dashboard";
 import { PageHeading } from "@/components/PageHeading";
 import { ReadingForm } from "@/components/ReadingForm";
 import { SavedProfileNote } from "@/components/SavedProfileNote";
 import { birthDefaults, getSavedBirth } from "@/lib/profile";
 
-export default async function Home() {
+const MAX_PREFILL = 300;
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string | string[] }>;
+}) {
+  // A suggested question arrives as `?q=`. It only fills the box - nothing is
+  // sent until the visitor presses Ask - and is clamped like any other input.
+  const { q } = await searchParams;
+  const prefill = (typeof q === "string" ? q : "").slice(0, MAX_PREFILL);
   const saved = await getSavedBirth();
   const defaults = birthDefaults(saved);
 
@@ -33,9 +44,11 @@ export default async function Home() {
 
       <SavedProfileNote saved={saved} />
 
+      {saved.status === "saved" && <Dashboard birth={saved.birth} />}
+
       <ReadingForm defaults={defaults} />
 
-      <AiGuideForm defaults={defaults} />
+      <AiGuideForm key={prefill} defaults={defaults} initialQuestion={prefill} />
     </>
   );
 }
