@@ -27,7 +27,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🪐 Planet exploration | ✅ Implemented - one call per planet: placement, current transit or aspects, and its description |
 | 🔒 Privacy controls | ✅ Implemented - delete memory, conversations, or everything in one call |
 | 📖 Daily/weekly/monthly readings + birth chart, career, love, relationships, growth | ✅ Implemented - weekly/monthly look ahead for real changes; follow-ups go through saved conversations |
-| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, AI Guide (with safety notices), readings with period, focus and birth-chart options |
+| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, memory and conversation management, delete-my-data, AI Guide (with safety notices), readings with period, focus and birth-chart options |
 
 | 📄 Document | What it covers |
 |---|---|
@@ -321,6 +321,10 @@ The site has the four primary pages from product spec §10:
   Logged out they show the log-in / create-account form. Logged in, you can
   save your one birth profile (product spec §28) and keep journal entries
   (product spec §16: reflective, not predictive) with full create/edit/delete.
+  The Profile page also holds your default explanation depth, what the guide
+  remembers (add or forget anything; nothing is remembered on its own), your
+  saved AI Guide conversations (read or delete), and "Delete my data", which
+  asks you to type `DELETE` before erasing the account and everything in it.
 
 Once you have saved a birth profile, the birth forms on Home and Birth Chart
 fill themselves in from it (you can still change them for a one-off). If you
