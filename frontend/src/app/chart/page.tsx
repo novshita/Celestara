@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { BirthDataForm } from "@/components/BirthDataForm";
 import { PageHeading } from "@/components/PageHeading";
+import { PlanetExplorer } from "@/components/PlanetExplorer";
 import { SavedProfileNote } from "@/components/SavedProfileNote";
 import { birthDefaults, getSavedBirth } from "@/lib/profile";
 
@@ -21,6 +22,8 @@ export default async function ChartPage() {
       <SavedProfileNote saved={saved} />
 
       <BirthDataForm defaults={birthDefaults(saved)} />
+
+      <PlanetExplorer defaults={birthDefaults(saved)} />
     </>
   );
 }

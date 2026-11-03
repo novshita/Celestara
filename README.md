@@ -317,6 +317,10 @@ The site has the four primary pages from product spec §10:
 - **Birth Chart** (`/chart`): a birth-data form that calculates a Vedic,
   Western, Compare, Vimshottari Dasha or current-transits view against the
   running backend - every calculation endpoint it exposes.
+  Below it, **Explore a planet** shows one planet in one chart: where it sits,
+  what it is doing now (Vedic) or its aspects (Western), and its curated
+  traditional description, with a link to ask the guide how it reads for you.
+  Nothing there uses AI or needs an account.
 - **Journal** (`/journal`) and **Profile** (`/profile`): need an account.
   Logged out they show the log-in / create-account form. Logged in, you can
   save your one birth profile (product spec §28) and keep journal entries
