@@ -23,10 +23,12 @@ import type {
   ConversationSummary,
   CompareChartResponse,
   ExplanationDepth,
+  ExploreSystem,
   JournalEntry,
   JournalEntryListResponse,
   MemoryItem,
   MemoryKind,
+  PlanetExploration,
   PreferencesResponse,
   ReadingFocus,
   ReadingPeriod,
@@ -380,4 +382,12 @@ export async function deleteAllConversations(token: string): Promise<void> {
 /** Permanently deletes the account and everything saved under it. */
 export async function deleteAccountData(token: string): Promise<void> {
   await request("/api/v1/account/data", { method: "DELETE", token });
+}
+
+export async function explorePlanet(
+  birth: BirthData,
+  system: ExploreSystem,
+  body: string,
+): Promise<PlanetExploration> {
+  return post<PlanetExploration>("/api/v1/explore/planet", { birth, system, body });
 }

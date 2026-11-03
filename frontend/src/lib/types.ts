@@ -438,3 +438,30 @@ export interface ConversationMessage {
 export interface ConversationDetail extends ConversationSummary {
   messages: ConversationMessage[];
 }
+
+// --- Planet exploration ---------------------------------------------------------
+
+export type ExploreSystem = "vedic" | "western";
+
+/** The curated description of a planet, from the versioned knowledge base:
+ * the traditional view, not a calculation. */
+export interface PlanetAbout {
+  id: string;
+  title: string;
+  version: number;
+  text: string;
+}
+
+export interface PlanetExploration {
+  system: ExploreSystem;
+  body: string;
+  /** Vedic: the graha's place in the D1 chart. */
+  placement: GrahaPlacement | null;
+  /** Vedic: where the graha is now, against the natal chart. */
+  transit: GrahaTransit | null;
+  /** Western: the planet's place in the tropical chart. */
+  position: PlanetPosition | null;
+  /** Western: every aspect this planet makes. */
+  aspects: Aspect[];
+  about: PlanetAbout | null;
+}
