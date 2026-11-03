@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 
+import { ConversationsSection } from "@/components/ConversationsSection";
 import { LoginRequired } from "@/components/LoginRequired";
 import { PageHeading } from "@/components/PageHeading";
+import { MemorySection } from "@/components/MemorySection";
+import { PreferencesSection } from "@/components/PreferencesSection";
+import { PrivacySection } from "@/components/PrivacySection";
 import { ProfileSection } from "@/components/ProfileSection";
 import { getSessionToken } from "@/lib/session";
 
@@ -13,7 +17,17 @@ export default async function ProfilePage() {
   return (
     <>
       <PageHeading title="Profile" />
-      {loggedIn ? <ProfileSection /> : <LoginRequired feature="a saved profile" />}
+      {loggedIn ? (
+        <>
+          <ProfileSection />
+          <PreferencesSection />
+          <MemorySection />
+          <ConversationsSection />
+          <PrivacySection />
+        </>
+      ) : (
+        <LoginRequired feature="a saved profile" />
+      )}
     </>
   );
 }

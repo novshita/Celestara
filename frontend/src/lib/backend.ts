@@ -19,10 +19,15 @@ import type {
   AuthTokenResponse,
   BirthData,
   BirthProfileResponse,
+  ConversationDetail,
+  ConversationSummary,
   CompareChartResponse,
   ExplanationDepth,
   JournalEntry,
   JournalEntryListResponse,
+  MemoryItem,
+  MemoryKind,
+  PreferencesResponse,
   ReadingFocus,
   ReadingPeriod,
   ReadingResponse,
@@ -300,4 +305,79 @@ export async function getBirthChartReading(
     options.token,
     await clientForwardingHeaders(),
   );
+}
+
+// --- Account data ---------------------------------------------------------------
+
+export async function getPreferences(token: string): Promise<PreferencesResponse> {
+  const response = await request("/api/v1/preferences", { method: "GET", token });
+  return (await response.json()) as PreferencesResponse;
+}
+
+export async function savePreferences(
+  token: string,
+  preferences: PreferencesResponse,
+): Promise<PreferencesResponse> {
+  return put<PreferencesResponse>("/api/v1/preferences", preferences, token);
+}
+
+export async function listMemories(token: string): Promise<MemoryItem[]> {
+  const response = await request("/api/v1/memory", { method: "GET", token });
+  return ((await response.json()) as { memories: MemoryItem[] }).memories;
+}
+
+export async function addMemory(
+  token: string,
+  kind: MemoryKind,
+  content: string,
+): Promise<MemoryItem> {
+  return post<MemoryItem>("/api/v1/memory", { kind, content }, token);
+}
+
+export async function deleteMemory(token: string, id: number): Promise<void> {
+  await request(`/api/v1/memory/${id}`, { method: "DELETE", token });
+}
+
+export async function deleteAllMemories(token: string): Promise<void> {
+  await request("/api/v1/memory", { method: "DELETE", token });
+}
+
+export async function listConversations(
+  token: string,
+): Promise<ConversationSummary[]> {
+  const response = await request("/api/v1/conversations", { method: "GET", token });
+  return ((await response.json()) as { conversations: ConversationSummary[] })
+    .conversations;
+}
+
+/** `null` for a conversation that does not exist or is not this user's. */
+export async function getConversation(
+  token: string,
+  id: number,
+): Promise<ConversationDetail | null> {
+  try {
+    const response = await request(`/api/v1/conversations/${id}`, {
+      method: "GET",
+      token,
+    });
+    return (await response.json()) as ConversationDetail;
+  } catch (error) {
+    if (error instanceof BackendError && error.code === "NOT_FOUND") {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function deleteConversation(token: string, id: number): Promise<void> {
+  await request(`/api/v1/conversations/${id}`, { method: "DELETE", token });
+}
+
+export async function deleteAllConversations(token: string): Promise<void> {
+  await request("/api/v1/conversations", { method: "DELETE", token });
+}
+
+/** Permanently deletes the account and everything saved under it. */
+export async function deleteAccountData(token: string): Promise<void> {
+  await request("/api/v1/account/data", { method: "DELETE", token });
 }

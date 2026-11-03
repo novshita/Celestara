@@ -403,3 +403,38 @@ export interface ApiErrorResponse {
   field_errors: { field: string; message: string }[];
   request_id: string;
 }
+
+// --- Account data: preferences, memory, saved conversations -------------------
+
+export interface PreferencesResponse {
+  explanation_depth: ExplanationDepth;
+  /** Passed back untouched when only the depth changes. */
+  calculation_config: Record<string, unknown> | null;
+}
+
+export type MemoryKind = "preference" | "note";
+
+export interface MemoryItem {
+  id: number;
+  kind: MemoryKind;
+  content: string;
+  created_at: string;
+}
+
+export interface ConversationSummary {
+  id: number;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConversationMessage {
+  id: number;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+}
+
+export interface ConversationDetail extends ConversationSummary {
+  messages: ConversationMessage[];
+}
