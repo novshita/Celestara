@@ -17,7 +17,13 @@ const SYSTEM_OPTIONS: { value: AiSystem; label: string }[] = [
   { value: "compare", label: "Compare both" },
 ];
 
-export function AiGuideForm({ defaults }: { defaults?: BirthData }) {
+export function AiGuideForm({
+  defaults,
+  initialQuestion,
+}: {
+  defaults?: BirthData;
+  initialQuestion?: string;
+}) {
   const [state, formAction, isPending] = useActionState(
     askAiGuideAction,
     INITIAL_STATE,
@@ -34,7 +40,7 @@ export function AiGuideForm({ defaults }: { defaults?: BirthData }) {
       : null;
 
   return (
-    <section className="flex flex-col gap-6 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
+    <section id="ask" className="flex scroll-mt-4 flex-col gap-6 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
       <div>
         <h2 className="text-lg font-semibold text-amber-300">
           Ask the AI Guide
@@ -87,6 +93,7 @@ export function AiGuideForm({ defaults }: { defaults?: BirthData }) {
         <Field label="Your question" error={fieldErrors["question"]}>
           <textarea
             name="question"
+            defaultValue={initialQuestion}
             required
             rows={3}
             maxLength={2000}
