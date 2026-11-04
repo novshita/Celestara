@@ -37,7 +37,7 @@ export function TransitResult({ report }: { report: TransitReport }) {
         {report.natal_moon_rashi ?? "unavailable"}
       </p>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Transit table">
         <table className="w-full min-w-[720px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-slate-800 text-left text-slate-500">

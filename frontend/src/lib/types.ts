@@ -71,6 +71,8 @@ export interface VedicChartMetadata {
   moment: ResolvedBirthMoment;
   ayanamsa_degrees: number;
   unavailable: string[];
+  /** The calculation settings used; only what the drawings need is typed. */
+  config?: { house_system?: string };
 }
 
 export interface VedicChart {

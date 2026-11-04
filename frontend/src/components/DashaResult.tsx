@@ -45,7 +45,7 @@ export function DashaResult({ dasha }: { dasha: VimshottariResponse }) {
                 {index > 0 && <span className="text-slate-600"> → </span>}
                 <span className="rounded bg-slate-800 px-2 py-1">
                   {period.lord}
-                  <span className="ml-1 text-xs text-slate-500">
+                  <span className="ml-1 text-xs text-slate-400">
                     ({period.level})
                   </span>
                 </span>

@@ -10,7 +10,7 @@ export function SavedProfileNote({ saved }: { saved: SavedBirth }) {
       <p className="text-sm text-slate-500">
         Birth details are filled in from your saved profile. You can change
         them for a one-off, or{" "}
-        <Link href="/profile" className="text-amber-300 hover:underline">
+        <Link href="/profile" className="text-amber-300 underline underline-offset-2 hover:text-amber-200">
           update the profile
         </Link>
         .
@@ -21,7 +21,7 @@ export function SavedProfileNote({ saved }: { saved: SavedBirth }) {
   if (saved.status === "none") {
     return (
       <p className="text-sm text-slate-500">
-        <Link href="/profile" className="text-amber-300 hover:underline">
+        <Link href="/profile" className="text-amber-300 underline underline-offset-2 hover:text-amber-200">
           Save a birth profile
         </Link>{" "}
         and these forms will fill themselves in.
