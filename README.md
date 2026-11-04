@@ -321,6 +321,16 @@ The site has the four primary pages from product spec §10:
   what it is doing now (Vedic) or its aspects (Western), and its curated
   traditional description, with a link to ask the guide how it reads for you.
   Nothing there uses AI or needs an account.
+- **Chart drawings** (product spec §6, §11-12, §26): the Western chart is a
+  zodiac wheel (signs, houses, planets, and aspect lines coloured by kind, with
+  the ascendant at the left); the Vedic chart is a Kundali in either the North
+  or South Indian layout. Compare shows both and slides between "Together",
+  "Vedic" and "Western". The lines draw themselves in and the planets appear
+  after. Without a birth time there is no ascendant or houses, so the wheel
+  omits them and only the South Indian layout is offered, and it says so.
+  Labels are plain letters, not astrological glyphs, which render differently
+  on every device. Each drawing has a text summary for screen readers and the
+  full tables remain beneath it.
 - **Look and motion** (product spec §25-26): a deep-indigo "cosmic observatory"
   theme with gold accents and a CSS-only starfield (no scripts, images or web
   fonts, so it costs nothing to load). Results fade in quickly; while the AI

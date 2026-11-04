@@ -1,3 +1,4 @@
+import { ZodiacWheel } from "@/components/charts/ZodiacWheel";
 import type { WesternChart } from "@/lib/types";
 
 /** Mirrors `VedicChartResult`: renders exactly what the backend returned,
@@ -38,7 +39,9 @@ export function WesternChartResult({ chart }: { chart: WesternChart }) {
         </p>
       )}
 
-      <div className="overflow-x-auto">
+      <ZodiacWheel chart={chart} />
+
+      <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Western chart table">
         <table className="w-full min-w-[640px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-slate-800 text-left text-slate-500">

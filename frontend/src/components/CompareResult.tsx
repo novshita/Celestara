@@ -1,3 +1,4 @@
+import { CompareVisual } from "@/components/charts/CompareVisual";
 import type { ChartComparison } from "@/lib/types";
 
 /**
@@ -43,7 +44,9 @@ export function CompareResult({
         </p>
       )}
 
-      <div className="overflow-x-auto">
+      <CompareVisual comparison={comparison} />
+
+      <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Comparison table">
         <table className="w-full min-w-[640px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-slate-800 text-left text-slate-500">

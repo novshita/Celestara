@@ -144,3 +144,27 @@ body::before {
 .thinking-node {
   animation: pulse-node 1.6s ease-in-out infinite;
 }
+
+/* Chart drawings: lines draw themselves in, then the planets appear. A line's
+ * length is normalised to 1 in the markup (pathLength), so one rule fits
+ * every ring, spoke and aspect. */
+@keyframes draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+
+.chart-ring {
+  stroke-dasharray: 1;
+  animation: draw 900ms ease-out both;
+}
+
+.chart-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop 320ms ease-out both;
+}

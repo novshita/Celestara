@@ -46,7 +46,7 @@ export function DashaTimeline({
                 aria-label={`${period.lord} Mahadasha, ${formatDashaDate(period.start)} to ${formatDashaDate(period.end)}`}
                 onClick={() => setSelected(index)}
                 style={{ flexGrow: share, flexBasis: 0 }}
-                className={`min-w-1 overflow-hidden rounded-sm text-xs transition ${
+                className={`min-w-6 overflow-hidden whitespace-nowrap rounded-sm px-0.5 text-xs transition ${
                   isSelected
                     ? "bg-amber-400 text-slate-950"
                     : isActive(period, active)
@@ -54,7 +54,7 @@ export function DashaTimeline({
                       : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                 }`}
               >
-                {share > 0.06 ? period.lord.slice(0, 3) : ""}
+                {share > 0.06 ? period.lord : ""}
               </button>
             );
           })}
