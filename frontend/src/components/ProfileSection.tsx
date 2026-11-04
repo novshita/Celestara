@@ -19,8 +19,8 @@ export async function ProfileSection() {
   const profile = await getProfile(token);
 
   return (
-    <section className="flex flex-col gap-4 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
-      <h2 className="text-lg font-semibold text-amber-300">
+    <section className="flex flex-col gap-4 panel p-6">
+      <h2 className="display text-lg font-semibold text-amber-300">
         Saved birth profile
       </h2>
 

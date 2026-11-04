@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 
 import { askAiGuideAction, type AiChatFormState } from "@/app/ai-actions";
+import { AiThinking } from "@/components/AiThinking";
 import { AnswerFactorsPanel } from "@/components/AnswerFactorsPanel";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
 import { DepthSelect } from "@/components/DepthSelect";
@@ -40,9 +41,9 @@ export function AiGuideForm({
       : null;
 
   return (
-    <section id="ask" className="flex scroll-mt-4 flex-col gap-6 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
+    <section id="ask" className="flex scroll-mt-4 flex-col gap-6 panel p-6">
       <div>
-        <h2 className="text-lg font-semibold text-amber-300">
+        <h2 className="display text-lg font-semibold text-amber-300">
           Ask the AI Guide
         </h2>
         <p className="text-sm text-slate-500">
@@ -110,6 +111,8 @@ export function AiGuideForm({
           {isPending ? "Asking…" : "Ask"}
         </button>
 
+        {isPending && <AiThinking label="Connecting your chart to your question…" />}
+
         {state.status === "error" && (
           <p role="alert" className="text-sm text-red-400">
             {state.message}
@@ -135,8 +138,8 @@ function AiAnswer({
       role="status"
       className={
         isCrisis
-          ? "flex flex-col gap-2 rounded-md border border-sky-800/60 bg-sky-950/30 p-4"
-          : "flex flex-col gap-3 rounded-md border border-amber-900/40 bg-amber-950/20 p-4"
+          ? "reveal flex flex-col gap-2 rounded-md border border-sky-800/60 bg-sky-950/30 p-4"
+          : "reveal flex flex-col gap-3 rounded-md border border-amber-900/40 bg-amber-950/20 p-4"
       }
     >
       <p className="whitespace-pre-wrap text-sm text-slate-100">

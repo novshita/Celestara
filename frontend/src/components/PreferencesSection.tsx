@@ -13,8 +13,8 @@ export async function PreferencesSection() {
   const preferences = await getPreferences(token);
 
   return (
-    <section className="flex flex-col gap-3 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
-      <h2 className="text-lg font-semibold text-amber-300">Preferences</h2>
+    <section className="flex flex-col gap-3 panel p-6">
+      <h2 className="display text-lg font-semibold text-amber-300">Preferences</h2>
       <p className="text-sm text-slate-400">
         How much detail the AI Guide and readings give by default. You can
         still change it for a single question.

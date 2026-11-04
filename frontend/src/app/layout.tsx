@@ -29,13 +29,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col">
-        <header className="border-b border-slate-800">
+        <header className="sticky top-0 z-10 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur">
           <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-3">
             <Link
               href="/"
-              className="text-lg font-semibold text-amber-300"
+              className="display text-xl font-semibold tracking-wide text-amber-300"
             >
-              🌌 Celestara
+              ✦ Celestara
             </Link>
             <SiteNav />
             <AccountBar />

@@ -51,7 +51,7 @@ export default async function ConversationPage({
             className={
               message.role === "user"
                 ? "self-end rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-3"
-                : "rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-3"
+                : "panel px-4 py-3"
             }
           >
             <p className="mb-1 text-xs uppercase tracking-wide text-slate-500">

@@ -6,6 +6,7 @@ import {
   requestReadingAction,
   type ReadingFormState,
 } from "@/app/reading-actions";
+import { AiThinking } from "@/components/AiThinking";
 import { AnswerFactorsPanel } from "@/components/AnswerFactorsPanel";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
 import { DepthSelect } from "@/components/DepthSelect";
@@ -56,9 +57,9 @@ export function ReadingForm({ defaults }: { defaults?: BirthData }) {
   const [kind, setKind] = useState<ReadingKind>("daily");
 
   return (
-    <section className="flex flex-col gap-6 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
+    <section className="flex flex-col gap-6 panel p-6">
       <div>
-        <h2 className="text-lg font-semibold text-amber-300">Reading</h2>
+        <h2 className="display text-lg font-semibold text-amber-300">Reading</h2>
         <p className="text-sm text-slate-500">
           Grounded in your calculated chart and the current transits -
           recalculated every time, never a static template. The week and
@@ -113,6 +114,8 @@ export function ReadingForm({ defaults }: { defaults?: BirthData }) {
           {isPending ? "Reading the sky…" : "Get my reading"}
         </button>
 
+        {isPending && <AiThinking label="Reading the sky against your chart…" />}
+
         {state.status === "error" && (
           <p role="alert" className="text-sm text-red-400">
             {state.message}
@@ -121,7 +124,7 @@ export function ReadingForm({ defaults }: { defaults?: BirthData }) {
       </form>
 
       {state.status === "success" && (
-        <div className="flex flex-col gap-2 rounded-md border border-amber-900/40 bg-amber-950/20 p-4">
+        <div className="reveal flex flex-col gap-2 rounded-md border border-amber-900/40 bg-amber-950/20 p-4">
           <p className="whitespace-pre-wrap text-sm text-slate-100">
             {state.reading}
           </p>

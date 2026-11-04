@@ -35,7 +35,7 @@ export function AuthForms() {
   const fieldErrors = state.status === "error" ? state.fieldErrors : {};
 
   return (
-    <section className="flex flex-col gap-4 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
+    <section className="flex flex-col gap-4 panel p-6">
       <div className="flex gap-4 text-sm">
         <ModeTab label="Log in" active={mode === "login"} onClick={() => setMode("login")} />
         <ModeTab
