@@ -18,8 +18,8 @@ export function PlanetResult({ exploration }: { exploration: PlanetExploration }
   const question = `How does my ${exploration.body} read in my ${exploration.system === "vedic" ? "Vedic" : "Western"} chart?`;
 
   return (
-    <section className="flex flex-col gap-5 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
-      <h2 className="text-lg font-semibold text-amber-300">
+    <section className="flex flex-col gap-5 panel reveal p-6">
+      <h2 className="display text-lg font-semibold text-amber-300">
         {exploration.body}{" "}
         <span className="text-sm font-normal text-slate-500">
           · {exploration.system === "vedic" ? "Vedic" : "Western"}

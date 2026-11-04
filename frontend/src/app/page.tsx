@@ -31,7 +31,7 @@ export default async function Home({
 
       <Link
         href="/chart"
-        className="flex flex-col gap-1 rounded-lg border border-slate-800 bg-slate-900/60 p-5 transition hover:border-amber-400/50"
+        className="flex flex-col gap-1 panel p-5 transition hover:border-amber-400/50"
       >
         <span className="font-medium text-amber-300">
           Start with your birth chart →

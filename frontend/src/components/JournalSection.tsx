@@ -17,9 +17,9 @@ export async function JournalSection() {
   const entries = await listJournalEntries(token);
 
   return (
-    <section className="flex flex-col gap-4 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
+    <section className="flex flex-col gap-4 panel p-6">
       <div>
-        <h2 className="text-lg font-semibold text-amber-300">Journal</h2>
+        <h2 className="display text-lg font-semibold text-amber-300">Journal</h2>
         <p className="text-sm text-slate-500">
           Reflective, not predictive (product spec §16) - a place to note
           what you&apos;re noticing, not a log of forecasts.

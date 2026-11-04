@@ -14,9 +14,9 @@ function formatMoment(iso: string): string {
  * no interpretation. See that component's docstring for why. */
 export function TransitResult({ report }: { report: TransitReport }) {
   return (
-    <section className="flex flex-col gap-6 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
+    <section className="flex flex-col gap-6 panel reveal p-6">
       <header className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-lg font-semibold text-amber-300">
+        <h2 className="display text-lg font-semibold text-amber-300">
           Current transits (Gochar)
         </h2>
         <span className="text-xs text-slate-500">

@@ -321,6 +321,12 @@ The site has the four primary pages from product spec §10:
   what it is doing now (Vedic) or its aspects (Western), and its curated
   traditional description, with a link to ask the guide how it reads for you.
   Nothing there uses AI or needs an account.
+- **Look and motion** (product spec §25-26): a deep-indigo "cosmic observatory"
+  theme with gold accents and a CSS-only starfield (no scripts, images or web
+  fonts, so it costs nothing to load). Results fade in quickly; while the AI
+  is working, a small constellation animates. All motion switches off for
+  anyone whose system asks for reduced motion. The Dasha view is a to-scale
+  bar of Mahadashas with a "now" marker; choosing one lists its Antardashas.
 - **Journal** (`/journal`) and **Profile** (`/profile`): need an account.
   Logged out they show the log-in / create-account form. Logged in, you can
   save your one birth profile (product spec §28) and keep journal entries

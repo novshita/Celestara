@@ -18,8 +18,8 @@ export async function MemorySection() {
   const memories = await listMemories(token);
 
   return (
-    <section className="flex flex-col gap-3 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
-      <h2 className="text-lg font-semibold text-amber-300">What the guide remembers</h2>
+    <section className="flex flex-col gap-3 panel p-6">
+      <h2 className="display text-lg font-semibold text-amber-300">What the guide remembers</h2>
       <p className="text-sm text-slate-400">
         Only what you add here. The guide treats it as background about you,
         never as instructions, and you can forget any of it at any time.

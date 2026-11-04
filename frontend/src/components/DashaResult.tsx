@@ -1,12 +1,5 @@
-import type { DashaPeriod, VimshottariResponse } from "@/lib/types";
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
+import { DashaTimeline } from "@/components/DashaTimeline";
+import type { VimshottariResponse } from "@/lib/types";
 
 /** Mirrors `VedicChartResult`: renders exactly what the backend returned,
  * no interpretation. See that component's docstring for why. */
@@ -14,9 +7,9 @@ export function DashaResult({ dasha }: { dasha: VimshottariResponse }) {
   const { timeline, active_now } = dasha;
 
   return (
-    <section className="flex flex-col gap-6 rounded-lg border border-slate-800 bg-slate-900/60 p-6">
+    <section className="flex flex-col gap-6 panel reveal p-6">
       <header className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-lg font-semibold text-amber-300">
+        <h2 className="display text-lg font-semibold text-amber-300">
           Vimshottari Dasha
         </h2>
         <span className="text-xs text-slate-500">
@@ -66,43 +59,14 @@ export function DashaResult({ dasha }: { dasha: VimshottariResponse }) {
         )}
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[480px] border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-slate-800 text-left text-slate-500">
-              <th className="py-2 pr-4 font-medium">Mahadasha lord</th>
-              <th className="py-2 pr-4 font-medium">Start</th>
-              <th className="py-2 pr-4 font-medium">End</th>
-              <th className="py-2 font-medium">Duration</th>
-            </tr>
-          </thead>
-          <tbody>
-            {timeline.periods.map((period: DashaPeriod) => (
-              <tr
-                key={`${period.lord}-${period.start}`}
-                className="border-b border-slate-800/60 text-slate-300"
-              >
-                <td className="py-2 pr-4 font-medium text-slate-100">
-                  {period.lord}
-                  {period.is_partial && (
-                    <span className="ml-1 text-xs text-amber-400">
-                      (partial)
-                    </span>
-                  )}
-                </td>
-                <td className="py-2 pr-4">{formatDate(period.start)}</td>
-                <td className="py-2 pr-4">{formatDate(period.end)}</td>
-                <td className="py-2">
-                  {period.duration_years.toFixed(2)} years
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DashaTimeline
+        periods={timeline.periods}
+        active={active_now}
+        asOf={dasha.as_of}
+      />
+
       <p className="text-xs text-slate-600">
-        Showing Mahadasha periods only. Each one subdivides further
-        (Antardasha and beyond) in the underlying data.
+        Choose a Mahadasha to see its Antardashas. The bar is drawn to scale.
       </p>
     </section>
   );

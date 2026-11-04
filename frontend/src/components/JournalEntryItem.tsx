@@ -44,7 +44,7 @@ export function JournalEntryItem({ entry }: { entry: JournalEntry }) {
 
   if (isEditing) {
     return (
-      <li className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+      <li className="panel p-4">
         <form action={formAction} className="flex flex-col gap-3">
           <input type="hidden" name="entry_id" value={entry.id} />
 
@@ -96,7 +96,7 @@ export function JournalEntryItem({ entry }: { entry: JournalEntry }) {
   }
 
   return (
-    <li className="flex flex-col gap-2 rounded-lg border border-slate-800 bg-slate-900/60 p-4">
+    <li className="flex flex-col gap-2 panel p-4">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="font-medium text-slate-100">{entry.title}</h3>
         <span className="text-xs text-slate-500">

@@ -26,7 +26,7 @@ export async function Dashboard({ birth }: { birth: BirthData }) {
   return (
     <section
       aria-label="Your dashboard"
-      className="grid gap-4 rounded-lg border border-slate-800 bg-slate-900/60 p-6 md:grid-cols-2"
+      className="grid gap-4 panel p-6 md:grid-cols-2"
     >
       <div className="flex flex-col gap-2">
         <h2 className="text-sm font-medium uppercase tracking-wide text-slate-500">

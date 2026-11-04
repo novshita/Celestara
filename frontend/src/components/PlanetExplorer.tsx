@@ -22,10 +22,10 @@ export function PlanetExplorer({ defaults }: { defaults?: BirthData }) {
     <div className="flex flex-col gap-6">
       <form
         action={formAction}
-        className="flex flex-col gap-5 rounded-lg border border-slate-800 bg-slate-900/60 p-6"
+        className="flex flex-col gap-5 panel p-6"
       >
         <div>
-          <h2 className="text-lg font-semibold text-amber-300">Explore a planet</h2>
+          <h2 className="display text-lg font-semibold text-amber-300">Explore a planet</h2>
           <p className="text-sm text-slate-400">
             Where one planet sits in your chart, what it is doing now, and what
             it traditionally means. Calculated and curated, no AI involved.
