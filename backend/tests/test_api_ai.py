@@ -211,6 +211,20 @@ def test_unexpected_sdk_failure_is_still_ai_unavailable_not_a_bare_500(
     assert response.json()["code"] == "AI_UNAVAILABLE"
 
 
+def test_reply_with_no_text_is_ai_unavailable_not_a_blank_answer(
+    client, mock_claude
+):
+    """Found by running the real SDK against a fake provider: a reply whose
+    content held no text block came back as a 200 with an empty answer."""
+    mock_claude.messages.create.return_value = _text_response("   ")
+    response = client.post(
+        URL, json={"birth": EXACT_BIRTH, "system": "vedic", "question": "..."}
+    )
+
+    assert response.status_code == 503
+    assert response.json()["code"] == "AI_UNAVAILABLE"
+
+
 def test_provider_error_message_is_not_leaked(client, mock_claude):
     import anthropic
 
