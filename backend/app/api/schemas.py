@@ -10,9 +10,9 @@ shape to send.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import AfterValidator, BaseModel, EmailStr, Field, field_validator
 
 from app.core.config import CalculationConfig
 from app.domain.ai import ExplanationDepth, Intent, ReadingTopic
@@ -24,12 +24,27 @@ from app.domain.vedic import GrahaPlacement, VedicChart
 from app.domain.western import Aspect, PlanetPosition, WesternChart
 
 
+def _no_server_paths(config: CalculationConfig) -> CalculationConfig:
+    # `ephemeris_path` points at a directory on the server. It is a
+    # deployment setting, never something a client may choose: it would let
+    # any caller aim the calculation engine at an arbitrary directory.
+    if config.ephemeris_path is not None:
+        raise ValueError("ephemeris_path is a server setting and cannot be set")
+    return config
+
+
+#: The calculation overrides a client may send. Every request model uses this
+#: instead of `CalculationConfig` directly, so the server-only fields stay
+#: closed on every endpoint - not only where someone remembered to check.
+ClientCalculationConfig = Annotated[CalculationConfig, AfterValidator(_no_server_paths)]
+
+
 class VedicChartRequest(BaseModel):
     """A request for a D1 / Rashi chart."""
 
     birth: BirthData
 
-    config: CalculationConfig | None = Field(
+    config: ClientCalculationConfig | None = Field(
         default=None,
         description=(
             "Optional calculation overrides. Omit to use the validated "
@@ -100,7 +115,7 @@ class WesternChartRequest(BaseModel):
 
     birth: BirthData
 
-    config: CalculationConfig | None = Field(
+    config: ClientCalculationConfig | None = Field(
         default=None,
         description=(
             "Optional overrides. The ones worth knowing about here are "
@@ -164,7 +179,7 @@ class CompareChartRequest(BaseModel):
 
     birth: BirthData
 
-    config: CalculationConfig | None = Field(
+    config: ClientCalculationConfig | None = Field(
         default=None,
         description=(
             "Optional overrides, applied to both pipelines - e.g. "
@@ -222,7 +237,7 @@ class VimshottariRequest(BaseModel):
 
     birth: BirthData
 
-    config: CalculationConfig | None = Field(
+    config: ClientCalculationConfig | None = Field(
         default=None,
         description=(
             "Optional overrides. `dasha_year_length` is the one worth knowing "
@@ -306,7 +321,7 @@ class TransitReportRequest(BaseModel):
     """A request for transits relative to a natal chart."""
 
     birth: BirthData
-    config: CalculationConfig | None = None
+    config: ClientCalculationConfig | None = None
 
     at: datetime | None = Field(
         default=None,
@@ -496,7 +511,7 @@ class AiChatRequest(BaseModel):
     birth: BirthData
     system: Literal["vedic", "western", "compare"] = "vedic"
     question: str = Field(min_length=1, max_length=2000)
-    config: CalculationConfig | None = None
+    config: ClientCalculationConfig | None = None
     depth: ExplanationDepth | None = None
     """How technical to be. Falls back to the user's saved preference, then
     to `beginner`."""
@@ -578,7 +593,7 @@ class ReadingRequest(BaseModel):
     this one."""
 
     birth: BirthData
-    config: CalculationConfig | None = None
+    config: ClientCalculationConfig | None = None
     depth: ExplanationDepth | None = None
     """How technical to be; see `AiChatRequest.depth`."""
     topic: ReadingTopic | None = None
@@ -619,7 +634,7 @@ class TopicReadingRequest(BaseModel):
     """A category reading; the category is in the path."""
 
     birth: BirthData
-    config: CalculationConfig | None = None
+    config: ClientCalculationConfig | None = None
     depth: ExplanationDepth | None = None
 
 
@@ -646,17 +661,8 @@ class PreferencesRequest(BaseModel):
     """Replaces the user's saved preferences."""
 
     explanation_depth: ExplanationDepth = ExplanationDepth.BEGINNER
-    calculation_config: CalculationConfig | None = None
+    calculation_config: ClientCalculationConfig | None = None
     """`null` returns to the application default."""
-
-    @field_validator("calculation_config")
-    @classmethod
-    def _no_server_paths(cls, value: CalculationConfig | None) -> CalculationConfig | None:
-        # `ephemeris_path` points at a directory on the server. It is a
-        # deployment setting, not something a user should be able to store.
-        if value is not None and value.ephemeris_path is not None:
-            raise ValueError("ephemeris_path is a server setting and cannot be saved")
-        return value
 
 
 class PreferencesResponse(BaseModel):
@@ -725,7 +731,7 @@ class PlanetExplorationRequest(BaseModel):
     system: Literal["vedic", "western"] = "vedic"
     body: str = Field(min_length=1, max_length=20, examples=["Saturn"])
     """The planet or graha's name, in any case."""
-    config: CalculationConfig | None = None
+    config: ClientCalculationConfig | None = None
 
 
 class PlanetAboutResponse(BaseModel):
