@@ -202,9 +202,16 @@ def _call_claude(user_content: str, declined_message: str) -> str:
     if response.stop_reason == "refusal":
         return declined_message
 
-    return next(
+    text = next(
         (block.text for block in response.content if block.type == "text"), ""
-    )
+    ).strip()
+    if not text:
+        # A reply with no text (e.g. only non-text blocks, or cut off before
+        # any output) is a provider failure, not an answer: returning "" would
+        # show the user a blank response as if the guide had spoken.
+        AI_CALLS.labels("provider_error").inc()
+        raise AIProviderError("AI provider returned no text")
+    return text
 
 
 @dataclass(frozen=True)
