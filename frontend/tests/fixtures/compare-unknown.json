@@ -1,0 +1,658 @@
+{
+ "comparison": {
+  "ascendant": null,
+  "metadata": {
+   "ayanamsa_degrees": 23.73013502042593,
+   "unavailable": [
+    "ascendant"
+   ]
+  },
+  "shared_bodies": [
+   {
+    "body": "Sun",
+    "signs_apart": 1,
+    "vedic_degrees_in_rashi": 28.455016989264948,
+    "vedic_rashi": "Karka",
+    "vedic_uncertain": false,
+    "western_degrees_in_sign": 22.18515200969088,
+    "western_sign": "Leo",
+    "western_uncertain": false
+   },
+   {
+    "body": "Moon",
+    "signs_apart": 1,
+    "vedic_degrees_in_rashi": 19.821420869363195,
+    "vedic_rashi": "Vrishabha",
+    "vedic_uncertain": false,
+    "western_degrees_in_sign": 13.551555889789128,
+    "western_sign": "Gemini",
+    "western_uncertain": false
+   },
+   {
+    "body": "Mars",
+    "signs_apart": 1,
+    "vedic_degrees_in_rashi": 27.522967816924197,
+    "vedic_rashi": "Mesha",
+    "vedic_uncertain": false,
+    "western_degrees_in_sign": 21.25310283735012,
+    "western_sign": "Taurus",
+    "western_uncertain": false
+   },
+   {
+    "body": "Mercury",
+    "signs_apart": 1,
+    "vedic_degrees_in_rashi": 25.494360915715475,
+    "vedic_rashi": "Simha",
+    "vedic_uncertain": false,
+    "western_degrees_in_sign": 19.22449593614141,
+    "western_sign": "Virgo",
+    "western_uncertain": false
+   },
+   {
+    "body": "Jupiter",
+    "signs_apart": 0,
+    "vedic_degrees_in_rashi": 5.620016697556267,
+    "vedic_rashi": "Karka",
+    "vedic_uncertain": false,
+    "western_degrees_in_sign": 29.3501517179822,
+    "western_sign": "Cancer",
+    "western_uncertain": false
+   },
+   {
+    "body": "Venus",
+    "signs_apart": 1,
+    "vedic_degrees_in_rashi": 7.918883194661902,
+    "vedic_rashi": "Karka",
+    "vedic_uncertain": false,
+    "western_degrees_in_sign": 1.6490182150878354,
+    "western_sign": "Leo",
+    "western_uncertain": false
+   },
+   {
+    "body": "Saturn",
+    "signs_apart": 1,
+    "vedic_degrees_in_rashi": 26.144414116952078,
+    "vedic_rashi": "Dhanu",
+    "vedic_uncertain": false,
+    "western_degrees_in_sign": 19.874549137377983,
+    "western_sign": "Capricorn",
+    "western_uncertain": false
+   }
+  ],
+  "vedic": {
+   "ascendant": null,
+   "bhavas": [],
+   "chart_type": "D1",
+   "metadata": {
+    "ayanamsa_degrees": 23.73013502042593,
+    "calculation_version": "1.0.0",
+    "config": {
+     "aspect_orb_degrees": 8.0,
+     "ayanamsa": "lahiri",
+     "calculation_version": "1.0.0",
+     "dasha_cycles": 1,
+     "dasha_levels": 2,
+     "dasha_year_length": "julian",
+     "ephemeris_path": null,
+     "ephemeris_source": "moshier",
+     "house_system": "whole_sign",
+     "include_outer_planets": true,
+     "node_type": "mean",
+     "sextile_orb_degrees": 6.0,
+     "western_house_system": "placidus"
+    },
+    "engine_id": "swisseph-2.10.03/moshier/lahiri",
+    "moment": {
+     "assumptions": [
+      "Birth time is unknown. Positions are calculated for 12:00 local time as a stated assumption, not as recorded data. The true time lies anywhere in the 24 hours of this date."
+     ],
+     "dst_anomaly": "NONE",
+     "julian_day_ut": 2448118.7708333335,
+     "time_confidence": "UNKNOWN",
+     "timezone_name": "Asia/Kolkata",
+     "uncertainty_hours": 12.0,
+     "utc_datetime": "1990-08-15T06:30:00Z",
+     "utc_offset_hours": 5.5
+    },
+    "unavailable": [
+     "ascendant",
+     "bhavas",
+     "bhava_placements",
+     "moon_nakshatra"
+    ]
+   },
+   "moon_nakshatra": null,
+   "placements": [
+    {
+     "bhava": null,
+     "certainty": {
+      "nakshatra_certain": true,
+      "pada_certain": true,
+      "rashi_certain": true
+     },
+     "degrees_in_rashi": 28.455016989264948,
+     "derived_from": null,
+     "graha": "Sun",
+     "longitude": 118.45501698926495,
+     "nakshatra": {
+      "index": 8,
+      "lord": "Mercury",
+      "name": "Ashlesha",
+      "pada": 4
+     },
+     "rashi": "Karka",
+     "rashi_index": 3,
+     "retrograde": false,
+     "speed_longitude": 0.9608840562214269
+    },
+    {
+     "bhava": null,
+     "certainty": {
+      "nakshatra_certain": false,
+      "pada_certain": false,
+      "rashi_certain": true
+     },
+     "degrees_in_rashi": 19.821420869363195,
+     "derived_from": null,
+     "graha": "Moon",
+     "longitude": 49.821420869363195,
+     "nakshatra": {
+      "index": 3,
+      "lord": "Moon",
+      "name": "Rohini",
+      "pada": 3
+     },
+     "rashi": "Vrishabha",
+     "rashi_index": 1,
+     "retrograde": false,
+     "speed_longitude": 14.2626651024784
+    },
+    {
+     "bhava": null,
+     "certainty": {
+      "nakshatra_certain": true,
+      "pada_certain": true,
+      "rashi_certain": true
+     },
+     "degrees_in_rashi": 27.522967816924197,
+     "derived_from": null,
+     "graha": "Mars",
+     "longitude": 27.522967816924197,
+     "nakshatra": {
+      "index": 2,
+      "lord": "Sun",
+      "name": "Krittika",
+      "pada": 1
+     },
+     "rashi": "Mesha",
+     "rashi_index": 0,
+     "retrograde": false,
+     "speed_longitude": 0.5766546157634983
+    },
+    {
+     "bhava": null,
+     "certainty": {
+      "nakshatra_certain": true,
+      "pada_certain": true,
+      "rashi_certain": true
+     },
+     "degrees_in_rashi": 25.494360915715475,
+     "derived_from": null,
+     "graha": "Mercury",
+     "longitude": 145.49436091571548,
+     "nakshatra": {
+      "index": 10,
+      "lord": "Venus",
+      "name": "Purva Phalguni",
+      "pada": 4
+     },
+     "rashi": "Simha",
+     "rashi_index": 4,
+     "retrograde": false,
+     "speed_longitude": 0.7730416658785403
+    },
+    {
+     "bhava": null,
+     "certainty": {
+      "nakshatra_certain": true,
+      "pada_certain": true,
+      "rashi_certain": true
+     },
+     "degrees_in_rashi": 5.620016697556267,
+     "derived_from": null,
+     "graha": "Jupiter",
+     "longitude": 95.62001669755627,
+     "nakshatra": {
+      "index": 7,
+      "lord": "Saturn",
+      "name": "Pushya",
+      "pada": 1
+     },
+     "rashi": "Karka",
+     "rashi_index": 3,
+     "retrograde": false,
+     "speed_longitude": 0.2145361535569161
+    },
+    {
+     "bhava": null,
+     "certainty": {
+      "nakshatra_certain": true,
+      "pada_certain": true,
+      "rashi_certain": true
+     },
+     "degrees_in_rashi": 7.918883194661902,
+     "derived_from": null,
+     "graha": "Venus",
+     "longitude": 97.9188831946619,
+     "nakshatra": {
+      "index": 7,
+      "lord": "Saturn",
+      "name": "Pushya",
+      "pada": 2
+     },
+     "rashi": "Karka",
+     "rashi_index": 3,
+     "retrograde": false,
+     "speed_longitude": 1.2211486377112697
+    },
+    {
+     "bhava": null,
+     "certainty": {
+      "nakshatra_certain": true,
+      "pada_certain": true,
+      "rashi_certain": true
+     },
+     "degrees_in_rashi": 26.144414116952078,
+     "derived_from": null,
+     "graha": "Saturn",
+     "longitude": 266.1444141169521,
+     "nakshatra": {
+      "index": 19,
+      "lord": "Venus",
+      "name": "Purva Ashadha",
+      "pada": 4
+     },
+     "rashi": "Dhanu",
+     "rashi_index": 8,
+     "retrograde": true,
+     "speed_longitude": -0.05638794360245055
+    },
+    {
+     "bhava": null,
+     "certainty": {
+      "nakshatra_certain": true,
+      "pada_certain": true,
+      "rashi_certain": true
+     },
+     "degrees_in_rashi": 12.750216963052594,
+     "derived_from": null,
+     "graha": "Rahu",
+     "longitude": 282.7502169630526,
+     "nakshatra": {
+      "index": 21,
+      "lord": "Moon",
+      "name": "Shravana",
+      "pada": 1
+     },
+     "rashi": "Makara",
+     "rashi_index": 9,
+     "retrograde": true,
+     "speed_longitude": -0.05299203020211391
+    },
+    {
+     "bhava": null,
+     "certainty": {
+      "nakshatra_certain": true,
+      "pada_certain": true,
+      "rashi_certain": true
+     },
+     "degrees_in_rashi": 12.750216963052594,
+     "derived_from": "Rahu",
+     "graha": "Ketu",
+     "longitude": 102.7502169630526,
+     "nakshatra": {
+      "index": 7,
+      "lord": "Saturn",
+      "name": "Pushya",
+      "pada": 3
+     },
+     "rashi": "Karka",
+     "rashi_index": 3,
+     "retrograde": true,
+     "speed_longitude": -0.05299203020211391
+    }
+   ],
+   "system": "vedic",
+   "zodiac": "sidereal"
+  },
+  "western": {
+   "angles": null,
+   "aspects": [
+    {
+     "applying": true,
+     "aspect": "Trine",
+     "exact_angle": 120.0,
+     "first": "Mercury",
+     "harmonious": true,
+     "orb": 0.6500532012365738,
+     "second": "Saturn",
+     "separation": 120.65005320123657
+    },
+    {
+     "applying": false,
+     "aspect": "Square",
+     "exact_angle": 90.0,
+     "first": "Sun",
+     "harmonious": false,
+     "orb": 0.9320491723407542,
+     "second": "Mars",
+     "separation": 90.93204917234075
+    },
+    {
+     "applying": false,
+     "aspect": "Trine",
+     "exact_angle": 120.0,
+     "first": "Mars",
+     "harmonious": true,
+     "orb": 1.3785536999721444,
+     "second": "Saturn",
+     "separation": 121.37855369997214
+    },
+    {
+     "applying": true,
+     "aspect": "Trine",
+     "exact_angle": 120.0,
+     "first": "Mercury",
+     "harmonious": true,
+     "orb": -2.0286069012087182,
+     "second": "Mars",
+     "separation": 117.97139309879128
+    },
+    {
+     "applying": false,
+     "aspect": "Conjunction",
+     "exact_angle": 0.0,
+     "first": "Venus",
+     "harmonious": null,
+     "orb": 2.298866497105635,
+     "second": "Jupiter",
+     "separation": 2.298866497105635
+    },
+    {
+     "applying": false,
+     "aspect": "Sextile",
+     "exact_angle": 60.0,
+     "first": "Neptune",
+     "harmonious": true,
+     "orb": -2.8873947536325772,
+     "second": "Pluto",
+     "separation": 57.11260524636742
+    },
+    {
+     "applying": false,
+     "aspect": "Sextile",
+     "exact_angle": 60.0,
+     "first": "Mercury",
+     "harmonious": true,
+     "orb": -4.139405951822198,
+     "second": "Pluto",
+     "separation": 55.8605940481778
+    },
+    {
+     "applying": true,
+     "aspect": "Sextile",
+     "exact_angle": 60.0,
+     "first": "Saturn",
+     "harmonious": true,
+     "orb": 4.789459153058772,
+     "second": "Pluto",
+     "separation": 64.78945915305877
+    },
+    {
+     "applying": false,
+     "aspect": "Square",
+     "exact_angle": 90.0,
+     "first": "Moon",
+     "harmonious": false,
+     "orb": 5.672940046352267,
+     "second": "Mercury",
+     "separation": 95.67294004635227
+    },
+    {
+     "applying": false,
+     "aspect": "Opposition",
+     "exact_angle": 180.0,
+     "first": "Mars",
+     "harmonious": false,
+     "orb": -6.168012853030916,
+     "second": "Pluto",
+     "separation": 173.83198714696908
+    },
+    {
+     "applying": false,
+     "aspect": "Conjunction",
+     "exact_angle": 0.0,
+     "first": "Uranus",
+     "harmonious": null,
+     "orb": 6.221044252814636,
+     "second": "Neptune",
+     "separation": 6.221044252814636
+    },
+    {
+     "applying": false,
+     "aspect": "Trine",
+     "exact_angle": 120.0,
+     "first": "Mercury",
+     "harmonious": true,
+     "orb": -7.026800705454775,
+     "second": "Neptune",
+     "separation": 112.97319929454522
+    },
+    {
+     "applying": false,
+     "aspect": "Square",
+     "exact_angle": 90.0,
+     "first": "Sun",
+     "harmonious": false,
+     "orb": -7.100062025371699,
+     "second": "Pluto",
+     "separation": 82.8999379746283
+    },
+    {
+     "applying": true,
+     "aspect": "Conjunction",
+     "exact_angle": 0.0,
+     "first": "Saturn",
+     "harmonious": null,
+     "orb": 7.676853906691349,
+     "second": "Neptune",
+     "separation": 7.676853906691349
+    }
+   ],
+   "houses": [],
+   "metadata": {
+    "bodies_included": [
+     "Sun",
+     "Moon",
+     "Mercury",
+     "Venus",
+     "Mars",
+     "Jupiter",
+     "Saturn",
+     "Uranus",
+     "Neptune",
+     "Pluto"
+    ],
+    "calculation_version": "1.0.0",
+    "config": {
+     "aspect_orb_degrees": 8.0,
+     "ayanamsa": "lahiri",
+     "calculation_version": "1.0.0",
+     "dasha_cycles": 1,
+     "dasha_levels": 2,
+     "dasha_year_length": "julian",
+     "ephemeris_path": null,
+     "ephemeris_source": "moshier",
+     "house_system": "whole_sign",
+     "include_outer_planets": true,
+     "node_type": "mean",
+     "sextile_orb_degrees": 6.0,
+     "western_house_system": "placidus"
+    },
+    "engine_id": "swisseph-2.10.03/moshier/lahiri",
+    "house_system": "placidus",
+    "moment": {
+     "assumptions": [
+      "Birth time is unknown. Positions are calculated for 12:00 local time as a stated assumption, not as recorded data. The true time lies anywhere in the 24 hours of this date."
+     ],
+     "dst_anomaly": "NONE",
+     "julian_day_ut": 2448118.7708333335,
+     "time_confidence": "UNKNOWN",
+     "timezone_name": "Asia/Kolkata",
+     "uncertainty_hours": 12.0,
+     "utc_datetime": "1990-08-15T06:30:00Z",
+     "utc_offset_hours": 5.5
+    },
+    "unavailable": [
+     "angles",
+     "houses",
+     "house_placements"
+    ]
+   },
+   "positions": [
+    {
+     "body": "Sun",
+     "degrees_in_sign": 22.18515200969088,
+     "element": "Fire",
+     "house": null,
+     "longitude": 142.18515200969088,
+     "modality": "Fixed",
+     "retrograde": false,
+     "sign": "Leo",
+     "sign_index": 4,
+     "speed_longitude": 0.9609583981317572,
+     "uncertain": false
+    },
+    {
+     "body": "Moon",
+     "degrees_in_sign": 13.551555889789128,
+     "element": "Air",
+     "house": null,
+     "longitude": 73.55155588978913,
+     "modality": "Mutable",
+     "retrograde": false,
+     "sign": "Gemini",
+     "sign_index": 2,
+     "speed_longitude": 14.262739526114924,
+     "uncertain": false
+    },
+    {
+     "body": "Mercury",
+     "degrees_in_sign": 19.22449593614141,
+     "element": "Earth",
+     "house": null,
+     "longitude": 169.2244959361414,
+     "modality": "Mutable",
+     "retrograde": false,
+     "sign": "Virgo",
+     "sign_index": 5,
+     "speed_longitude": 0.7731161662619332,
+     "uncertain": false
+    },
+    {
+     "body": "Venus",
+     "degrees_in_sign": 1.6490182150878354,
+     "element": "Fire",
+     "house": null,
+     "longitude": 121.64901821508784,
+     "modality": "Fixed",
+     "retrograde": false,
+     "sign": "Leo",
+     "sign_index": 4,
+     "speed_longitude": 1.2212229648431525,
+     "uncertain": false
+    },
+    {
+     "body": "Mars",
+     "degrees_in_sign": 21.25310283735012,
+     "element": "Earth",
+     "house": null,
+     "longitude": 51.25310283735012,
+     "modality": "Fixed",
+     "retrograde": false,
+     "sign": "Taurus",
+     "sign_index": 1,
+     "speed_longitude": 0.5767288756701536,
+     "uncertain": false
+    },
+    {
+     "body": "Jupiter",
+     "degrees_in_sign": 29.3501517179822,
+     "element": "Water",
+     "house": null,
+     "longitude": 119.3501517179822,
+     "modality": "Cardinal",
+     "retrograde": false,
+     "sign": "Cancer",
+     "sign_index": 3,
+     "speed_longitude": 0.2146104861348524,
+     "uncertain": false
+    },
+    {
+     "body": "Saturn",
+     "degrees_in_sign": 19.874549137377983,
+     "element": "Earth",
+     "house": null,
+     "longitude": 289.874549137378,
+     "modality": "Cardinal",
+     "retrograde": true,
+     "sign": "Capricorn",
+     "sign_index": 9,
+     "speed_longitude": -0.0563136010642001,
+     "uncertain": false
+    },
+    {
+     "body": "Uranus",
+     "degrees_in_sign": 5.976650977871998,
+     "element": "Earth",
+     "house": null,
+     "longitude": 275.976650977872,
+     "modality": "Cardinal",
+     "retrograde": true,
+     "sign": "Capricorn",
+     "sign_index": 9,
+     "speed_longitude": -0.0237333294708528,
+     "uncertain": false
+    },
+    {
+     "body": "Neptune",
+     "degrees_in_sign": 12.197695230686634,
+     "element": "Earth",
+     "house": null,
+     "longitude": 282.19769523068663,
+     "modality": "Cardinal",
+     "retrograde": true,
+     "sign": "Capricorn",
+     "sign_index": 9,
+     "speed_longitude": -0.01903961715878799,
+     "uncertain": false
+    },
+    {
+     "body": "Pluto",
+     "degrees_in_sign": 15.085089984319211,
+     "element": "Water",
+     "house": null,
+     "longitude": 225.0850899843192,
+     "modality": "Fixed",
+     "retrograde": false,
+     "sign": "Scorpio",
+     "sign_index": 7,
+     "speed_longitude": 0.011504640642591223,
+     "uncertain": false
+    }
+   ],
+   "system": "western",
+   "zodiac": "tropical"
+  }
+ }
+}
