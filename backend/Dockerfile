@@ -27,6 +27,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH"
 
+# The base image is rebuilt only now and then, so it can lag behind Debian's
+# security fixes (the CI image scan fails on a fixable HIGH/CRITICAL finding).
+# Pull in whatever has been fixed since; no extra packages are installed.
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /opt/venv /opt/venv
 
 WORKDIR /app

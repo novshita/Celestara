@@ -161,6 +161,10 @@ class UserPreferences(Base):
     """A `CalculationConfig` as JSON, validated on the way in. None means
     the application default."""
 
+    pattern_detection: Mapped[bool] = mapped_column(default=True)
+    """Whether recurring themes in the user's saved questions may be shown
+    to them (product spec §20: pattern detection must be user-controllable)."""
+
     created_at: Mapped[dt.datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

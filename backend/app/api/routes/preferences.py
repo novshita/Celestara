@@ -24,6 +24,7 @@ def read_preferences(user: CurrentUser, db: DbSession) -> PreferencesResponse:
     return PreferencesResponse(
         explanation_depth=saved.explanation_depth,
         calculation_config=saved.calculation_config,
+        pattern_detection=saved.pattern_detection,
     )
 
 
@@ -40,9 +41,14 @@ def replace_preferences(
     not say otherwise. The chart endpoints take no account, so a client wanting
     its saved configuration there passes it in the request."""
     saved = save_preferences(
-        db, user, request.explanation_depth, request.calculation_config
+        db,
+        user,
+        request.explanation_depth,
+        request.calculation_config,
+        request.pattern_detection,
     )
     return PreferencesResponse(
         explanation_depth=saved.explanation_depth,
         calculation_config=saved.calculation_config,
+        pattern_detection=saved.pattern_detection,
     )

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AiGuideForm } from "@/components/AiGuideForm";
 import { Dashboard } from "@/components/Dashboard";
 import { PageHeading } from "@/components/PageHeading";
+import { PatternsNote } from "@/components/PatternsNote";
 import { ReadingForm } from "@/components/ReadingForm";
 import { SavedProfileNote } from "@/components/SavedProfileNote";
 import { birthDefaults, getSavedBirth } from "@/lib/profile";
@@ -45,6 +46,8 @@ export default async function Home({
       <SavedProfileNote saved={saved} />
 
       {saved.status === "saved" && <Dashboard birth={saved.birth} />}
+
+      <PatternsNote />
 
       <ReadingForm defaults={defaults} />
 

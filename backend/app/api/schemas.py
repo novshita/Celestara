@@ -663,11 +663,34 @@ class PreferencesRequest(BaseModel):
     explanation_depth: ExplanationDepth = ExplanationDepth.BEGINNER
     calculation_config: ClientCalculationConfig | None = None
     """`null` returns to the application default."""
+    pattern_detection: bool = True
+    """Whether recurring themes in the user's saved questions may be shown
+    to them (product spec §20)."""
 
 
 class PreferencesResponse(BaseModel):
     explanation_depth: ExplanationDepth
     calculation_config: CalculationConfig | None
+    pattern_detection: bool = True
+
+
+# --- Patterns ------------------------------------------------------------------
+
+
+class PatternResponse(BaseModel):
+    topic: ReadingTopic
+    count: int
+    window_days: int
+    note: str
+    """Authored text, shown as is: it states the count, says it is based on
+    the user's saved questions, and says it is not a conclusion about them."""
+
+
+class PatternsResponse(BaseModel):
+    enabled: bool
+    """False when the user (or the deployment) has switched this off; the
+    client shows nothing in that case."""
+    patterns: list[PatternResponse]
 
 
 # --- Memory --------------------------------------------------------------------

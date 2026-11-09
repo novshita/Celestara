@@ -35,6 +35,13 @@ HTTP_DURATION = Histogram(
     registry=registry,
 )
 
+CACHE_LOOKUPS = Counter(
+    "celestara_cache_lookups_total",
+    "Calculation cache lookups, by cache name and result (hit or miss).",
+    ["cache", "result"],
+    registry=registry,
+)
+
 AI_CALLS = Counter(
     "celestara_ai_calls_total",
     "Calls made to the AI provider, by outcome (ok or provider_error).",

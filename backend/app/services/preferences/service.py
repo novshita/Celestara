@@ -18,6 +18,7 @@ class Preferences:
     explanation_depth: ExplanationDepth
     calculation_config: CalculationConfig | None
     """`None` means the application default."""
+    pattern_detection: bool = True
 
 
 DEFAULT_PREFERENCES = Preferences(ExplanationDepth.BEGINNER, None)
@@ -41,6 +42,7 @@ def get_preferences(db: Session, user: User) -> Preferences:
             if row.calculation_config
             else None
         ),
+        pattern_detection=row.pattern_detection,
     )
 
 
@@ -49,6 +51,7 @@ def save_preferences(
     user: User,
     explanation_depth: ExplanationDepth,
     calculation_config: CalculationConfig | None,
+    pattern_detection: bool = True,
 ) -> Preferences:
     """Replace the user's preferences. A `None` configuration goes back to the
     application default."""
@@ -60,6 +63,7 @@ def save_preferences(
     row.calculation_config = (
         calculation_config.model_dump_json() if calculation_config else None
     )
+    row.pattern_detection = pattern_detection
     db.commit()
     return get_preferences(db, user)
 

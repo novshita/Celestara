@@ -17,9 +17,14 @@ export async function PreferencesSection() {
       <h2 className="display text-lg font-semibold text-amber-300">Preferences</h2>
       <p className="text-sm text-slate-400">
         How much detail the AI Guide and readings give by default. You can
-        still change it for a single question.
+        still change it for a single question. If a topic keeps coming up in
+        your saved questions, the home page can point it out; untick the box
+        to switch that off.
       </p>
-      <PreferencesForm depth={preferences.explanation_depth} />
+      <PreferencesForm
+        depth={preferences.explanation_depth}
+        patternDetection={preferences.pattern_detection}
+      />
     </section>
   );
 }

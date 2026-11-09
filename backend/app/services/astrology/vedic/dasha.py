@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
+from app.core.cache import cached_calculation
 from app.core.config import (
     DASHA_YEAR_DAYS,
     DEFAULT_CALCULATION_CONFIG,
@@ -266,6 +267,7 @@ def _boundary_uncertainty_days(
     return spread_years * _year_days(config) / 2.0
 
 
+@cached_calculation("vimshottari")
 def calculate_vimshottari(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,

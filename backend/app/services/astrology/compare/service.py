@@ -9,6 +9,7 @@ calculated independently.
 
 from __future__ import annotations
 
+from app.core.cache import cached_calculation
 from app.core.config import DEFAULT_CALCULATION_CONFIG, CalculationConfig
 from app.domain.birth_data import BirthData
 from app.domain.compare import (
@@ -73,6 +74,7 @@ def _ascendant(
     )
 
 
+@cached_calculation("comparison")
 def calculate_comparison(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,
