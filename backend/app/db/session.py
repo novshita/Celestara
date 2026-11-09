@@ -26,10 +26,16 @@ DEFAULT_DATABASE_URL = "sqlite:///./celestara.db"
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 
 #: SQLite enforces one connection per thread by default, which breaks under
-#: FastAPI's threaded test client and worker pool. Every other supported
-#: backend (Postgres included) ignores this argument, so it is safe to pass
-#: unconditionally rather than branching on the URL scheme.
-_connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+#: FastAPI's threaded test client and worker pool, so it needs
+#: `check_same_thread=False`; Postgres takes its own, separate options.
+_connect_args: dict = {}
+if DATABASE_URL.startswith("sqlite"):
+    _connect_args = {"check_same_thread": False}
+elif DATABASE_URL.startswith("postgresql"):
+    # Timestamps come back in the connection's timezone, which would otherwise
+    # be whatever the database server happens to be set to. Pin it to UTC so the
+    # API's output does not depend on server configuration (see core/timeutil).
+    _connect_args = {"options": "-c timezone=UTC"}
 
 engine = create_engine(DATABASE_URL, connect_args=_connect_args)
 

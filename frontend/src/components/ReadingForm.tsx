@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 
 import {
   requestReadingAction,
@@ -11,6 +11,7 @@ import { AnswerFactorsPanel } from "@/components/AnswerFactorsPanel";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
 import { DepthSelect } from "@/components/DepthSelect";
 import type { BirthData, ReadingFocus, ReadingKind } from "@/lib/types";
+import { useKeptFormAction } from "@/lib/useKeptFormAction";
 
 const INITIAL_STATE: ReadingFormState = { status: "idle" };
 
@@ -47,7 +48,7 @@ function formatMoment(iso: string): string {
 }
 
 export function ReadingForm({ defaults }: { defaults?: BirthData }) {
-  const [state, formAction, isPending] = useActionState(
+  const [state, onSubmit, isPending] = useKeptFormAction(
     requestReadingAction,
     INITIAL_STATE,
   );
@@ -69,7 +70,7 @@ export function ReadingForm({ defaults }: { defaults?: BirthData }) {
         </p>
       </div>
 
-      <form action={formAction} className="flex flex-col gap-5">
+      <form onSubmit={onSubmit} className="flex flex-col gap-5">
         <div className="flex gap-4 text-sm text-slate-300">
           {KIND_OPTIONS.map((option) => (
             <label key={option.value} className="flex items-center gap-2">

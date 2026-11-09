@@ -9,6 +9,10 @@ dependencies = [
     "email-validator>=2.1",
     "fastapi>=0.115",
     "prometheus-client>=0.20",
+    # The Postgres driver (engineering spec §18 makes Postgres the primary
+    # database); a `postgresql+psycopg://` DATABASE_URL needs it. Unused with
+    # the default SQLite file.
+    "psycopg[binary]>=3.2",
     "pydantic>=2.9",
     "pyswisseph>=2.10",
     "sqlalchemy>=2.0",

@@ -10,11 +10,12 @@ there is a frontend to exercise one.
 from __future__ import annotations
 
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.timeutil import as_utc, utc_now
 from app.db.models import AuthSession, User
 from app.domain.auth import generate_session_token, hash_password, hash_token, verify_password
 
@@ -25,19 +26,6 @@ _DEFAULT_SESSION_TTL_DAYS = 30
 
 def _session_ttl_days() -> int:
     return int(os.getenv("SESSION_TTL_DAYS", str(_DEFAULT_SESSION_TTL_DAYS)))
-
-
-def _now_utc_naive() -> datetime:
-    """UTC "now" with `tzinfo` stripped.
-
-    SQLite (the default `DATABASE_URL`) does not persist `tzinfo`: a value
-    written as timezone-aware comes back naive, which makes a direct `<`
-    comparison against a freshly-computed aware value raise `TypeError`.
-    Treating every session timestamp as naive-but-always-UTC sidesteps that
-    inconsistency entirely rather than depending on what a given backend
-    round-trips.
-    """
-    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class EmailAlreadyRegisteredError(ValueError):
@@ -94,7 +82,7 @@ def create_session(db: Session, user: User) -> str:
     session = AuthSession(
         user_id=user.id,
         token_hash=hash_token(token),
-        expires_at=_now_utc_naive() + timedelta(days=_session_ttl_days()),
+        expires_at=utc_now() + timedelta(days=_session_ttl_days()),
     )
     db.add(session)
     db.commit()
@@ -111,7 +99,7 @@ def get_user_by_token(db: Session, token: str) -> User:
         select(AuthSession).where(AuthSession.token_hash == hash_token(token))
     ).first()
 
-    if session is None or session.expires_at < _now_utc_naive():
+    if session is None or as_utc(session.expires_at) < utc_now():
         raise InvalidSessionError("session is invalid or has expired")
 
     return session.user

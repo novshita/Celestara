@@ -52,8 +52,13 @@ pytest                            # run the test suite
 Interactive API docs are served at `/docs` once the server is running.
 
 Data is stored in a local SQLite file (`celestara.db`) by default - nothing
-to install. Set `DATABASE_URL` to point at Postgres instead; see
-`backend/.env.example` for every environment variable the app reads.
+to install. Set `DATABASE_URL` to point at Postgres instead
+(`postgresql+psycopg://user:password@host:5432/celestara`; the driver is
+installed with the backend and the tables are created on start). The backend's
+tests run against both: `pytest` uses in-memory SQLite, and
+`TEST_DATABASE_URL=postgresql+psycopg://... pytest` runs the same suite on an
+empty, disposable Postgres database, as CI does. See `backend/.env.example` for
+every environment variable the app reads.
 
 ### 🧪 Frontend tests
 

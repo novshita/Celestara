@@ -1,7 +1,5 @@
 "use client";
 
-import { useActionState } from "react";
-
 import { submitBirthData, type ChartFormState, type ChartSystem } from "@/app/actions";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
 import { CompareResult } from "@/components/CompareResult";
@@ -10,6 +8,7 @@ import { TransitResult } from "@/components/TransitResult";
 import { VedicChartResult } from "@/components/VedicChartResult";
 import { WesternChartResult } from "@/components/WesternChartResult";
 import type { BirthData } from "@/lib/types";
+import { useKeptFormAction } from "@/lib/useKeptFormAction";
 
 const INITIAL_STATE: ChartFormState = { status: "idle" };
 
@@ -22,7 +21,7 @@ const SYSTEM_OPTIONS: { value: ChartSystem; label: string }[] = [
 ];
 
 export function BirthDataForm({ defaults }: { defaults?: BirthData }) {
-  const [state, formAction, isPending] = useActionState(
+  const [state, onSubmit, isPending] = useKeptFormAction(
     submitBirthData,
     INITIAL_STATE,
   );
@@ -31,7 +30,7 @@ export function BirthDataForm({ defaults }: { defaults?: BirthData }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <form action={formAction} className="flex flex-col gap-5">
+      <form onSubmit={onSubmit} className="flex flex-col gap-5">
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-300">
           {SYSTEM_OPTIONS.map((option) => (
             <label key={option.value} className="flex items-center gap-2">

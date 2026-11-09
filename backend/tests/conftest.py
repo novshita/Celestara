@@ -6,6 +6,7 @@ reproducible chart rather than a moving target.
 
 from __future__ import annotations
 
+import os
 from datetime import date, time
 
 import pytest
@@ -77,23 +78,54 @@ def unknown_time_birth() -> BirthData:
     )
 
 
-@pytest.fixture(autouse=True)
-def session_factory():
-    """A fresh in-memory database for every test, wired in as the app's
-    database, so no test ever touches the real one - important now that AI
-    answers write an audit record even for anonymous callers.
+#: Set to a SQLAlchemy URL to run the whole suite against that database (CI
+#: points it at a Postgres service) instead of the in-memory SQLite default:
+#:
+#:     TEST_DATABASE_URL=postgresql+psycopg://user:pw@localhost/test pytest
+#:
+#: The database must be empty and disposable: its tables are created, emptied
+#: between tests and dropped at the end.
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 
-    Yields the `sessionmaker`, so a test can look at what was stored. `StaticPool`
+
+@pytest.fixture(scope="session")
+def _external_engine():
+    if not TEST_DATABASE_URL:
+        yield None
+        return
+    engine = create_engine(TEST_DATABASE_URL, pool_pre_ping=True)
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    try:
+        yield engine
+    finally:
+        Base.metadata.drop_all(bind=engine)
+        engine.dispose()
+
+
+@pytest.fixture(autouse=True)
+def session_factory(_external_engine):
+    """A fresh database for every test, wired in as the app's database, so no
+    test ever touches the real one - important now that AI answers write an
+    audit record even for anonymous callers.
+
+    Yields the `sessionmaker`, so a test can look at what was stored.
+
+    By default each test gets its own in-memory SQLite database. `StaticPool`
     keeps the single in-memory connection alive across the multiple threads
     FastAPI's `TestClient` uses; without it, each connection would see an
-    empty (and separate) `:memory:` database.
+    empty (and separate) `:memory:` database. With `TEST_DATABASE_URL` the one
+    external database is reused and emptied after each test instead.
     """
-    engine = create_engine(
-        "sqlite:///:memory:",
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-    )
-    Base.metadata.create_all(bind=engine)
+    if _external_engine is not None:
+        engine = _external_engine
+    else:
+        engine = create_engine(
+            "sqlite:///:memory:",
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
+        )
+        Base.metadata.create_all(bind=engine)
     factory = sessionmaker(autoflush=False, autocommit=False, bind=engine)
 
     def override_get_db():
@@ -108,8 +140,13 @@ def session_factory():
         yield factory
     finally:
         app.dependency_overrides.clear()
-        Base.metadata.drop_all(bind=engine)
-        engine.dispose()
+        if _external_engine is not None:
+            with engine.begin() as connection:
+                for table in reversed(Base.metadata.sorted_tables):
+                    connection.execute(table.delete())
+        else:
+            Base.metadata.drop_all(bind=engine)
+            engine.dispose()
 
 
 @pytest.fixture
