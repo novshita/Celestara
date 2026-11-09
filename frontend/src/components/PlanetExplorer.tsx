@@ -1,17 +1,18 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 
 import { explorePlanetAction, type ExploreFormState } from "@/app/explore-actions";
 import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
 import { PlanetResult } from "@/components/PlanetResult";
 import { EXPLORE_BODIES } from "@/lib/planets";
 import type { BirthData, ExploreSystem } from "@/lib/types";
+import { useKeptFormAction } from "@/lib/useKeptFormAction";
 
 const INITIAL_STATE: ExploreFormState = { status: "idle" };
 
 export function PlanetExplorer({ defaults }: { defaults?: BirthData }) {
-  const [state, formAction, isPending] = useActionState(
+  const [state, onSubmit, isPending] = useKeptFormAction(
     explorePlanetAction,
     INITIAL_STATE,
   );
@@ -21,7 +22,7 @@ export function PlanetExplorer({ defaults }: { defaults?: BirthData }) {
   return (
     <div className="flex flex-col gap-6">
       <form
-        action={formAction}
+        onSubmit={onSubmit}
         className="flex flex-col gap-5 panel p-6"
       >
         <div>

@@ -27,6 +27,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.flags import Flag, is_enabled
+from app.core.timeutil import as_utc
 from app.db.models import Conversation, ConversationMessage, User
 from app.domain.ai import ReadingTopic
 from app.services.preferences.service import get_preferences
@@ -96,12 +97,6 @@ class PatternReport:
     patterns: tuple[Pattern, ...]
 
 
-def _as_utc(moment: datetime) -> datetime:
-    # SQLite does not persist tzinfo (see auth.service): a stored UTC time
-    # comes back naive, so a naive value is read as UTC.
-    return moment.replace(tzinfo=timezone.utc) if moment.tzinfo is None else moment
-
-
 def _note(label: str, count: int) -> str:
     return (
         f"{label} has come up in {count} of your saved questions in the last "
@@ -141,5 +136,5 @@ def detect_patterns(
         .order_by(ConversationMessage.id.desc())
         .limit(MAX_QUESTIONS)
     ).all()
-    recent = [content for content, created in rows if _as_utc(created) >= cutoff]
+    recent = [content for content, created in rows if as_utc(created) >= cutoff]
     return PatternReport(enabled=True, patterns=tuple(find_patterns(recent)))

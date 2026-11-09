@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { askAiGuideAction, type AiChatFormState } from "@/app/ai-actions";
 import { AiThinking } from "@/components/AiThinking";
@@ -9,6 +9,7 @@ import { BirthFieldsFieldset } from "@/components/BirthFieldsFieldset";
 import { DepthSelect } from "@/components/DepthSelect";
 import { Field } from "@/components/Field";
 import type { AiSystem, BirthData } from "@/lib/types";
+import { useKeptFormAction } from "@/lib/useKeptFormAction";
 
 const INITIAL_STATE: AiChatFormState = { status: "idle" };
 
@@ -25,11 +26,20 @@ export function AiGuideForm({
   defaults?: BirthData;
   initialQuestion?: string;
 }) {
-  const [state, formAction, isPending] = useActionState(
+  const [state, onSubmit, isPending] = useKeptFormAction(
     askAiGuideAction,
     INITIAL_STATE,
   );
   const fieldErrors = state.status === "error" ? state.fieldErrors : {};
+
+  // The birth data stays for the next question; the answered question does
+  // not (a failed one stays, so it can be sent again).
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (state.status !== "success") return;
+    const question = formRef.current?.elements.namedItem("question");
+    if (question instanceof HTMLTextAreaElement) question.value = "";
+  }, [state]);
 
   // A saved answer names the conversation the next question continues. The
   // visitor can start afresh, which just means not sending that id: the
@@ -54,7 +64,7 @@ export function AiGuideForm({
         </p>
       </div>
 
-      <form action={formAction} className="flex flex-col gap-5">
+      <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-5">
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-300">
           {SYSTEM_OPTIONS.map((option) => (
             <label key={option.value} className="flex items-center gap-2">

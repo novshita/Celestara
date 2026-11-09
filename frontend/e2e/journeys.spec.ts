@@ -103,9 +103,9 @@ test("6. An AI question is answered, and a provider failure is handled kindly", 
 }) => {
   await page.goto("/");
   const guide = formWith(page, "Ask");
-  // The form empties itself after every answer, so each question is a full fill.
+  await fillBirth(guide);
+  // The birth data is typed once; the form keeps it for every later question.
   const ask = async (question: string) => {
-    await fillBirth(guide);
     await guide.getByLabel("Your question").fill(question);
     await guide.getByRole("button", { name: "Ask" }).click();
   };
@@ -182,4 +182,42 @@ test("9. Delete all data: the account is gone and so is the session", async ({ p
   await page.locator("main form").getByRole("button", { name: "Log in" }).click();
   await expect(page.getByRole("alert").filter({ hasText: /email or password/i })).toBeVisible();
   await expect(page.getByRole("button", { name: "Log out" })).toHaveCount(0);
+});
+
+test("10. Birth data is kept after a result, so the next question or system needs no retyping", async ({
+  page,
+}) => {
+  await page.goto("/chart");
+  const form = formWith(page, "Calculate chart");
+  await form.getByLabel("Vedic (Rashi / D1)", { exact: true }).check();
+  await fillBirth(form);
+  await form.getByRole("button", { name: "Calculate chart" }).click();
+  await expect(page.getByRole("heading", { name: "Rashi (D1) chart" })).toBeVisible();
+
+  // Still filled in...
+  await expect(form.getByLabel("Birth date")).toHaveValue("1990-08-15");
+  await expect(form.getByLabel("Latitude")).toHaveValue("18.9756");
+
+  // ...so the other system is one click away.
+  await form.getByLabel("Western (Tropical)", { exact: true }).check();
+  await form.getByRole("button", { name: "Calculate chart" }).click();
+  await expect(page.getByRole("heading", { name: "Western natal chart" })).toBeVisible();
+
+  // The Guide keeps the birth data but clears an answered question.
+  await page.goto("/");
+  const guide = formWith(page, "Ask");
+  await fillBirth(guide);
+  await guide.getByLabel("Your question").fill("What does my Moon say?");
+  await guide.getByRole("button", { name: "Ask" }).click();
+  await expect(page.getByRole("status").getByText(/Fake guide:/)).toBeVisible();
+  await expect(guide.getByLabel("Birth date")).toHaveValue("1990-08-15");
+  await expect(guide.getByLabel("Your question")).toHaveValue("");
+
+  // A question that fails stays in the box, to be sent again.
+  await guide.getByLabel("Your question").fill("[[AUTH]] What does my Moon say?");
+  await guide.getByRole("button", { name: "Ask" }).click();
+  await expect(
+    page.getByRole("alert").filter({ hasText: /isn't answering right now/ }),
+  ).toBeVisible();
+  await expect(guide.getByLabel("Your question")).toHaveValue("[[AUTH]] What does my Moon say?");
 });
