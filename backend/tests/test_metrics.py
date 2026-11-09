@@ -3,6 +3,7 @@ can read it."""
 
 from __future__ import annotations
 
+import re
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -21,6 +22,17 @@ BIRTH = {
     "longitude": 72.8258,
     "timezone_name": "Asia/Kolkata",
 }
+
+
+def label_text(exposed: str) -> str:
+    """Only what sits inside the `{...}` label sets of the exposition text.
+
+    A request path or id could only ever leak as a label value. The rest of
+    the output holds `_created` timestamps (`1.7942040386123457e+09`) whose
+    digits can contain any short number by chance, so searching the whole
+    text for one made these tests fail at random.
+    """
+    return "".join(re.findall(r"\{[^}]*\}", exposed))
 
 
 def sample(name: str, **labels) -> float:
@@ -88,7 +100,8 @@ def test_unmatched_paths_share_one_label_instead_of_minting_series(client):
 
     assert sample("celestara_http_requests_total", **labels) == before + 2
     exposed = "".join(metric_family_text())
-    assert "12345" not in exposed and "67890" not in exposed
+    assert "12345" not in label_text(exposed) and "67890" not in label_text(exposed)
+    assert "/no/such/path" not in exposed and "/another/one" not in exposed
 
 
 def test_path_parameters_never_become_label_values(client):
@@ -96,7 +109,7 @@ def test_path_parameters_never_become_label_values(client):
     client.get("/api/v1/journal/987654")
 
     exposed = "".join(metric_family_text())
-    assert "987654" not in exposed
+    assert "987654" not in label_text(exposed)
     assert 'route="/api/v1/journal/{entry_id}"' in exposed
 
 
