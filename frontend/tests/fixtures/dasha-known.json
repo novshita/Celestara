@@ -1,0 +1,903 @@
+{
+ "active_now": [
+  {
+   "duration_years": 16.0,
+   "end": "2033-02-20T16:34:07.629686Z",
+   "is_partial": false,
+   "level": "maha",
+   "lord": "Jupiter",
+   "start": "2017-02-20T16:34:07.629686Z",
+   "sub_periods": [
+    {
+     "duration_years": 2.1333333333333333,
+     "end": "2019-04-10T21:22:07.629686Z",
+     "is_partial": false,
+     "level": "antar",
+     "lord": "Jupiter",
+     "start": "2017-02-20T16:34:07.629686Z",
+     "sub_periods": []
+    },
+    {
+     "duration_years": 2.533333333333333,
+     "end": "2021-10-22T04:34:07.629686Z",
+     "is_partial": false,
+     "level": "antar",
+     "lord": "Saturn",
+     "start": "2019-04-10T21:22:07.629686Z",
+     "sub_periods": []
+    },
+    {
+     "duration_years": 2.2666666666666666,
+     "end": "2024-01-28T02:10:07.629686Z",
+     "is_partial": false,
+     "level": "antar",
+     "lord": "Mercury",
+     "start": "2021-10-22T04:34:07.629686Z",
+     "sub_periods": []
+    },
+    {
+     "duration_years": 0.9333333333333333,
+     "end": "2025-01-02T23:46:07.629686Z",
+     "is_partial": false,
+     "level": "antar",
+     "lord": "Ketu",
+     "start": "2024-01-28T02:10:07.629686Z",
+     "sub_periods": []
+    },
+    {
+     "duration_years": 2.6666666666666665,
+     "end": "2027-09-03T23:46:07.629686Z",
+     "is_partial": false,
+     "level": "antar",
+     "lord": "Venus",
+     "start": "2025-01-02T23:46:07.629686Z",
+     "sub_periods": []
+    },
+    {
+     "duration_years": 0.8,
+     "end": "2028-06-22T04:34:07.629686Z",
+     "is_partial": false,
+     "level": "antar",
+     "lord": "Sun",
+     "start": "2027-09-03T23:46:07.629686Z",
+     "sub_periods": []
+    },
+    {
+     "duration_years": 1.3333333333333333,
+     "end": "2029-10-22T04:34:07.629686Z",
+     "is_partial": false,
+     "level": "antar",
+     "lord": "Moon",
+     "start": "2028-06-22T04:34:07.629686Z",
+     "sub_periods": []
+    },
+    {
+     "duration_years": 0.9333333333333333,
+     "end": "2030-09-28T02:10:07.629686Z",
+     "is_partial": false,
+     "level": "antar",
+     "lord": "Mars",
+     "start": "2029-10-22T04:34:07.629686Z",
+     "sub_periods": []
+    },
+    {
+     "duration_years": 2.4,
+     "end": "2033-02-20T16:34:07.629686Z",
+     "is_partial": false,
+     "level": "antar",
+     "lord": "Rahu",
+     "start": "2030-09-28T02:10:07.629686Z",
+     "sub_periods": []
+    }
+   ]
+  },
+  {
+   "duration_years": 2.6666666666666665,
+   "end": "2027-09-03T23:46:07.629686Z",
+   "is_partial": false,
+   "level": "antar",
+   "lord": "Venus",
+   "start": "2025-01-02T23:46:07.629686Z",
+   "sub_periods": []
+  }
+ ],
+ "as_of": "2026-11-09T13:22:17.232000Z",
+ "timeline": {
+  "balance_years": 1.5196861494437486,
+  "config": {
+   "aspect_orb_degrees": 8.0,
+   "ayanamsa": "lahiri",
+   "calculation_version": "1.0.0",
+   "dasha_cycles": 1,
+   "dasha_levels": 2,
+   "dasha_year_length": "julian",
+   "ephemeris_path": null,
+   "ephemeris_source": "moshier",
+   "house_system": "whole_sign",
+   "include_outer_planets": true,
+   "node_type": "mean",
+   "sextile_orb_degrees": 6.0,
+   "western_house_system": "placidus"
+  },
+  "elapsed_fraction": 0.8480313850556251,
+  "moment": {
+   "assumptions": [],
+   "dst_anomaly": "NONE",
+   "julian_day_ut": 2448118.875,
+   "time_confidence": "EXACT",
+   "timezone_name": "Asia/Kolkata",
+   "uncertainty_hours": 0.0,
+   "utc_datetime": "1990-08-15T09:00:00Z",
+   "utc_offset_hours": 5.5
+  },
+  "moon_nakshatra": {
+   "index": 3,
+   "lord": "Moon",
+   "name": "Rohini",
+   "pada": 4
+  },
+  "periods": [
+   {
+    "duration_years": 1.5196861494437472,
+    "end": "1992-02-21T10:34:07.629686Z",
+    "is_partial": true,
+    "level": "maha",
+    "lord": "Moon",
+    "start": "1990-08-15T09:00:00Z",
+    "sub_periods": [
+     {
+      "duration_years": 1.0196861494437475,
+      "end": "1991-08-22T19:34:07.629686Z",
+      "is_partial": true,
+      "level": "antar",
+      "lord": "Venus",
+      "start": "1990-08-15T09:00:00Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.5,
+      "end": "1992-02-21T10:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Sun",
+      "start": "1991-08-22T19:34:07.629686Z",
+      "sub_periods": []
+     }
+    ]
+   },
+   {
+    "duration_years": 7.0,
+    "end": "1999-02-21T04:34:07.629686Z",
+    "is_partial": false,
+    "level": "maha",
+    "lord": "Mars",
+    "start": "1992-02-21T10:34:07.629686Z",
+    "sub_periods": [
+     {
+      "duration_years": 0.4083333333333333,
+      "end": "1992-07-19T14:01:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mars",
+      "start": "1992-02-21T10:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.05,
+      "end": "1993-08-07T02:19:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Rahu",
+      "start": "1992-07-19T14:01:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9333333333333333,
+      "end": "1994-07-13T23:55:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Jupiter",
+      "start": "1993-08-07T02:19:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.1083333333333334,
+      "end": "1995-08-22T19:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Saturn",
+      "start": "1994-07-13T23:55:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9916666666666667,
+      "end": "1996-08-19T00:31:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mercury",
+      "start": "1995-08-22T19:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.4083333333333333,
+      "end": "1997-01-15T03:58:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Ketu",
+      "start": "1996-08-19T00:31:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.1666666666666667,
+      "end": "1998-03-17T06:58:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Venus",
+      "start": "1997-01-15T03:58:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.35,
+      "end": "1998-07-23T03:04:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Sun",
+      "start": "1998-03-17T06:58:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.5833333333333334,
+      "end": "1999-02-21T04:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Moon",
+      "start": "1998-07-23T03:04:07.629686Z",
+      "sub_periods": []
+     }
+    ]
+   },
+   {
+    "duration_years": 18.0,
+    "end": "2017-02-20T16:34:07.629686Z",
+    "is_partial": false,
+    "level": "maha",
+    "lord": "Rahu",
+    "start": "1999-02-21T04:34:07.629686Z",
+    "sub_periods": [
+     {
+      "duration_years": 2.7,
+      "end": "2001-11-03T08:46:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Rahu",
+      "start": "1999-02-21T04:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.4,
+      "end": "2004-03-28T23:10:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Jupiter",
+      "start": "2001-11-03T08:46:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.85,
+      "end": "2007-02-02T22:16:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Saturn",
+      "start": "2004-03-28T23:10:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.55,
+      "end": "2009-08-22T07:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mercury",
+      "start": "2007-02-02T22:16:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.05,
+      "end": "2010-09-09T19:52:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Ketu",
+      "start": "2009-08-22T07:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 3.0,
+      "end": "2013-09-09T13:52:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Venus",
+      "start": "2010-09-09T19:52:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9,
+      "end": "2014-08-04T07:16:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Sun",
+      "start": "2013-09-09T13:52:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.5,
+      "end": "2016-02-03T04:16:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Moon",
+      "start": "2014-08-04T07:16:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.05,
+      "end": "2017-02-20T16:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mars",
+      "start": "2016-02-03T04:16:07.629686Z",
+      "sub_periods": []
+     }
+    ]
+   },
+   {
+    "duration_years": 16.0,
+    "end": "2033-02-20T16:34:07.629686Z",
+    "is_partial": false,
+    "level": "maha",
+    "lord": "Jupiter",
+    "start": "2017-02-20T16:34:07.629686Z",
+    "sub_periods": [
+     {
+      "duration_years": 2.1333333333333333,
+      "end": "2019-04-10T21:22:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Jupiter",
+      "start": "2017-02-20T16:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.533333333333333,
+      "end": "2021-10-22T04:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Saturn",
+      "start": "2019-04-10T21:22:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.2666666666666666,
+      "end": "2024-01-28T02:10:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mercury",
+      "start": "2021-10-22T04:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9333333333333333,
+      "end": "2025-01-02T23:46:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Ketu",
+      "start": "2024-01-28T02:10:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.6666666666666665,
+      "end": "2027-09-03T23:46:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Venus",
+      "start": "2025-01-02T23:46:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.8,
+      "end": "2028-06-22T04:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Sun",
+      "start": "2027-09-03T23:46:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.3333333333333333,
+      "end": "2029-10-22T04:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Moon",
+      "start": "2028-06-22T04:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9333333333333333,
+      "end": "2030-09-28T02:10:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mars",
+      "start": "2029-10-22T04:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.4,
+      "end": "2033-02-20T16:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Rahu",
+      "start": "2030-09-28T02:10:07.629686Z",
+      "sub_periods": []
+     }
+    ]
+   },
+   {
+    "duration_years": 19.0,
+    "end": "2052-02-21T10:34:07.629686Z",
+    "is_partial": false,
+    "level": "maha",
+    "lord": "Saturn",
+    "start": "2033-02-20T16:34:07.629686Z",
+    "sub_periods": [
+     {
+      "duration_years": 3.0083333333333333,
+      "end": "2036-02-24T11:37:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Saturn",
+      "start": "2033-02-20T16:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.691666666666667,
+      "end": "2038-11-03T14:46:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mercury",
+      "start": "2036-02-24T11:37:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.1083333333333334,
+      "end": "2039-12-13T10:25:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Ketu",
+      "start": "2038-11-03T14:46:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 3.1666666666666665,
+      "end": "2043-02-12T01:25:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Venus",
+      "start": "2039-12-13T10:25:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.95,
+      "end": "2044-01-25T01:07:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Sun",
+      "start": "2043-02-12T01:25:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.5833333333333333,
+      "end": "2045-08-25T08:37:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Moon",
+      "start": "2044-01-25T01:07:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.1083333333333334,
+      "end": "2046-10-04T04:16:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mars",
+      "start": "2045-08-25T08:37:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.85,
+      "end": "2049-08-10T03:22:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Rahu",
+      "start": "2046-10-04T04:16:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.533333333333333,
+      "end": "2052-02-21T10:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Jupiter",
+      "start": "2049-08-10T03:22:07.629686Z",
+      "sub_periods": []
+     }
+    ]
+   },
+   {
+    "duration_years": 17.0,
+    "end": "2069-02-20T16:34:07.629686Z",
+    "is_partial": false,
+    "level": "maha",
+    "lord": "Mercury",
+    "start": "2052-02-21T10:34:07.629686Z",
+    "sub_periods": [
+     {
+      "duration_years": 2.408333333333333,
+      "end": "2054-07-20T02:01:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mercury",
+      "start": "2052-02-21T10:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9916666666666667,
+      "end": "2055-07-17T06:58:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Ketu",
+      "start": "2054-07-20T02:01:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.8333333333333335,
+      "end": "2058-05-17T03:58:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Venus",
+      "start": "2055-07-17T06:58:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.85,
+      "end": "2059-03-23T15:04:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Sun",
+      "start": "2058-05-17T03:58:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.4166666666666667,
+      "end": "2060-08-22T01:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Moon",
+      "start": "2059-03-23T15:04:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9916666666666667,
+      "end": "2061-08-19T06:31:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mars",
+      "start": "2060-08-22T01:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.55,
+      "end": "2064-03-07T15:49:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Rahu",
+      "start": "2061-08-19T06:31:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.2666666666666666,
+      "end": "2066-06-13T13:25:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Jupiter",
+      "start": "2064-03-07T15:49:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.691666666666667,
+      "end": "2069-02-20T16:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Saturn",
+      "start": "2066-06-13T13:25:07.629686Z",
+      "sub_periods": []
+     }
+    ]
+   },
+   {
+    "duration_years": 7.0,
+    "end": "2076-02-21T10:34:07.629686Z",
+    "is_partial": false,
+    "level": "maha",
+    "lord": "Ketu",
+    "start": "2069-02-20T16:34:07.629686Z",
+    "sub_periods": [
+     {
+      "duration_years": 0.4083333333333333,
+      "end": "2069-07-19T20:01:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Ketu",
+      "start": "2069-02-20T16:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.1666666666666667,
+      "end": "2070-09-18T23:01:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Venus",
+      "start": "2069-07-19T20:01:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.35,
+      "end": "2071-01-24T19:07:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Sun",
+      "start": "2070-09-18T23:01:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.5833333333333334,
+      "end": "2071-08-25T20:37:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Moon",
+      "start": "2071-01-24T19:07:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.4083333333333333,
+      "end": "2072-01-22T00:04:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mars",
+      "start": "2071-08-25T20:37:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.05,
+      "end": "2073-02-08T12:22:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Rahu",
+      "start": "2072-01-22T00:04:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9333333333333333,
+      "end": "2074-01-15T09:58:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Jupiter",
+      "start": "2073-02-08T12:22:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.1083333333333334,
+      "end": "2075-02-24T05:37:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Saturn",
+      "start": "2074-01-15T09:58:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9916666666666667,
+      "end": "2076-02-21T10:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mercury",
+      "start": "2075-02-24T05:37:07.629686Z",
+      "sub_periods": []
+     }
+    ]
+   },
+   {
+    "duration_years": 20.0,
+    "end": "2096-02-21T10:34:07.629686Z",
+    "is_partial": false,
+    "level": "maha",
+    "lord": "Venus",
+    "start": "2076-02-21T10:34:07.629686Z",
+    "sub_periods": [
+     {
+      "duration_years": 3.3333333333333335,
+      "end": "2079-06-22T22:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Venus",
+      "start": "2076-02-21T10:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.0,
+      "end": "2080-06-22T04:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Sun",
+      "start": "2079-06-22T22:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.6666666666666667,
+      "end": "2082-02-20T22:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Moon",
+      "start": "2080-06-22T04:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.1666666666666667,
+      "end": "2083-04-23T01:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mars",
+      "start": "2082-02-20T22:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 3.0,
+      "end": "2086-04-22T19:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Rahu",
+      "start": "2083-04-23T01:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.6666666666666665,
+      "end": "2088-12-21T19:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Jupiter",
+      "start": "2086-04-22T19:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 3.1666666666666665,
+      "end": "2092-02-21T10:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Saturn",
+      "start": "2088-12-21T19:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 2.8333333333333335,
+      "end": "2094-12-22T07:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mercury",
+      "start": "2092-02-21T10:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.1666666666666667,
+      "end": "2096-02-21T10:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Ketu",
+      "start": "2094-12-22T07:34:07.629686Z",
+      "sub_periods": []
+     }
+    ]
+   },
+   {
+    "duration_years": 6.0,
+    "end": "2102-02-21T22:34:07.629686Z",
+    "is_partial": false,
+    "level": "maha",
+    "lord": "Sun",
+    "start": "2096-02-21T10:34:07.629686Z",
+    "sub_periods": [
+     {
+      "duration_years": 0.3,
+      "end": "2096-06-10T00:22:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Sun",
+      "start": "2096-02-21T10:34:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.5,
+      "end": "2096-12-09T15:22:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Moon",
+      "start": "2096-06-10T00:22:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.35,
+      "end": "2097-04-16T11:28:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mars",
+      "start": "2096-12-09T15:22:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.9,
+      "end": "2098-03-11T04:52:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Rahu",
+      "start": "2097-04-16T11:28:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.8,
+      "end": "2098-12-28T09:40:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Jupiter",
+      "start": "2098-03-11T04:52:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.95,
+      "end": "2099-12-10T09:22:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Saturn",
+      "start": "2098-12-28T09:40:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.85,
+      "end": "2100-10-16T20:28:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Mercury",
+      "start": "2099-12-10T09:22:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 0.35,
+      "end": "2101-02-21T16:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Ketu",
+      "start": "2100-10-16T20:28:07.629686Z",
+      "sub_periods": []
+     },
+     {
+      "duration_years": 1.0,
+      "end": "2102-02-21T22:34:07.629686Z",
+      "is_partial": false,
+      "level": "antar",
+      "lord": "Venus",
+      "start": "2101-02-21T16:34:07.629686Z",
+      "sub_periods": []
+     }
+    ]
+   }
+  ],
+  "starting_lord": "Moon",
+  "system": "vimshottari",
+  "uncertainty_days": 0.0,
+  "year_days": 365.25,
+  "year_length": "julian"
+ }
+}

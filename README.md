@@ -55,6 +55,27 @@ Data is stored in a local SQLite file (`celestara.db`) by default - nothing
 to install. Set `DATABASE_URL` to point at Postgres instead; see
 `backend/.env.example` for every environment variable the app reads.
 
+### 🧪 Frontend tests
+
+```bash
+cd frontend
+npm test                          # unit and component tests (Vitest), seconds
+npm run build && npm run test:e2e # browser journeys (Playwright), about a minute
+```
+
+The unit tests cover the chart geometry, the Dasha timeline maths, the form
+helpers and the chart components, using real backend responses saved in
+`frontend/tests/fixtures`. The browser tests drive the production build in
+Chrome against the real backend on a throwaway database and a fake Anthropic
+API, so they need no key and cost nothing. They cover the nine journeys from
+engineering spec §31 (new user to chart, Vedic and Western exploration,
+Compare, transit reading, an AI question and its failure modes, unknown birth
+time, memory management, deleting all data) plus accessibility (axe, at desktop
+and phone width), reduced motion and no sideways scrolling on small screens.
+They use ports 3200, 8200 and 8201, so a running dev server is left alone; set
+`E2E_PYTHON` if `python3` is not the interpreter with the backend installed.
+CI runs both.
+
 ### 🔑 Authentication
 
 Endpoints under `/profile`, `/journal` and `/account` require a bearer

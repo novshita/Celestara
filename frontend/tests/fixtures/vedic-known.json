@@ -1,0 +1,370 @@
+{
+ "chart": {
+  "ascendant": {
+   "degrees_in_rashi": 20.727535920367245,
+   "longitude": 230.72753592036725,
+   "lord": "Mars",
+   "nakshatra": {
+    "index": 17,
+    "lord": "Mercury",
+    "name": "Jyeshtha",
+    "pada": 2
+   },
+   "rashi": "Vrischika",
+   "rashi_index": 7
+  },
+  "bhavas": [
+   {
+    "cusp_longitude": 210.0,
+    "grahas": [],
+    "lord": "Mars",
+    "number": 1,
+    "rashi": "Vrischika",
+    "rashi_index": 7
+   },
+   {
+    "cusp_longitude": 240.0,
+    "grahas": [
+     "Saturn"
+    ],
+    "lord": "Jupiter",
+    "number": 2,
+    "rashi": "Dhanu",
+    "rashi_index": 8
+   },
+   {
+    "cusp_longitude": 270.0,
+    "grahas": [
+     "Rahu"
+    ],
+    "lord": "Saturn",
+    "number": 3,
+    "rashi": "Makara",
+    "rashi_index": 9
+   },
+   {
+    "cusp_longitude": 300.0,
+    "grahas": [],
+    "lord": "Saturn",
+    "number": 4,
+    "rashi": "Kumbha",
+    "rashi_index": 10
+   },
+   {
+    "cusp_longitude": 330.0,
+    "grahas": [],
+    "lord": "Jupiter",
+    "number": 5,
+    "rashi": "Meena",
+    "rashi_index": 11
+   },
+   {
+    "cusp_longitude": 0.0,
+    "grahas": [
+     "Mars"
+    ],
+    "lord": "Mars",
+    "number": 6,
+    "rashi": "Mesha",
+    "rashi_index": 0
+   },
+   {
+    "cusp_longitude": 30.0,
+    "grahas": [
+     "Moon"
+    ],
+    "lord": "Venus",
+    "number": 7,
+    "rashi": "Vrishabha",
+    "rashi_index": 1
+   },
+   {
+    "cusp_longitude": 60.0,
+    "grahas": [],
+    "lord": "Mercury",
+    "number": 8,
+    "rashi": "Mithuna",
+    "rashi_index": 2
+   },
+   {
+    "cusp_longitude": 90.0,
+    "grahas": [
+     "Sun",
+     "Jupiter",
+     "Venus",
+     "Ketu"
+    ],
+    "lord": "Moon",
+    "number": 9,
+    "rashi": "Karka",
+    "rashi_index": 3
+   },
+   {
+    "cusp_longitude": 120.0,
+    "grahas": [
+     "Mercury"
+    ],
+    "lord": "Sun",
+    "number": 10,
+    "rashi": "Simha",
+    "rashi_index": 4
+   },
+   {
+    "cusp_longitude": 150.0,
+    "grahas": [],
+    "lord": "Mercury",
+    "number": 11,
+    "rashi": "Kanya",
+    "rashi_index": 5
+   },
+   {
+    "cusp_longitude": 180.0,
+    "grahas": [],
+    "lord": "Venus",
+    "number": 12,
+    "rashi": "Tula",
+    "rashi_index": 6
+   }
+  ],
+  "chart_type": "D1",
+  "metadata": {
+   "ayanamsa_degrees": 23.730142806651678,
+   "calculation_version": "1.0.0",
+   "config": {
+    "aspect_orb_degrees": 8.0,
+    "ayanamsa": "lahiri",
+    "calculation_version": "1.0.0",
+    "dasha_cycles": 1,
+    "dasha_levels": 2,
+    "dasha_year_length": "julian",
+    "ephemeris_path": null,
+    "ephemeris_source": "moshier",
+    "house_system": "whole_sign",
+    "include_outer_planets": true,
+    "node_type": "mean",
+    "sextile_orb_degrees": 6.0,
+    "western_house_system": "placidus"
+   },
+   "engine_id": "swisseph-2.10.03/moshier/lahiri",
+   "moment": {
+    "assumptions": [],
+    "dst_anomaly": "NONE",
+    "julian_day_ut": 2448118.875,
+    "time_confidence": "EXACT",
+    "timezone_name": "Asia/Kolkata",
+    "uncertainty_hours": 0.0,
+    "utc_datetime": "1990-08-15T09:00:00Z",
+    "utc_offset_hours": 5.5
+   },
+   "unavailable": []
+  },
+  "moon_nakshatra": {
+   "index": 3,
+   "lord": "Moon",
+   "name": "Rohini",
+   "pada": 4
+  },
+  "placements": [
+   {
+    "bhava": 9,
+    "certainty": {
+     "nakshatra_certain": true,
+     "pada_certain": true,
+     "rashi_certain": true
+    },
+    "degrees_in_rashi": 28.555111509929745,
+    "derived_from": null,
+    "graha": "Sun",
+    "longitude": 118.55511150992974,
+    "nakshatra": {
+     "index": 8,
+     "lord": "Mercury",
+     "name": "Ashlesha",
+     "pada": 4
+    },
+    "rashi": "Karka",
+    "rashi_index": 3,
+    "retrograde": false,
+    "speed_longitude": 0.9609285183675014
+   },
+   {
+    "bhava": 7,
+    "certainty": {
+     "nakshatra_certain": true,
+     "pada_certain": true,
+     "rashi_certain": true
+    },
+    "degrees_in_rashi": 21.307085134075002,
+    "derived_from": null,
+    "graha": "Moon",
+    "longitude": 51.307085134075,
+    "nakshatra": {
+     "index": 3,
+     "lord": "Moon",
+     "name": "Rohini",
+     "pada": 4
+    },
+    "rashi": "Vrishabha",
+    "rashi_index": 1,
+    "retrograde": false,
+    "speed_longitude": 14.261960047800804
+   },
+   {
+    "bhava": 6,
+    "certainty": {
+     "nakshatra_certain": true,
+     "pada_certain": true,
+     "rashi_certain": true
+    },
+    "degrees_in_rashi": 27.58301390617708,
+    "derived_from": null,
+    "graha": "Mars",
+    "longitude": 27.58301390617708,
+    "nakshatra": {
+     "index": 2,
+     "lord": "Sun",
+     "name": "Krittika",
+     "pada": 1
+    },
+    "rashi": "Mesha",
+    "rashi_index": 0,
+    "retrograde": false,
+    "speed_longitude": 0.5762295505315272
+   },
+   {
+    "bhava": 10,
+    "certainty": {
+     "nakshatra_certain": true,
+     "pada_certain": true,
+     "rashi_certain": true
+    },
+    "degrees_in_rashi": 25.574580828240897,
+    "derived_from": null,
+    "graha": "Mercury",
+    "longitude": 145.5745808282409,
+    "nakshatra": {
+     "index": 10,
+     "lord": "Venus",
+     "name": "Purva Phalguni",
+     "pada": 4
+    },
+    "rashi": "Simha",
+    "rashi_index": 4,
+    "retrograde": false,
+    "speed_longitude": 0.7671806408595826
+   },
+   {
+    "bhava": 9,
+    "certainty": {
+     "nakshatra_certain": true,
+     "pada_certain": true,
+     "rashi_certain": true
+    },
+    "degrees_in_rashi": 5.642360903986685,
+    "derived_from": null,
+    "graha": "Jupiter",
+    "longitude": 95.64236090398668,
+    "nakshatra": {
+     "index": 7,
+     "lord": "Saturn",
+     "name": "Pushya",
+     "pada": 1
+    },
+    "rashi": "Karka",
+    "rashi_index": 3,
+    "retrograde": false,
+    "speed_longitude": 0.21447192182334027
+   },
+   {
+    "bhava": 9,
+    "certainty": {
+     "nakshatra_certain": true,
+     "pada_certain": true,
+     "rashi_certain": true
+    },
+    "degrees_in_rashi": 8.046090222964182,
+    "derived_from": null,
+    "graha": "Venus",
+    "longitude": 98.04609022296418,
+    "nakshatra": {
+     "index": 7,
+     "lord": "Saturn",
+     "name": "Pushya",
+     "pada": 2
+    },
+    "rashi": "Karka",
+    "rashi_index": 3,
+    "retrograde": false,
+    "speed_longitude": 1.2212240772438325
+   },
+   {
+    "bhava": 2,
+    "certainty": {
+     "nakshatra_certain": true,
+     "pada_certain": true,
+     "rashi_certain": true
+    },
+    "degrees_in_rashi": 26.138546157633357,
+    "derived_from": null,
+    "graha": "Saturn",
+    "longitude": 266.13854615763336,
+    "nakshatra": {
+     "index": 19,
+     "lord": "Venus",
+     "name": "Purva Ashadha",
+     "pada": 4
+    },
+    "rashi": "Dhanu",
+    "rashi_index": 8,
+    "retrograde": true,
+    "speed_longitude": -0.056276635255444026
+   },
+   {
+    "bhava": 3,
+    "certainty": {
+     "nakshatra_certain": true,
+     "pada_certain": true,
+     "rashi_certain": true
+    },
+    "degrees_in_rashi": 12.744696960841338,
+    "derived_from": null,
+    "graha": "Rahu",
+    "longitude": 282.74469696084134,
+    "nakshatra": {
+     "index": 21,
+     "lord": "Moon",
+     "name": "Shravana",
+     "pada": 1
+    },
+    "rashi": "Makara",
+    "rashi_index": 9,
+    "retrograde": true,
+    "speed_longitude": -0.05299203844611166
+   },
+   {
+    "bhava": 9,
+    "certainty": {
+     "nakshatra_certain": true,
+     "pada_certain": true,
+     "rashi_certain": true
+    },
+    "degrees_in_rashi": 12.744696960841338,
+    "derived_from": "Rahu",
+    "graha": "Ketu",
+    "longitude": 102.74469696084134,
+    "nakshatra": {
+     "index": 7,
+     "lord": "Saturn",
+     "name": "Pushya",
+     "pada": 3
+    },
+    "rashi": "Karka",
+    "rashi_index": 3,
+    "retrograde": true,
+    "speed_longitude": -0.05299203844611166
+   }
+  ],
+  "system": "vedic",
+  "zodiac": "sidereal"
+ }
+}

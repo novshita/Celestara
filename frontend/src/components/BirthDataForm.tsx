@@ -32,7 +32,7 @@ export function BirthDataForm({ defaults }: { defaults?: BirthData }) {
   return (
     <div className="flex flex-col gap-8">
       <form action={formAction} className="flex flex-col gap-5">
-        <div className="flex gap-4 text-sm text-slate-300">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-300">
           {SYSTEM_OPTIONS.map((option) => (
             <label key={option.value} className="flex items-center gap-2">
               <input
