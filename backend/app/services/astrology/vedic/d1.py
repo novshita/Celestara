@@ -6,6 +6,7 @@ input plus identical `CalculationConfig` always yields identical output.
 
 from __future__ import annotations
 
+from app.core.cache import cached_calculation
 from app.core.config import CalculationConfig, DEFAULT_CALCULATION_CONFIG
 from app.domain.birth_data import (
     BirthData,
@@ -175,6 +176,7 @@ def _build_bhavas(
     return tuple(bhavas)
 
 
+@cached_calculation("vedic_chart")
 def calculate_d1_chart(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,

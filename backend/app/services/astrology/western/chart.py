@@ -7,6 +7,7 @@ spec §16.
 
 from __future__ import annotations
 
+from app.core.cache import cached_calculation
 from app.core.config import DEFAULT_CALCULATION_CONFIG, CalculationConfig
 from app.domain.birth_data import BirthData, ResolvedBirthMoment, resolve_birth_moment
 from app.domain.western import (
@@ -157,6 +158,7 @@ def _build_houses(
     return tuple(houses)
 
 
+@cached_calculation("western_chart")
 def calculate_western_chart(
     birth: BirthData,
     config: CalculationConfig = DEFAULT_CALCULATION_CONFIG,

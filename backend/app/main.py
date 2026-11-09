@@ -30,6 +30,7 @@ from app.api.routes import (
     journal,
     memory,
     metrics,
+    patterns,
     preferences,
     profile,
     readings,
@@ -124,6 +125,7 @@ app.include_router(profile.router, prefix=API_PREFIX)
 app.include_router(journal.router, prefix=API_PREFIX)
 app.include_router(account.router, prefix=API_PREFIX)
 app.include_router(preferences.router, prefix=API_PREFIX)
+app.include_router(patterns.router, prefix=API_PREFIX)
 app.include_router(memory.router, prefix=API_PREFIX)
 app.include_router(conversations.router, prefix=API_PREFIX)
 app.include_router(explore.router, prefix=API_PREFIX)

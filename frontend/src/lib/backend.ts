@@ -29,6 +29,7 @@ import type {
   MemoryItem,
   MemoryKind,
   PlanetExploration,
+  PatternsResponse,
   PreferencesResponse,
   ReadingFocus,
   ReadingPeriod,
@@ -314,6 +315,11 @@ export async function getBirthChartReading(
 export async function getPreferences(token: string): Promise<PreferencesResponse> {
   const response = await request("/api/v1/preferences", { method: "GET", token });
   return (await response.json()) as PreferencesResponse;
+}
+
+export async function getPatterns(token: string): Promise<PatternsResponse> {
+  const response = await request("/api/v1/patterns", { method: "GET", token });
+  return (await response.json()) as PatternsResponse;
 }
 
 export async function savePreferences(

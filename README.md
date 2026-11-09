@@ -321,6 +321,19 @@ The site has the four primary pages from product spec §10:
   what it is doing now (Vedic) or its aspects (Western), and its curated
   traditional description, with a link to ask the guide how it reads for you.
   Nothing there uses AI or needs an account.
+- **Recurring themes** (product spec §20): if one topic (career, love,
+  relationships, personal growth) comes up in at least three of a signed-in
+  user's saved questions within 30 days, the home page says so, in plain
+  counts, noting it describes the questions and not the person. At most one
+  theme, computed on demand and never stored or given to the model, switchable
+  per user in Preferences and per deployment with
+  `FEATURE_PATTERN_DETECTION`. Only this basic form exists; advanced detection
+  is deferred in the spec.
+- **Calculation cache** (engineering spec §28): natal charts, Dasha timelines
+  and comparisons are cached in memory for 15 minutes, keyed by birth data
+  and the full calculation configuration including its version. Transits and
+  readings (which depend on the clock) are not cached. Tune with
+  `CALCULATION_CACHE_SIZE` / `CALCULATION_CACHE_TTL_SECONDS`.
 - **Chart drawings** (product spec §6, §11-12, §26): the Western chart is a
   zodiac wheel (signs, houses, planets, and aspect lines coloured by kind, with
   the ascendant at the left); the Vedic chart is a Kundali in either the North

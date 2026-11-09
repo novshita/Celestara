@@ -61,6 +61,8 @@ export async function savePreferencesAction(
     await savePreferences(token, {
       explanation_depth: depth as ExplanationDepth,
       calculation_config: current.calculation_config,
+      // An unticked checkbox is simply absent from the form data.
+      pattern_detection: formData.get("patternDetection") === "on",
     });
   } catch (error) {
     return toError(error, "Could not save your preference. Please try again.");

@@ -412,6 +412,22 @@ export interface PreferencesResponse {
   explanation_depth: ExplanationDepth;
   /** Passed back untouched when only the depth changes. */
   calculation_config: Record<string, unknown> | null;
+  /** Whether recurring themes in the user's saved questions may be shown. */
+  pattern_detection: boolean;
+}
+
+export interface PatternItem {
+  topic: string;
+  count: number;
+  window_days: number;
+  /** Authored by the backend; shown as is. */
+  note: string;
+}
+
+export interface PatternsResponse {
+  /** False when the user (or the deployment) has switched this off. */
+  enabled: boolean;
+  patterns: PatternItem[];
 }
 
 export type MemoryKind = "preference" | "note";
