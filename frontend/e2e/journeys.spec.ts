@@ -221,3 +221,93 @@ test("10. Birth data is kept after a result, so the next question or system need
   ).toBeVisible();
   await expect(guide.getByLabel("Your question")).toHaveValue("[[AUTH]] What does my Moon say?");
 });
+
+test("11. The Celestial Universe: the planets hold still while the zodiac turns around them", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const sky = page.getByRole("region", { name: "The sky" });
+  const wheel = sky.locator("svg").first();
+  await expect(wheel).toBeVisible();
+
+  // Where a planet's disc is, as an angle and a distance from the wheel's centre.
+  const place = async (name: string) => {
+    const disc = await sky.getByRole("button", { name: new RegExp(`^Now: ${name}`) }).boundingBox();
+    const frame = (await wheel.boundingBox())!;
+    const dx = disc!.x + disc!.width / 2 - (frame.x + frame.width / 2);
+    const dy = disc!.y + disc!.height / 2 - (frame.y + frame.height / 2);
+    return {
+      degrees: (Math.atan2(dy, dx) * 180) / Math.PI,
+      distance: Math.hypot(dx, dy) / frame.width,
+    };
+  };
+  const rings = () =>
+    wheel.evaluate((svg) => {
+      const opacity = (which: string) =>
+        getComputedStyle(svg.querySelector(`[data-ring="${which}"] > g`)!).opacity;
+      return { western: opacity("western"), vedic: opacity("vedic") };
+    });
+  const choose = async (mode: string) => {
+    await sky.getByRole("button", { name: mode, exact: true }).click();
+    await page.waitForTimeout(1300); // the turn takes one second
+  };
+
+  await expect(sky.getByRole("button", { name: "Vedic", exact: true })).toHaveAttribute("aria-pressed", "true");
+  const vedic = await place("Saturn");
+  expect(await rings()).toEqual({ western: "0", vedic: "1" });
+  await expect(sky.getByText("Mesha")).toBeVisible();
+
+  await choose("Western");
+  const western = await place("Saturn");
+  expect(await rings()).toEqual({ western: "1", vedic: "0" });
+
+  // Same angle and same distance: the planet did not move, the ring turned.
+  expect(Math.abs(western.degrees - vedic.degrees)).toBeLessThan(0.6);
+  expect(Math.abs(western.distance - vedic.distance)).toBeLessThan(0.005);
+
+  await choose("Compare");
+  const compare = await place("Saturn");
+  expect(await rings()).toEqual({ western: "1", vedic: "1" });
+  // Still the same direction, now tucked in closer to make room for both rings.
+  expect(Math.abs(compare.degrees - vedic.degrees)).toBeLessThan(0.6);
+  expect(compare.distance).toBeLessThan(vedic.distance * 0.9);
+});
+
+test("12. A planet in the sky can be chosen and turned into a question for the Guide", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const sky = page.getByRole("region", { name: "The sky" });
+
+  await sky.getByRole("button", { name: /^Now: Saturn/ }).click();
+  await expect(sky.getByText("Saturn now")).toBeVisible();
+  await expect(sky.getByText(/Vedic:/)).toBeVisible();
+  await expect(sky.getByText(/Western:/)).toBeVisible();
+
+  await sky.getByRole("link", { name: "Ask the Guide" }).click();
+  await expect(page).toHaveURL(/\?q=.*Saturn.*#ask/);
+  // It fills the question box and sends nothing.
+  await expect(page.getByLabel("Your question")).toHaveValue(/Saturn/);
+  await expect(page.getByRole("status")).toHaveCount(0);
+});
+
+test("13. A signed-in visitor with a saved profile sees their own chart in the sky", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.getByRole("region", { name: "The sky" }).getByText("your birth chart")).toHaveCount(0);
+
+  await register(page);
+  const profile = formWith(page, "Save profile");
+  await fillBirth(profile);
+  await profile.getByRole("button", { name: "Save profile" }).click();
+  await expect(page.getByRole("button", { name: "Save changes" })).toBeVisible();
+
+  await page.goto("/");
+  const sky = page.getByRole("region", { name: "The sky" });
+  await expect(sky.getByText("your birth chart")).toBeVisible();
+  await expect(sky.getByText("ASC", { exact: true })).toBeVisible();
+  await sky.getByRole("button", { name: /^Your natal Saturn/ }).click();
+  await expect(sky.locator("aside").getByText(/^Your natal Saturn/)).toBeVisible();
+  await expect(sky.locator("aside").getByText(/Dhanu 26\.1°/)).toBeVisible(); // the reference chart's Saturn
+});

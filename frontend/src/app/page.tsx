@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AiGuideForm } from "@/components/AiGuideForm";
+import { CelestialUniverseSection } from "@/components/CelestialUniverseSection";
 import { Dashboard } from "@/components/Dashboard";
 import { PageHeading } from "@/components/PageHeading";
 import { PatternsNote } from "@/components/PatternsNote";
@@ -29,6 +30,8 @@ export default async function Home({
         and ask questions of a guide that interprets only what has been
         calculated. For reflection, not prediction.
       </PageHeading>
+
+      <CelestialUniverseSection birth={saved.status === "saved" ? saved.birth : undefined} />
 
       <Link
         href="/chart"

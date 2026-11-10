@@ -39,6 +39,7 @@ import type {
   VedicChartResponse,
   VimshottariResponse,
   WesternChartResponse,
+  TransitSnapshotResponse,
 } from "./types";
 
 const DEFAULT_BACKEND_URL = "http://127.0.0.1:8000";
@@ -111,6 +112,13 @@ async function put<T>(path: string, body: unknown, token?: string): Promise<T> {
     token,
   });
   return response.json() as Promise<T>;
+}
+
+/** The sky right now, in the sidereal zodiac, with the ayanamsa that turns it
+ * into the tropical one. Public and personal-data-free. */
+export async function getCurrentSky(): Promise<TransitSnapshotResponse> {
+  const response = await request("/api/v1/transits", { method: "GET" });
+  return (await response.json()) as TransitSnapshotResponse;
 }
 
 export async function calculateVedicChart(

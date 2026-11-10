@@ -13,6 +13,7 @@ from app.api.schemas import (
     TransitSnapshotResponse,
 )
 from app.core.config import DEFAULT_CALCULATION_CONFIG
+from app.services.astrology.common.swisseph_engine import SwissEphemerisEngine
 from app.services.astrology.transit.service import (
     calculate_transits,
     current_snapshot,
@@ -46,7 +47,12 @@ def get_transit_snapshot(
     For what these positions mean relative to a specific chart, use
     `POST /transits/vedic`.
     """
-    return TransitSnapshotResponse(snapshot=current_snapshot(at))
+    snapshot = current_snapshot(at)
+    engine = SwissEphemerisEngine(DEFAULT_CALCULATION_CONFIG)
+    return TransitSnapshotResponse(
+        snapshot=snapshot,
+        ayanamsa_degrees=engine.ayanamsa(snapshot.julian_day_ut),
+    )
 
 
 @router.post(

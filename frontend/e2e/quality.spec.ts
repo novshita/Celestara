@@ -39,6 +39,26 @@ test.describe("accessibility (WCAG 2.2 AA, checked by axe)", () => {
     expect(await violations(page)).toEqual([]);
   });
 
+  for (const mode of ["Vedic", "Western", "Compare"]) {
+    test(`the Celestial Universe in ${mode}, with a planet chosen`, async ({ page }) => {
+      await page.goto("/");
+      const sky = page.getByRole("region", { name: "The sky" });
+      await sky.getByRole("button", { name: mode, exact: true }).click();
+      await sky.getByRole("button", { name: /^Now: Saturn/ }).click();
+      await page.waitForTimeout(1300);
+      expect(await violations(page)).toEqual([]);
+    });
+  }
+
+  test("the Celestial Universe with the positions table open, on a phone", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto("/");
+    await page.getByText("Positions as text").click();
+    await page.getByRole("button", { name: "Compare", exact: true }).click();
+    await page.waitForTimeout(1300);
+    expect(await violations(page)).toEqual([]);
+  });
+
   for (const system of SYSTEMS) {
     test(`the chart page showing: ${system}`, async ({ page }) => {
       await calculate(page, system);
@@ -102,8 +122,28 @@ test.describe("motion", () => {
     expect(await ringDuration(page)).toBeGreaterThan(0.1);
   });
 
+  test("the Celestial Universe turns its rings over about a second", async ({ page }) => {
+    await page.goto("/");
+    const duration = await page
+      .locator(".universe-move")
+      .first()
+      .evaluate((element) => Number.parseFloat(getComputedStyle(element).transitionDuration));
+    expect(duration).toBeGreaterThan(0.5);
+  });
+
   test.describe("when the visitor asks for reduced motion", () => {
     test.use({ reducedMotion: "reduce" });
+
+    test("the Celestial Universe changes zodiac without turning", async ({ page }) => {
+      await page.goto("/");
+      const durations = await page
+        .locator(".universe-move")
+        .evaluateAll((elements) =>
+          elements.map((element) => Number.parseFloat(getComputedStyle(element).transitionDuration)),
+        );
+      expect(durations.length).toBeGreaterThan(0);
+      for (const duration of durations) expect(duration).toBeLessThan(0.01);
+    });
 
     test("the drawing is not animated", async ({ page }) => {
       await calculate(page, "Western (Tropical)");

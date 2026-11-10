@@ -20,6 +20,12 @@ export function planetAbbr(name: string): string {
   return PLANET_ABBR[name] ?? name.slice(0, 2);
 }
 
+/** Western signs in full, by zero-based index (Aries first). */
+export const WESTERN_SIGNS = [
+  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
+] as const;
+
 /** Western signs, by zero-based index (Aries first). */
 export const WESTERN_SIGN_ABBR = [
   "Ari", "Tau", "Gem", "Can", "Leo", "Vir", "Lib", "Sco", "Sag", "Cap", "Aqu", "Pis",
