@@ -61,6 +61,25 @@ def test_snapshot_needs_no_parameters(client):
     assert len(response.json()["snapshot"]["positions"]) == 9
 
 
+def test_snapshot_reports_the_ayanamsa_between_the_two_zodiacs(client):
+    body = client.get(SNAPSHOT_URL, params={"at": AT}).json()
+
+    # Lahiri is about 24 degrees in the 2020s, and grows about 50" a year.
+    assert 23.5 < body["ayanamsa_degrees"] < 25.0
+    later = client.get(SNAPSHOT_URL, params={"at": "2036-09-22T12:00:00Z"}).json()
+    assert 0.1 < later["ayanamsa_degrees"] - body["ayanamsa_degrees"] < 0.2
+
+
+def test_the_ayanamsa_turns_sidereal_positions_into_tropical_ones(client):
+    """The Sun's tropical longitude at the September equinox is ~180 degrees,
+    so its sidereal one plus the ayanamsa must land there."""
+    body = client.get(SNAPSHOT_URL, params={"at": "2026-09-23T00:00:00Z"}).json()
+    sun = next(p for p in body["snapshot"]["positions"] if p["graha"] == "Sun")
+
+    tropical = (sun["longitude"] + body["ayanamsa_degrees"]) % 360
+    assert abs(tropical - 180.0) < 1.0
+
+
 def test_snapshot_accepts_a_moment(client):
     snapshot = client.get(SNAPSHOT_URL, params={"at": AT}).json()["snapshot"]
 

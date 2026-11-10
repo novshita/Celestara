@@ -116,6 +116,15 @@ body::before {
 
 /* Results arrive with a short rise and fade: fast and purposeful (spec §26),
  * and they never hold anything back, since the content is already there. */
+/* The Celestial Universe turns, scales and fades its rings, and slides its
+ * bodies between tracks, when the zodiac shown changes (product spec §26). The
+ * reduced-motion rule above shortens all of it to nothing. */
+.universe-move {
+  transition:
+    transform 1000ms cubic-bezier(0.45, 0.05, 0.2, 1),
+    opacity 700ms ease;
+}
+
 @keyframes reveal {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }

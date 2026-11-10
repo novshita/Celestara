@@ -347,6 +347,15 @@ The site has the four primary pages from product spec §10:
   what it is doing now (Vedic) or its aspects (Western), and its curated
   traditional description, with a link to ask the guide how it reads for you.
   Nothing there uses AI or needs an account.
+- **Celestial Universe** (product spec §9, §26): the home page opens on the
+  sky as it is now - the nine grahas on a wheel of signs - and, with a saved
+  profile, your own birth chart and ascendant inside it. Pick a planet to see
+  its sign in both zodiacs, or ask the Guide about it. Switching between Vedic
+  and Western does not swap a picture: the planets stay where they are and the
+  ring of signs turns around them by the ayanamsa (about 24 degrees), because
+  that is all the difference between the two zodiacs is. Compare shows both
+  rings at once, the Vedic one tucked inside the Western one. Every position is
+  also given as a table, and with reduced motion the changes are instant.
 - **Recurring themes** (product spec §20): if one topic (career, love,
   relationships, personal growth) comes up in at least three of a signed-in
   user's saved questions within 30 days, the home page says so, in plain

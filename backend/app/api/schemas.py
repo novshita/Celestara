@@ -316,6 +316,12 @@ class TransitSnapshotResponse(BaseModel):
 
     snapshot: TransitSnapshot
 
+    ayanamsa_degrees: float
+    """The offset between the sidereal zodiac the positions are given in and
+    the tropical one, at this moment: a tropical longitude is the sidereal one
+    plus this. Reported so a client can draw both zodiacs around the same sky
+    without asking for a second set of positions."""
+
 
 class TransitReportRequest(BaseModel):
     """A request for transits relative to a natal chart."""

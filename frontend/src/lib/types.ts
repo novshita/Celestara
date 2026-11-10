@@ -247,6 +247,12 @@ export interface TransitSnapshot {
   positions: TransitPosition[];
 }
 
+export interface TransitSnapshotResponse {
+  snapshot: TransitSnapshot;
+  /** Tropical longitude = sidereal longitude + this, at the snapshot's moment. */
+  ayanamsa_degrees: number;
+}
+
 export interface GrahaTransit {
   graha: string;
   transit: TransitPosition;
