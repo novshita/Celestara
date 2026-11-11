@@ -29,3 +29,7 @@ __pycache__/
 .DS_Store
 .idea/
 *.swp
+
+# Database backups hold personal data (docs/DEPLOYMENT.md)
+backups/
+*.dump
