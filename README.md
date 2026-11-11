@@ -27,10 +27,12 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🪐 Planet exploration | ✅ Implemented - one call per planet: placement, current transit or aspects, and its description |
 | 🔒 Privacy controls | ✅ Implemented - delete memory, conversations, or everything in one call |
 | 📖 Daily/weekly/monthly readings + birth chart, career, love, relationships, growth | ✅ Implemented - weekly/monthly look ahead for real changes; follow-ups go through saved conversations |
-| 🖥️ Next.js frontend | 🚧 Started - calculation views, auth, profile, journal, memory and conversation management, delete-my-data, AI Guide (with safety notices), readings with period, focus and birth-chart options |
+| 🖥️ Next.js frontend | ✅ Implemented - calculation views and drawings, Celestial Universe home page, auth, profile, journal, memory and conversation management, delete-my-data, AI Guide (with safety notices), readings, recurring themes; visual redesign pending |
+| 🚀 Deployment | ✅ Docker (SQLite or PostgreSQL), CI, security scanning, backups - see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
 
 | 📄 Document | What it covers |
 |---|---|
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Running on PostgreSQL, pre-launch checklist, backups and restore, updates |
 | [Celestara-product-spec.md](Celestara-product-spec.md) | Vision, user journeys, features, visual direction, safety, V1/V2 scope |
 | [Celestara-engineering-spec.md](Celestara-engineering-spec.md) | Architecture, calculation layer, AI orchestration, data model, testing, security |
 
@@ -308,7 +310,8 @@ export it) to enable the AI endpoints; without it they answer `503` and
 everything else works. The backend's SQLite database lives on the
 `celestara-data` volume, so it survives `docker compose down` (use `down -v`
 to wipe it). Each image also builds on its own: `docker build backend` and
-`docker build frontend`.
+`docker build frontend`. For PostgreSQL, security checks before launch and
+backup/restore, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 Notes: `pyswisseph` has no prebuilt wheel for every platform (Linux on ARM,
 for one), so the backend image compiles it in a build stage and ships
@@ -407,8 +410,7 @@ forms are simply empty - pre-filling never gets in the way.
 
 The session is a bearer token from the backend held in an httpOnly cookie,
 set and read entirely server-side (Next.js Server Actions and Server
-Components - the token is never exposed to client JavaScript). The celestial
-visualization layer is still to come. See `frontend/.env.example` for the
+Components - the token is never exposed to client JavaScript). See `frontend/.env.example` for the
 settings this app reads (`BACKEND_URL`, only needed if the backend isn't on
 its default port, and `FORWARD_CLIENT_IP`).
 
@@ -529,6 +531,24 @@ These guardrails come directly from the specs and hold for every contribution:
 6. 📦 Feature breadth
 
 ---
+
+## 🔎 Open items
+
+Things the code cannot settle, so they are listed rather than hidden:
+
+- **Astrology review.** The 47 knowledge entries and 19 planet descriptions
+  were written to be conservative, but a Jyotish practitioner should read them,
+  and a few charts should be compared against a second ephemeris (for example
+  Jagannatha Hora). Positions match the saved reference fixtures; they have not
+  been checked against an independent program.
+- **Live model.** Every test of the AI path used a fake Claude. Run the AI Guide
+  and Dasha explanations once against a real `ANTHROPIC_API_KEY` before launch.
+- **Browsers.** The browser tests run in Chrome. The Celestial Universe turns
+  rings with CSS transforms on SVG, which Safari has handled inconsistently, so
+  look at it there.
+- **Embeddings (pgvector).** Retrieval is keyword-based, which suits 47 entries.
+  Revisit when the corpus is in the hundreds.
+- **Privacy policy and terms**, and a strict Content-Security-Policy.
 
 ## 🗺️ Roadmap
 

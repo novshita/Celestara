@@ -199,3 +199,15 @@ test.describe("small screens", () => {
     });
   }
 });
+
+test.describe("security headers", () => {
+  test("every page forbids framing and content sniffing", async ({ request }) => {
+    for (const path of ["/", "/chart", "/login"]) {
+      const headers = (await request.get(path, { maxRedirects: 0 })).headers();
+      expect(headers["x-content-type-options"], path).toBe("nosniff");
+      expect(headers["x-frame-options"], path).toBe("DENY");
+      expect(headers["content-security-policy"], path).toContain("frame-ancestors 'none'");
+      expect(headers["referrer-policy"], path).toBe("strict-origin-when-cross-origin");
+    }
+  });
+});
