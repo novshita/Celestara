@@ -460,7 +460,7 @@ export function CelestialUniverse({
               })}
               <p className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
                 <Link
-                  href={`/?q=${encodeURIComponent(question)}#ask`}
+                  href={`/guide?q=${encodeURIComponent(question)}#ask`}
                   className="text-amber-300 underline underline-offset-2"
                 >
                   Ask the Guide

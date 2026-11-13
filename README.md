@@ -331,9 +331,17 @@ npm install
 npm run dev     # http://localhost:3000
 ```
 
-The site has the four primary pages from product spec §10:
+The site has the four primary pages from product spec §10, behind a landing
+page:
 
-- **Home** (`/`): readings (today, this week, this month or your birth chart,
+- **Landing page** (`/`, signed out): a pinned scroll story - a flight through
+  a zodiac wheel into a sample chart - then a panel of what is inside, designed
+  in `design/Celestara_landing.html`. The chart on it is an illustration. It has
+  its own navigation instead of the app header, and every call to action leads
+  into the app. Signed in, `/` is the app home below. A signed-out visitor
+  reaches that same home, with no account, at `/guide`. With reduced motion the
+  pointer parallax is off and the figures show their final values at once.
+- **Home** (`/` signed in, `/guide` for anyone): readings (today, this week, this month or your birth chart,
   optionally focused on career, love, relationships or growth) and the AI
   Guide. Both have an Explanation choice (beginner or technical, or your saved
   default) and a collapsed "How this was built" panel showing the calculated

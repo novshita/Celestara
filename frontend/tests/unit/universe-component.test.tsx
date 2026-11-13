@@ -180,7 +180,7 @@ describe("the Celestial Universe", () => {
       fireEvent.click(screen.getByRole("button", { name: /^Now: Saturn/ }));
 
       const ask = screen.getByRole("link", { name: "Ask the Guide" });
-      expect(ask.getAttribute("href")).toMatch(/^\/\?q=.*Saturn.*#ask$/);
+      expect(ask.getAttribute("href")).toMatch(/^\/guide\?q=.*Saturn.*#ask$/);
       expect(screen.getByRole("link", { name: "Explore Saturn" }).getAttribute("href")).toBe("/chart");
     });
   });

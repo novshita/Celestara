@@ -33,3 +33,7 @@ __pycache__/
 # Database backups hold personal data (docs/DEPLOYMENT.md)
 backups/
 *.dump
+
+# Source photos of the planets (licences unchecked); the cut-outs in
+# frontend/public/planets are made from them by design/prepare_planets.py
+/planets/

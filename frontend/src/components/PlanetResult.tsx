@@ -116,7 +116,7 @@ export function PlanetResult({ exploration }: { exploration: PlanetExploration }
       )}
 
       <Link
-        href={`/?q=${encodeURIComponent(question)}#ask`}
+        href={`/guide?q=${encodeURIComponent(question)}#ask`}
         className="self-start text-sm text-amber-300 transition hover:text-amber-200"
       >
         Ask the guide how this reads in your chart →

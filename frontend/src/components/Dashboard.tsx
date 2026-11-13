@@ -94,7 +94,7 @@ export async function Dashboard({ birth }: { birth: BirthData }) {
           {questions.map((question) => (
             <li key={question}>
               <Link
-                href={`/?q=${encodeURIComponent(question)}#ask`}
+                href={`/guide?q=${encodeURIComponent(question)}#ask`}
                 className="inline-block rounded-full border border-slate-700 px-3 py-1.5 text-sm text-slate-300 transition hover:border-amber-400/60 hover:text-amber-300"
               >
                 {question}
