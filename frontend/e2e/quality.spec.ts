@@ -34,14 +34,14 @@ async function violations(page: Page) {
 }
 
 test.describe("accessibility (WCAG 2.2 AA, checked by axe)", () => {
-  test("the home page", async ({ page }) => {
-    await page.goto("/");
+  test("the guide (the app home)", async ({ page }) => {
+    await page.goto("/guide");
     expect(await violations(page)).toEqual([]);
   });
 
   for (const mode of ["Vedic", "Western", "Compare"]) {
     test(`the Celestial Universe in ${mode}, with a planet chosen`, async ({ page }) => {
-      await page.goto("/");
+      await page.goto("/guide");
       const sky = page.getByRole("region", { name: "The sky" });
       await sky.getByRole("button", { name: mode, exact: true }).click();
       await sky.getByRole("button", { name: /^Now: Saturn/ }).click();
@@ -52,7 +52,7 @@ test.describe("accessibility (WCAG 2.2 AA, checked by axe)", () => {
 
   test("the Celestial Universe with the positions table open, on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto("/");
+    await page.goto("/guide");
     await page.getByText("Positions as text").click();
     await page.getByRole("button", { name: "Compare", exact: true }).click();
     await page.waitForTimeout(1300);
@@ -123,7 +123,7 @@ test.describe("motion", () => {
   });
 
   test("the Celestial Universe turns its rings over about a second", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/guide");
     const duration = await page
       .locator(".universe-move")
       .first()
@@ -135,7 +135,7 @@ test.describe("motion", () => {
     test.use({ reducedMotion: "reduce" });
 
     test("the Celestial Universe changes zodiac without turning", async ({ page }) => {
-      await page.goto("/");
+      await page.goto("/guide");
       const durations = await page
         .locator(".universe-move")
         .evaluateAll((elements) =>
@@ -184,8 +184,8 @@ test.describe("small screens", () => {
           return root.scrollWidth - root.clientWidth;
         });
 
-      test("the home page does not scroll sideways", async ({ page }) => {
-        await page.goto("/");
+      test("the guide does not scroll sideways", async ({ page }) => {
+        await page.goto("/guide");
         expect(await overflow(page)).toBeLessThanOrEqual(0);
       });
 

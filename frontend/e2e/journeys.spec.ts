@@ -89,7 +89,7 @@ test("5. Transit reading: the current sky, then a reading of it", async ({ page 
   await expect(page.getByRole("heading", { name: /Current transits/ })).toBeVisible();
   await expect(page.getByRole("region", { name: "Transit table" })).toContainText("Saturn");
 
-  await page.goto("/");
+  await page.goto("/guide");
   const reading = formWith(page, "Get my reading");
   await fillBirth(reading);
   await reading.getByLabel("Today").check();
@@ -101,7 +101,7 @@ test("5. Transit reading: the current sky, then a reading of it", async ({ page 
 test("6. An AI question is answered, and a provider failure is handled kindly", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/guide");
   const guide = formWith(page, "Ask");
   await fillBirth(guide);
   // The birth data is typed once; the form keeps it for every later question.
@@ -204,7 +204,7 @@ test("10. Birth data is kept after a result, so the next question or system need
   await expect(page.getByRole("heading", { name: "Western natal chart" })).toBeVisible();
 
   // The Guide keeps the birth data but clears an answered question.
-  await page.goto("/");
+  await page.goto("/guide");
   const guide = formWith(page, "Ask");
   await fillBirth(guide);
   await guide.getByLabel("Your question").fill("What does my Moon say?");
@@ -225,7 +225,7 @@ test("10. Birth data is kept after a result, so the next question or system need
 test("11. The Celestial Universe: the planets hold still while the zodiac turns around them", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/guide");
   const sky = page.getByRole("region", { name: "The sky" });
   const wheel = sky.locator("svg").first();
   await expect(wheel).toBeVisible();
@@ -276,7 +276,7 @@ test("11. The Celestial Universe: the planets hold still while the zodiac turns 
 test("12. A planet in the sky can be chosen and turned into a question for the Guide", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/guide");
   const sky = page.getByRole("region", { name: "The sky" });
 
   await sky.getByRole("button", { name: /^Now: Saturn/ }).click();
@@ -294,7 +294,7 @@ test("12. A planet in the sky can be chosen and turned into a question for the G
 test("13. A signed-in visitor with a saved profile sees their own chart in the sky", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/guide");
   await expect(page.getByRole("region", { name: "The sky" }).getByText("your birth chart")).toHaveCount(0);
 
   await register(page);

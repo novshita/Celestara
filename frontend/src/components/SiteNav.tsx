@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 /** Product spec §10: Home, Birth Chart, Journal, Profile. Vedic, Western and
  * Compare are experiences inside the chart, not entries here. */
 const LINKS = [
-  { href: "/", label: "Home" },
   { href: "/chart", label: "Birth Chart" },
   { href: "/journal", label: "Journal" },
   { href: "/profile", label: "Profile" },
@@ -16,12 +15,13 @@ function isActive(pathname: string, href: string): boolean {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-export function SiteNav() {
+export function SiteNav({ homeHref = "/" }: { homeHref?: string }) {
   const pathname = usePathname();
+  const links = [{ href: homeHref, label: "Home" }, ...LINKS];
 
   return (
     <nav aria-label="Primary" className="flex gap-1 text-sm">
-      {LINKS.map(({ href, label }) => {
+      {links.map(({ href, label }) => {
         const active = isActive(pathname, href);
         return (
           <Link
