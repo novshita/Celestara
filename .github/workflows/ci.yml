@@ -124,7 +124,7 @@ jobs:
           E2E_PYTHON: python
       - name: Keep the traces of a failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-traces
           path: frontend/test-results
