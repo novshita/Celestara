@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AccountBar } from "@/components/AccountBar";
+import { LogoMark } from "@/components/Logo";
 import { SiteNav } from "@/components/SiteNav";
 import { getSessionEmail } from "@/lib/session";
 
@@ -22,9 +23,10 @@ export async function SiteShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-3">
           <Link
             href="/"
-            className="display text-xl font-semibold tracking-wide text-amber-300"
+            className="display flex items-center gap-2 text-xl font-semibold tracking-wide text-amber-300"
           >
-            ✦ Celestara
+            <LogoMark size={28} className="text-slate-100" />
+            Celestara
           </Link>
           <SiteNav homeHref={signedIn ? "/" : "/guide"} />
           <AccountBar />

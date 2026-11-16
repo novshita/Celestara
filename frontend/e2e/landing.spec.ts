@@ -63,6 +63,24 @@ test.describe("the landing page", () => {
     await expect.poll(() => star.evaluate((el) => Number(getComputedStyle(el).opacity)), { timeout: 12000 }).toBeLessThan(0.05);
   });
 
+  test("the logo is in the landing nav and the app header, and the tab icon is served", async ({ page, request }) => {
+    await page.goto("/");
+    const navLogo = page.getByRole("link", { name: "Celestara home" });
+    await expect(navLogo.locator("svg")).toHaveAttribute("aria-hidden", "true");
+    await expect(navLogo.locator("svg path")).toHaveCount(3); // the C, the orbit and the star
+
+    await page.goto("/guide");
+    const header = page.locator("header").getByRole("link", { name: "Celestara", exact: true });
+    await expect(header.locator("svg path")).toHaveCount(3);
+
+    const icon = page.locator('link[rel="icon"]');
+    await expect(icon).toHaveAttribute("type", "image/svg+xml");
+    const response = await request.get((await icon.getAttribute("href")) ?? "/icon.svg");
+    expect(response.ok()).toBe(true);
+    expect(response.headers()["content-type"]).toContain("image/svg+xml");
+    expect(await response.text()).toContain("<svg");
+  });
+
   test("a signed-in visitor gets the app home at / instead", async ({ page }) => {
     await register(page);
     await page.goto("/");
