@@ -4,6 +4,7 @@ import { Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from "next/font/goog
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 
+import { LogoMark } from "@/components/Logo";
 import { startLanding } from "./engine";
 import "./landing.css";
 
@@ -31,11 +32,7 @@ export function Landing() {
     <div ref={root} className={`landing ${serif.variable} ${sans.variable} ${mono.variable}`}>
       <nav className="nav" id="lnav" aria-label="Primary">
         <a className="logo" href="#story" aria-label="Celestara home">
-          <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true">
-            <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" strokeWidth="1.6" />
-            <ellipse cx="16" cy="16" rx="13" ry="5" fill="none" stroke="currentColor" strokeWidth="1.2" transform="rotate(-24 16 16)" />
-            <circle cx="16" cy="16" r="4" fill="#f4d27a" />
-          </svg>
+          <LogoMark size={32} />
           Celestara
         </a>
         <div className="menu">
