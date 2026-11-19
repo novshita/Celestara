@@ -48,6 +48,161 @@ function splitWords(el: HTMLElement): HTMLElement[] {
   return words;
 }
 
+/** A normally distributed random number (Box-Muller), from a seeded source. */
+function gaussian(r: () => number): number {
+  let u = 0;
+  let v = 0;
+  while (u === 0) u = r();
+  while (v === 0) v = r();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+/** Realistic colours for the Milky Way's tiny stars, with their weights. */
+const MW_STARS: [string, number][] = [
+  ["255,255,255", 0.36],
+  ["190,210,255", 0.26],
+  ["255,226,190", 0.24],
+  ["255,200,140", 0.14],
+];
+/** The few bright stars stand out in colour, as in a photograph: warm and blue-white. */
+const MW_BRIGHT: [string, number][] = [
+  ["255,214,150", 0.3],
+  ["255,172,104", 0.18],
+  ["255,255,255", 0.22],
+  ["200,218,255", 0.3],
+];
+
+function pickWeighted(r: () => number, table: [string, number][]): string {
+  let x = r();
+  for (const [value, weight] of table) {
+    if (x < weight) return value;
+    x -= weight;
+  }
+  return table[0][0];
+}
+
+/**
+ * Paints a Milky Way like a long-exposure photograph, sharp at any size: a band
+ * running about 25 degrees up to the right, made of tens of thousands of crisp
+ * stars (more along the band, but sprinkled across the whole sky), a few bright
+ * coloured stars with a glint, soft warm haze, a pale core, and mottled dark dust
+ * down its centre. The sky is drawn for a 1600-wide picture and scaled up by
+ * W / 1600, so on a big screen it is drawn bigger instead of being stretched.
+ */
+function paintMilkyWay(c: CanvasRenderingContext2D, W: number, H: number, purple: HTMLImageElement | null) {
+  const S = W / 1600;
+  const r = rng(21);
+  const theta = (-25 * Math.PI) / 180;
+  const cos = Math.cos(theta);
+  const sin = Math.sin(theta);
+  // band coordinates (u along the band, v across it) to canvas coordinates
+  const toX = (u: number, v: number) => W * 0.5 + u * cos - v * sin;
+  const toY = (u: number, v: number) => H * 0.5 + u * sin + v * cos;
+  const along = (u: number) => Math.exp(-(u * u) / (2 * (W * 0.3) ** 2)); // 1 in the middle, fading out
+
+  c.fillStyle = "#000";
+  c.fillRect(0, 0, W, H);
+
+  const glow = (x: number, y: number, rad: number, rgb: string, a: number) => {
+    const g = c.createRadialGradient(x, y, 0, x, y, rad);
+    g.addColorStop(0, `rgba(${rgb},${a})`);
+    g.addColorStop(1, `rgba(${rgb},0)`);
+    c.fillStyle = g;
+    c.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+  };
+
+  c.globalCompositeOperation = "lighter";
+  // soft warm haze along the band, strongest in the middle
+  for (let k = 0; k < 28; k++) {
+    const u = gaussian(r) * W * 0.3;
+    const v = gaussian(r) * H * 0.05;
+    glow(toX(u, v), toY(u, v), (110 + r() * 230) * S, "200,170,130", 0.05 + 0.07 * along(u));
+  }
+  // the pale core, a little off centre
+  glow(toX(W * 0.06, -H * 0.01), toY(W * 0.06, -H * 0.01), W * 0.2, "235,220,190", 0.05);
+  glow(toX(W * 0.06, -H * 0.01), toY(W * 0.06, -H * 0.01), W * 0.08, "235,220,190", 0.03);
+  // only a faint hint of colour elsewhere: blue-grey, and hydrogen-alpha red
+  for (let k = 0; k < 6; k++) {
+    const side = k % 2 === 0 ? 1 : -1;
+    const u = (r() - 0.5) * W * 1.1;
+    const v = side * (H * 0.24 + r() * H * 0.2);
+    glow(toX(u, v), toY(u, v), (200 + r() * 160) * S, k % 3 === 0 ? "150,60,70" : "90,110,160", 0.03 + r() * 0.02);
+  }
+  // The purple Milky Way photograph, blended into the middle of the band at ~58% and feathered at its
+  // edges, so the centre glows violet while the rest of the sky stays as it is.
+  if (purple) {
+    const m = document.createElement("canvas");
+    m.width = W;
+    m.height = H;
+    const mc = m.getContext("2d");
+    if (mc) {
+      const pw = W * 0.7;
+      const ph = (pw * purple.height) / purple.width;
+      mc.translate(toX(W * 0.04, 0), toY(W * 0.04, 0));
+      mc.rotate(theta);
+      mc.drawImage(purple, -pw / 2, -ph / 2, pw, ph);
+      // feather: keep an ellipse along the band, fading to nothing at its rim
+      mc.globalCompositeOperation = "destination-in";
+      mc.save();
+      mc.scale(1, 0.46);
+      const fade = mc.createRadialGradient(0, 0, 0, 0, 0, pw * 0.5);
+      fade.addColorStop(0, "rgba(0,0,0,1)");
+      fade.addColorStop(0.55, "rgba(0,0,0,.85)");
+      fade.addColorStop(1, "rgba(0,0,0,0)");
+      mc.fillStyle = fade;
+      mc.fillRect(-pw, -pw, pw * 2, pw * 2);
+      mc.restore();
+      c.save();
+      c.globalAlpha = 0.4;
+      c.drawImage(m, 0, 0);
+      c.restore();
+    }
+  }
+  // small warm-brown dust glows near the centre, like the photograph's orange-brown patches
+  for (let k = 0; k < 46; k++) {
+    const u = gaussian(r) * W * 0.2;
+    const v = gaussian(r) * H * 0.03;
+    glow(toX(u, v), toY(u, v), (8 + r() * 26) * S, "176,104,62", 0.03 + r() * 0.05);
+  }
+
+  // tens of thousands of crisp stars: many along the band, plenty across the whole sky
+  for (let i = 0; i < 60000; i++) {
+    const broad = r() < 0.46;
+    const u = broad ? (r() - 0.5) * W * 1.9 : gaussian(r) * W * 0.27;
+    const spread = broad ? H * 0.34 : H * 0.065 * (0.75 + 0.5 * along(u));
+    const v = gaussian(r) * spread;
+    const density = Math.exp(-(v * v) / (2 * (H * 0.09) ** 2)) * (0.5 + 0.5 * along(u));
+    const a = (0.12 + r() * r() * 0.8) * (broad ? 0.62 : 0.26 + 0.6 * density);
+    const size = (r() < 0.05 ? 1.2 + r() * 0.8 : 0.55 + r() * 0.6) * Math.max(S, 1) * 0.9;
+    c.fillStyle = `rgba(${pickWeighted(r, MW_STARS)},${a.toFixed(3)})`;
+    c.fillRect(toX(u, v) - size / 2, toY(u, v) - size / 2, size, size);
+  }
+
+  // a few bright stars, in colour, each with a soft halo and the brightest with a glint
+  for (let k = 0; k < 150; k++) {
+    const x = r() * W;
+    const y = r() * H;
+    const size = (1.3 + r() * r() * 2.4) * Math.max(S, 1);
+    const rgb = pickWeighted(r, MW_BRIGHT);
+    glow(x, y, size * 4.2, rgb, 0.2);
+    c.fillStyle = `rgba(${rgb},${(0.75 + r() * 0.25).toFixed(2)})`;
+    c.beginPath();
+    c.arc(x, y, size * 0.55, 0, Math.PI * 2);
+    c.fill();
+    if (size > 3.45 * Math.max(S, 1)) {
+      const len = size * (3.4 + r() * 2.6);
+      c.strokeStyle = `rgba(${rgb},0.45)`;
+      c.lineWidth = Math.max(1, S * 0.8);
+      c.beginPath();
+      c.moveTo(x - len, y);
+      c.lineTo(x + len, y);
+      c.moveTo(x, y - len);
+      c.lineTo(x, y + len);
+      c.stroke();
+    }
+  }
+}
+
 export function startLanding(root: HTMLElement): () => void {
   const q = <T extends Element = HTMLElement>(sel: string): T => {
     const el = root.querySelector<T>(sel);
@@ -78,62 +233,65 @@ export function startLanding(root: HTMLElement): () => void {
   const R = rng(7);
   const stars: Star[] = [];
   const N = 1500;
-  const cols = ["255,255,255", "244,210,122", "233,160,192", "170,190,255"];
+  // Real stars: mostly white and blue-white, some cream, a few amber. Weights add to 1.
+  const cols = ["255,255,255", "255,226,190", "255,200,140", "190,210,255"];
+  const colourOf = (u: number) => (u < 0.38 ? 0 : u < 0.64 ? 3 : u < 0.88 ? 1 : 2);
   for (let i = 0; i < N; i++) {
     stars.push({
       x: (R() * 2 - 1) * 1.7,
       y: (R() * 2 - 1) * 1.7,
       z: R(),
-      c: Math.floor(R() * 4),
+      c: colourOf(R()),
       s: 0.4 + R() * 1.2,
     });
   }
 
-  const neb = document.createElement("canvas");
-  neb.width = 1024;
-  neb.height = 576;
-  const nctx = neb.getContext("2d");
-  if (nctx) {
-    const r = rng(21);
-    nctx.globalCompositeOperation = "lighter";
-    const B: [string, number][] = [
-      ["91,42,134", 0.55], ["194,81,127", 0.32], ["27,58,122", 0.5],
-      ["60,30,110", 0.5], ["40,100,140", 0.22],
-    ];
-    for (let k = 0; k < 16; k++) {
-      const b = B[k % B.length];
-      const x = r() * 1024;
-      const y = r() * 576;
-      const rad = 140 + r() * 260;
-      const g = nctx.createRadialGradient(x, y, 0, x, y, rad);
-      g.addColorStop(0, `rgba(${b[0]},${b[1] * 0.55})`);
-      g.addColorStop(1, `rgba(${b[0]},0)`);
-      nctx.fillStyle = g;
-      nctx.fillRect(x - rad, y - rad, rad * 2, rad * 2);
-    }
-  }
+  // A photographic Milky Way: a diagonal band of warm dust and stars with dark lanes.
+  // It is drawn at about the size it will be shown, so it stays crisp rather than stretched.
+  let neb: HTMLCanvasElement | null = null;
+  let skyTimer = 0;
+  let purpleImage: HTMLImageElement | null = null;
+  const buildSky = () => {
+    if (stopped) return;
+    const width = Math.min(3200, Math.max(1600, Math.round(CW * 1.25)));
+    const sky = document.createElement("canvas");
+    sky.width = width;
+    sky.height = Math.round((width * 9) / 16);
+    const sctx = sky.getContext("2d");
+    if (!sctx) return;
+    paintMilkyWay(sctx, sky.width, sky.height, purpleImage);
+    neb = sky;
+    dirty = true;
+  };
 
+  // The galaxy the fly-in passes through. It is drawn already tilted (twice as wide as tall), so each
+  // star stays a small crisp dot; squashing a square picture at draw time turned them into flat flakes.
   const gal = document.createElement("canvas");
-  gal.width = gal.height = 900;
+  gal.width = 1800;
+  gal.height = 900;
   const gctx = gal.getContext("2d");
   if (gctx) {
     const r = rng(33);
-    const g = gctx.createRadialGradient(450, 450, 0, 450, 450, 300);
-    g.addColorStop(0, "rgba(255,244,200,.95)");
-    g.addColorStop(0.12, "rgba(244,210,122,.55)");
-    g.addColorStop(0.5, "rgba(120,100,200,.18)");
-    g.addColorStop(1, "rgba(60,40,140,0)");
+    gctx.save();
+    gctx.translate(900, 450);
+    gctx.scale(1, 0.5);
+    const g = gctx.createRadialGradient(0, 0, 0, 0, 0, 640);
+    g.addColorStop(0, "rgba(255,246,214,.7)");
+    g.addColorStop(0.12, "rgba(255,224,160,.4)");
+    g.addColorStop(0.5, "rgba(176,196,238,.12)");
+    g.addColorStop(1, "rgba(96,116,170,0)");
     gctx.fillStyle = g;
-    gctx.fillRect(0, 0, 900, 900);
-    for (let i = 0; i < 9000; i++) {
+    gctx.fillRect(-900, -900, 1800, 1800);
+    gctx.restore();
+    for (let i = 0; i < 15000; i++) {
       const arm = i % 2;
-      const rr = Math.pow(r(), 0.7) * 400;
-      const th = arm * Math.PI + rr * 0.014 + (r() - 0.5) * (0.5 + rr / 260);
-      const x = 450 + Math.cos(th) * rr;
-      const y = 450 + Math.sin(th) * rr;
-      const t = rr / 400;
-      gctx.fillStyle = `rgba(${Math.round(255 - t * 110)},${Math.round(236 - t * 60)},${Math.round(190 + t * 65)},${(0.2 + r() * 0.6) * (1 - t * 0.55)})`;
-      gctx.fillRect(x, y, r() * 2.2 + 0.4, r() * 2.2 + 0.4);
+      const t = Math.pow(r(), 0.7); // 0 at the centre, 1 at the edge
+      const th = arm * Math.PI + t * 5.6 + (r() - 0.5) * (0.5 + t * 1.54);
+      const x = 900 + Math.cos(th) * t * 860;
+      const y = 450 + Math.sin(th) * t * 430;
+      const size = 0.5 + r() * r() * 1.5;
+      gctx.fillStyle = `rgba(${Math.round(255 - t * 85)},${Math.round(238 - t * 42)},${Math.round(196 + t * 59)},${(0.2 + r() * 0.6) * (1 - t * 0.55) * 0.8})`;
+      gctx.fillRect(x, y, size, size);
     }
   }
 
@@ -159,22 +317,21 @@ export function startLanding(root: HTMLElement): () => void {
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = "source-over";
     const g = ctx.createLinearGradient(0, 0, 0, CH);
-    g.addColorStop(0, "#0b0824");
-    g.addColorStop(0.6, "#150d33");
-    g.addColorStop(1, "#07061a");
+    g.addColorStop(0, "#02030a");
+    g.addColorStop(0.6, "#04060e");
+    g.addColorStop(1, "#010208");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, CW, CH);
     ctx.globalCompositeOperation = "lighter";
-    cover(neb, 1 + vp * 0.9, 0.85, -sx * CW * 0.02, -sy * CH * 0.02);
-    const ga = seg(vp, 0.06, 0.35) * (1 - 0.45 * seg(vp, 0.6, 1));
+    if (neb) cover(neb, 1 + vp * 0.2, 1, -sx * CW * 0.02, -sy * CH * 0.02);
+    const ga = 0.55 * seg(vp, 0.06, 0.35) * (1 - 0.45 * seg(vp, 0.6, 1));
     if (ga > 0.01) {
       const s = Math.min(CW, CH) * (0.5 + vp * 2.1);
       ctx.save();
       ctx.translate(CW * (0.62 - 0.12 * vp) - sx * CW * 0.03, CH * (0.42 + 0.08 * vp) - sy * CH * 0.03);
       ctx.rotate(-0.35 + vp * 0.5);
-      ctx.scale(1, 0.5);
       ctx.globalAlpha = ga;
-      ctx.drawImage(gal, -s / 2, -s / 2, s, s);
+      ctx.drawImage(gal, -s / 2, -s / 4, s, s / 2);
       ctx.restore();
     }
     ctx.globalCompositeOperation = "source-over";
@@ -229,6 +386,7 @@ export function startLanding(root: HTMLElement): () => void {
   const L2 = q("#L2");
   const L3 = q("#L3");
   const L4 = q("#L4");
+  const vision = q("#vision");
   const vChip = q("#vChip");
   const vP = q("#vP");
   const chart = q("#chart");
@@ -326,6 +484,8 @@ export function startLanding(root: HTMLElement): () => void {
       w.style.opacity = String(k * (1 - vOut));
     });
     const vo = clamp(vIn * 2 - 0.6) * (1 - vOut);
+    // a dark halo behind the words (see .vision:before), fading with them, keeps them readable over the bright core
+    vision.style.setProperty("--shade", String(vo));
     for (const e of [vChip, vP]) {
       e.style.opacity = String(vo);
       e.style.transform = `translate3d(0,${-vOut * 50}px,0)`;
@@ -401,6 +561,15 @@ export function startLanding(root: HTMLElement): () => void {
   window.addEventListener("pointermove", onPointerMove, { passive: true });
   window.addEventListener("resize", size);
   size();
+  const purple = new Image();
+  purple.onload = () => {
+    purpleImage = purple;
+    skyTimer = window.setTimeout(buildSky, 0);
+  };
+  purple.onerror = () => {
+    skyTimer = window.setTimeout(buildSky, 0); // without the purple centre
+  };
+  purple.src = "/sky/milkyway-purple.webp";
   raf = requestAnimationFrame(tick);
 
   /* interactions */
@@ -463,6 +632,7 @@ export function startLanding(root: HTMLElement): () => void {
 
   return () => {
     stopped = true;
+    window.clearTimeout(skyTimer);
     cancelAnimationFrame(raf);
     window.removeEventListener("pointermove", onPointerMove);
     window.removeEventListener("resize", size);
