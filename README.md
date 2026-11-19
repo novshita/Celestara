@@ -351,13 +351,26 @@ page:
   start a new one at any point. Neither needs an account, but both need the backend to have
   `ANTHROPIC_API_KEY` set, or they show the backend's "AI guide isn't
   answering right now" message.
-- **Birth Chart** (`/chart`): a birth-data form that calculates a Vedic,
-  Western, Compare, Vimshottari Dasha or current-transits view against the
-  running backend - every calculation endpoint it exposes.
-  Below it, **Explore a planet** shows one planet in one chart: where it sits,
-  what it is doing now (Vedic) or its aspects (Western), and its curated
-  traditional description, with a link to ask the guide how it reads for you.
-  Nothing there uses AI or needs an account.
+- **Birth Chart** (`/chart`, redesigned from `design/Celestara Birth Chart.html`): a
+  night-sky page with a sticky wheel "instrument" beside a three-step form -
+  When, Where, What to see. The wheel's ring fills as the form is completed
+  (five steps, shown as moon phases), a world grid marks the coordinates, and
+  the lens you pick is named under it. Time confidence is Exact, Approximate or
+  Unknown (no time means no houses, and the wheel drops them); the timezone is
+  detected from the coordinates unless you set it by hand. Mistakes are named
+  next to the field before anything is sent. Results use the real drawings and
+  tables behind one tab per lens: a tab calculates its view when pressed, a view
+  already calculated for the same details shows at once, and changing a detail
+  marks the results "calculate again". The wheel itself is an illustration, not
+  your chart. Calculates a Vedic, Western, Compare, Vimshottari Dasha or
+  current-transits view against the running backend - every calculation endpoint
+  it exposes. Only this page wears the new header and sky; the others keep the
+  app's standard header until they are redone.
+  Below it, **Explore a planet** shows one planet in the chart you just
+  calculated (nothing is typed twice): where it sits, what it is doing now
+  (Vedic) or its aspects (Western), its curated traditional description, and a
+  link to ask the guide how it reads for you. Vedic offers the nine grahas,
+  Western the ten planets. Nothing there uses AI or needs an account.
 - **Celestial Universe** (product spec §9, §26): the home page opens on the
   sky as it is now - the nine grahas on a wheel of signs - and, with a saved
   profile, your own birth chart and ascendant inside it. Pick a planet to see
