@@ -1,16 +1,12 @@
 "use client";
 
-import { Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 
 import { LogoMark } from "@/components/Logo";
+import { designFonts } from "@/lib/fonts";
 import { startLanding } from "./engine";
 import "./landing.css";
-
-const serif = Instrument_Serif({ weight: "400", subsets: ["latin"], variable: "--font-ln-serif" });
-const sans = Hanken_Grotesk({ subsets: ["latin"], variable: "--font-ln-sans" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-ln-mono" });
 
 /**
  * The signed-out front door (design/Celestara_landing.html): a pinned scroll
@@ -29,7 +25,7 @@ export function Landing() {
   }, []);
 
   return (
-    <div ref={root} className={`landing ${serif.variable} ${sans.variable} ${mono.variable}`}>
+    <div ref={root} className={`landing ${designFonts}`}>
       <nav className="nav" id="lnav" aria-label="Primary">
         <a className="logo" href="#story" aria-label="Celestara home">
           <LogoMark size={32} />

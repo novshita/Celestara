@@ -29,13 +29,26 @@ export function formWith(page: Page, button: string): Locator {
 export async function fillBirth(form: Locator, overrides: Birth = {}) {
   const birth = { ...MUMBAI, ...overrides };
   await form.getByLabel("Birth date").fill(birth.date);
-  if (birth.time === null) {
+  // The birth-chart page asks for the time confidence with three pills; the other forms
+  // (home, profile) still use a dropdown.
+  const pills = form.getByRole("radiogroup", { name: "Time confidence" });
+  if (await pills.count()) {
+    if (birth.time === null) {
+      await form.getByLabel("I don't know the time").check();
+    } else {
+      await form.getByLabel("Exact, I know the time").check();
+      await form.getByLabel("Birth time").fill(birth.time);
+    }
+  } else if (birth.time === null) {
     await form.getByLabel("Time confidence").selectOption("UNKNOWN");
   } else {
     await form.getByLabel("Time confidence").selectOption("EXACT");
     await form.getByLabel("Birth time").fill(birth.time);
   }
-  await form.getByLabel("Timezone").fill(birth.timezone);
+  // The birth-chart page detects the timezone from the coordinates unless asked not to.
+  const timezone = form.getByLabel("Timezone");
+  if ((await timezone.count()) === 0) await form.getByRole("button", { name: "Set manually" }).click();
+  await timezone.fill(birth.timezone);
   await form.getByLabel("Latitude").fill(birth.latitude);
   await form.getByLabel("Longitude").fill(birth.longitude);
 }

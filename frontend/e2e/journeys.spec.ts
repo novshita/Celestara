@@ -50,11 +50,15 @@ test("2. Vedic exploration: the Kundali styles, the Dasha timeline and a planet"
   await expect(next).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator('[aria-live="polite"] h3')).toContainText(`${lord} Mahadasha`);
 
-  const explorer = formWith(page, "Explore");
-  await explorer.getByLabel("Planet").selectOption("Saturn");
-  await fillBirth(explorer);
-  await explorer.getByRole("button", { name: "Explore" }).click();
-  await expect(page.getByRole("heading", { name: /^Saturn/ })).toBeVisible();
+  // Explore a planet: it uses the chart just calculated, so nothing is typed twice
+  const explore = page.locator("#explore");
+  await explore.getByRole("button", { name: "Saturn", exact: true }).click();
+  await expect(explore.getByRole("heading", { name: "Saturn" })).toBeVisible();
+  await expect(explore).toContainText("Dhanu"); // the reference chart's Saturn
+  await expect(explore.getByRole("link", { name: /Ask the Guide how Saturn reads for me/ })).toHaveAttribute(
+    "href",
+    /\/guide\?q=.*Saturn.*#ask$/,
+  );
 });
 
 test("3. Western exploration: the zodiac wheel and its aspects", async ({ page }) => {
@@ -78,10 +82,11 @@ test("4. Compare: both systems together, then each alone", async ({ page }) => {
   const views = page.getByRole("group", { name: "Which chart to show" });
   await views.getByRole("button", { name: "Vedic" }).click();
   await expect(views.getByRole("button", { name: "Vedic" })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator('[aria-hidden="true"]').filter({ has: page.locator("svg") })).toHaveCount(1);
+  const results = page.locator("#results");
+  await expect(results.locator('[aria-hidden="true"]').filter({ has: page.locator("svg") })).toHaveCount(1);
 
   await views.getByRole("button", { name: "Together" }).click();
-  await expect(page.locator('[aria-hidden="true"]').filter({ has: page.locator("svg") })).toHaveCount(0);
+  await expect(results.locator('[aria-hidden="true"]').filter({ has: page.locator("svg") })).toHaveCount(0);
 });
 
 test("5. Transit reading: the current sky, then a reading of it", async ({ page }) => {
