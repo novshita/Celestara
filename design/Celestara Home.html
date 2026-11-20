@@ -1,0 +1,414 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Celestara Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: text and the live sky readout on the left; a portal scene on the right whose arc of signs carries the nine grahas. Below: three doors (chart, readings, guide) and a saved-profile strip. */
+:root{
+  --void:#03040b;--ink:#f1ede4;--ink2:#a9adc2;--ink3:#7d8299;
+  --gold:#f2c55c;--gold-soft:rgba(242,197,92,.14);--cool:#c9d4e6;
+  --line:rgba(255,255,255,.14);--field:rgba(255,255,255,.04);
+  --serif:"Instrument Serif","Times New Roman",serif;
+  --sans:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--void)}
+body{font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:2px}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:11px}
+.tag{display:inline-block;font:400 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;border:1px dashed var(--ink3);color:var(--ink2);padding:2px 7px;border-radius:2px}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);background:rgba(3,4,11,.72);border-bottom:1px solid var(--line)}
+.top>div{max-width:1240px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-size:26px;color:var(--gold)}
+.links{display:flex;gap:4px;align-items:center}
+.links a{padding:8px 14px;border-radius:8px;font-size:14px;color:var(--ink2);min-height:40px;display:flex;align-items:center}
+.links a:hover{color:var(--ink)}
+.links a[aria-current]{background:var(--gold-soft);color:var(--gold)}
+.login{border:1px solid var(--line);padding:9px 16px;border-radius:8px;font-size:14px;min-height:40px;display:flex;align-items:center}
+.login:hover{border-color:var(--gold)}
+
+main{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding-block:40px 80px}
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:48px;align-items:center}
+.eyebrow{color:var(--gold);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(50px,6.4vw,88px);line-height:.96;letter-spacing:-.02em;margin:14px 0 18px;text-wrap:balance}
+.lede{color:var(--ink2);font-size:17px;max-width:48ch;text-wrap:pretty}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;margin-top:26px}
+.seg button{padding:0 18px;min-height:44px;border-radius:999px;font-size:14px;color:var(--ink2);transition:all .2s}
+.seg button[aria-pressed=true]{background:var(--gold);color:#1a1405;font-weight:600}
+.seg.sm{margin-top:0}.seg.sm button{min-height:38px;padding:0 14px}
+.seg.sm button[aria-pressed=true]{background:var(--ink);color:#0a0b14}
+.zinfo{margin-top:22px;display:flex;flex-direction:column;gap:10px;color:var(--ink2);font-size:15px;max-width:50ch}
+.zinfo small{font-size:13px;color:var(--ink3)}
+.zinfo b{color:var(--ink);font-weight:600}
+.pinfo{margin-top:18px;min-height:96px;padding:14px 16px;border-left:2px solid var(--gold);background:var(--gold-soft);border-radius:0 10px 10px 0;max-width:50ch}
+.pinfo h2{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1}
+.pinfo p{font-size:14px;color:var(--ink2);margin-top:6px}
+.pinfo .rows{display:grid;grid-template-columns:auto 1fr;gap:2px 16px;margin-top:8px;font-size:15px}
+.pinfo .rows span:nth-child(odd){color:var(--ink3);font:400 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;align-self:center}
+details{margin-top:16px;color:var(--ink2);font-size:14px}
+summary{cursor:pointer;min-height:36px;display:flex;align-items:center}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin-top:8px}
+th{text-align:left;font:400 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:6px 10px 6px 0;border-bottom:1px solid var(--line)}
+td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);font-size:14px}
+
+/* portal scene (600x740 stage, scaled to fit) */
+.scene{position:relative;width:100%;max-width:600px;margin-inline:auto;aspect-ratio:600/740;
+  -webkit-mask-image:radial-gradient(ellipse 66% 60% at 50% 48%,#000 58%,transparent 100%);mask-image:radial-gradient(ellipse 66% 60% at 50% 48%,#000 58%,transparent 100%)}
+.stage{position:absolute;left:0;top:0;width:600px;height:740px;transform-origin:0 0;overflow:hidden}
+.stage>*{position:absolute}
+.lay{left:0;top:0;width:600px;height:740px;pointer-events:none;will-change:transform}
+.lay>*{position:absolute}
+#st,#cl{left:0;top:0;width:600px;height:740px}
+#pl{left:-30px;top:-500px;width:660px;height:660px}
+.glint{width:60px;height:60px;margin:-30px;pointer-events:none}
+.glint:before,.glint:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(90deg,transparent,#d8f6ff,transparent);width:100%;height:1.5px}
+.glint:after{width:1.5px;height:100%;background:linear-gradient(180deg,transparent,#d8f6ff,transparent)}
+.glint i{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:#fff;box-shadow:0 0 14px 4px rgba(150,230,255,.8)}
+.tg{width:56px;height:56px;margin:-28px 0 0 -28px;pointer-events:auto;border-radius:50%;display:block;opacity:.55;transition:opacity .3s,transform .3s}
+.tg:hover,.tg[aria-pressed=true]{opacity:1}
+.tg:hover{transform:scale(1.08)}
+.tg i{position:absolute;left:4px;top:4px;width:48px;height:48px;border-radius:50%;transition:filter .3s,box-shadow .3s}
+.tg .cap{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:2px;font:500 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.tg[aria-pressed=true] .cap{color:var(--gold)}
+.tg .mn{background:radial-gradient(circle at 62% 38%,rgba(90,110,130,.5) 0 8%,transparent 9%),radial-gradient(circle at 34% 64%,rgba(90,110,130,.45) 0 10%,transparent 11%),radial-gradient(circle at 36% 30%,#f6f9fc,#a9bccd 55%,#566a7e);box-shadow:0 0 16px 3px rgba(120,210,235,.3),inset -8px -8px 16px rgba(10,20,40,.55)}
+.tg[aria-pressed=true] .mn{box-shadow:0 0 30px 8px rgba(120,210,235,.6),inset -8px -8px 16px rgba(10,20,40,.55)}
+.tg .cl{box-shadow:inset 11px 0 0 0 #f0e2bd;transform:rotate(-18deg)}
+.tg .cr{box-shadow:inset -11px 0 0 0 #f0e2bd;transform:rotate(18deg)}
+.tg[aria-pressed=true] .cl,.tg[aria-pressed=true] .cr{filter:drop-shadow(0 0 10px rgba(242,197,92,.9))}
+.arc{left:0;top:0;width:600px;height:740px;overflow:visible}
+.arc path{fill:none;stroke:var(--gold);stroke-width:1.2;opacity:.55}
+.arc path.g{stroke-width:5;opacity:.12;filter:blur(3px)}
+.ringitem{left:300px;top:430px;width:0;height:0;transition:transform .9s cubic-bezier(.3,.7,.2,1),opacity .6s}
+.rt{position:absolute;left:-7px;top:0;width:14px;height:1px;background:currentColor}
+.rl{position:absolute;left:0;top:0;white-space:nowrap;font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.t{color:var(--cool)}.s{color:var(--gold)}
+.orb{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;display:grid;place-items:center;pointer-events:auto;border-radius:50%}
+.orb i{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe9a6,#f2c55c 60%,#b8892c);color:#1a1405;font:600 11px var(--mono);box-shadow:0 0 14px rgba(242,197,92,.55);transition:transform .25s,box-shadow .25s;font-style:normal}
+.orb:hover i{transform:scale(1.18)}
+.orb[aria-pressed=true] i{transform:scale(1.3);box-shadow:0 0 0 3px #03040b,0 0 0 5px var(--gold),0 0 24px rgba(242,197,92,.8)}
+.tip{pointer-events:none;font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;background:rgba(3,4,11,.85);border:1px solid var(--gold);color:var(--gold);padding:3px 8px;border-radius:3px;white-space:nowrap;transform:translate(-50%,-50%);opacity:0;transition:opacity .3s}
+.tip.on{opacity:1}
+#arch{left:0;top:390px;width:600px;height:350px;overflow:visible}
+.gxw{left:238px;top:408px;width:124px;height:158px;border-radius:62px 62px 0 0;overflow:hidden;background:#030816;box-shadow:0 0 40px 6px rgba(242,197,92,.2)}
+.gxw canvas{display:block;width:124px;height:158px}
+.gxw:after{content:"";position:absolute;inset:0;background:radial-gradient(70% 45% at 25% 100%,rgba(242,160,70,.45),transparent 70%),radial-gradient(60% 40% at 80% 95%,rgba(240,190,110,.3),transparent 70%);pointer-events:none}
+.portal{left:200px;top:400px;width:200px;height:340px;pointer-events:auto;border-radius:100px 100px 0 0;display:block}
+.portal:hover~.gxw,.portal:focus-visible~.gxw{box-shadow:0 0 60px 14px rgba(242,197,92,.4)}
+.step-l{left:50%;transform:translateX(-50%);top:580px;font:500 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:#f6e7bd;text-shadow:0 1px 6px rgba(0,0,0,.8);pointer-events:none;white-space:nowrap}
+
+/* doors */
+.sec{margin-top:96px}
+.sec>h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,4vw,54px);line-height:1}
+.sec>p{color:var(--ink2);margin-top:10px;max-width:56ch}
+.doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:34px;border-top:1px solid var(--line)}
+.door{padding:28px 28px 8px 0;display:flex;flex-direction:column;gap:14px;min-width:0}
+.door+.door{padding-left:28px;border-left:1px solid var(--line)}
+.door svg{width:40px;height:40px;color:var(--gold)}
+.door h3{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.02}
+.door p{color:var(--ink2);font-size:15px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--ink2);display:inline-flex;align-items:center;transition:all .2s;text-align:left}
+.chip:hover{border-color:var(--gold);color:var(--ink)}
+.chip[aria-pressed=true]{background:var(--ink);color:#0a0b14;border-color:var(--ink);font-weight:600}
+.go{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;border-radius:999px;background:var(--gold);color:#1a1405;font-weight:600;font-size:15px;align-self:flex-start;transition:transform .2s,box-shadow .3s}
+.go:hover{transform:translateY(-2px);box-shadow:0 10px 30px -8px rgba(242,197,92,.6)}
+.go.o{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+.go.o:hover{background:var(--gold-soft);box-shadow:none}
+.ask{display:flex;gap:8px}
+.ask input{flex:1;min-width:0;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);font:400 17px var(--sans);padding:10px 0;min-height:48px}
+.ask input:focus{outline:0;border-bottom-color:var(--gold)}
+.ask input::placeholder{color:var(--ink3)}
+.note{font-size:13px;color:var(--ink3)}
+.strip{margin-top:56px;padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.strip .off{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;color:var(--ink2);font-size:15px}
+.strip .on{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px}
+.strip h4{font:400 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.dbar{display:flex;gap:3px;height:34px;margin-top:6px;position:relative}
+.dbar span{border:1px solid var(--line);border-radius:3px;font:500 10px var(--mono);color:var(--ink3);display:flex;align-items:flex-end;padding:3px 5px;min-width:0}
+.dbar span.n{border-color:var(--gold);background:var(--gold-soft);color:var(--gold)}
+.dbar em{position:absolute;top:-16px;font:500 10px var(--mono);letter-spacing:.14em;color:var(--gold);font-style:normal;transform:translateX(-50%)}
+.sq{display:flex;flex-direction:column;gap:6px}
+.sq button{text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink2);min-height:44px}
+.sq button:hover{border-color:var(--gold);color:var(--ink)}
+footer{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:0 0 60px;color:var(--ink3);font-size:13px}
+footer p{max-width:74ch}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;z-index:40;background:var(--ink);color:#0a0b14;padding:12px 18px;border-radius:10px;font-size:14px;pointer-events:none;transition:all .3s;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:960px){
+  .hero{grid-template-columns:minmax(0,1fr);gap:28px}
+  .scene{order:-1;max-width:440px}
+  .doors{grid-template-columns:minmax(0,1fr)}
+  .door,.door+.door{padding:26px 0;border-left:0}.door+.door{border-top:1px solid var(--line)}
+  .strip .on{grid-template-columns:minmax(0,1fr);gap:24px}
+  .links a:not([aria-current]){display:none}
+}
+@media (max-width:640px){.login{display:none}.seg button{padding:0 14px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="top"><div>
+  <a class="logo" href="#top" aria-label="Celestara home"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="1.6"/><ellipse cx="16" cy="16" rx="13" ry="5" fill="none" stroke="currentColor" stroke-width="1.2" transform="rotate(-24 16 16)"/><circle cx="16" cy="16" r="4" fill="currentColor"/></svg>Celestara</a>
+  <nav class="links" aria-label="Primary"><a href="#top" aria-current="page">Home</a><a href="https://claude.ai/artifact/5Ytc32xW7HPeSCYHD6maci" target="_blank" rel="noopener">Birth Chart</a><a href="#start">Journal</a><a href="#start">Profile</a></nav>
+  <a class="login" href="#start">Log in</a>
+</div></header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="h">
+    <div>
+      <div class="eyebrow mono"><span>The sky now</span><span id="asof"></span><span class="tag">Sample positions</span></div>
+      <h1 id="h">Your celestial universe</h1>
+      <p class="lede">Calculate your Vedic and Western charts, read the sky as it is now, and ask questions of a guide that interprets only what has been calculated. For reflection, not prediction.</p>
+      <div class="seg" id="mode" role="group" aria-label="Zodiac"><button type="button" data-m="v" aria-pressed="true">Vedic</button><button type="button" data-m="w" aria-pressed="false">Western</button><button type="button" data-m="c" aria-pressed="false">Compare</button></div>
+      <div class="zinfo" aria-live="polite"><p id="zt"></p><small id="zs"></small></div>
+      <div class="pinfo" id="pinfo" aria-live="polite"></div>
+      <details><summary>Positions as text</summary><div id="ptab"></div></details>
+    </div>
+    <div class="scene" id="scene" aria-label="A stair climbing to a glowing doorway under a great planet. An arc over the doorway carries the nine grahas.">
+      <div class="stage" id="stage">
+        <canvas id="st" aria-hidden="true"></canvas>
+        <div class="lay" id="lPl" aria-hidden="true">
+          <canvas id="pl"></canvas>
+          <span class="glint" style="left:130px;top:130px"><i></i></span><span class="glint" style="left:470px;top:70px;transform:scale(.7)"><i></i></span><span class="glint" style="left:360px;top:205px;transform:scale(.55)"><i></i></span>
+        </div>
+        <canvas id="cl" aria-hidden="true"></canvas>
+        <div class="lay" id="lArc">
+          <svg class="arc" viewBox="0 0 600 740" aria-hidden="true"><path class="g" id="arcg"/><path id="arcp"/></svg>
+          <div id="ring"></div>
+          <div id="orbs" style="pointer-events:none"></div>
+          <div class="tip" id="tip"></div>
+          <button type="button" class="tg" data-m="v" style="left:187px;top:365px" aria-pressed="true" aria-label="Vedic zodiac"><i class="cl"></i><span class="cap">Vedic</span></button>
+          <button type="button" class="tg" data-m="c" style="left:300px;top:272px" aria-pressed="false" aria-label="Compare both zodiacs"><i class="mn"></i><span class="cap">Both</span></button>
+          <button type="button" class="tg" data-m="w" style="left:413px;top:365px" aria-pressed="false" aria-label="Western zodiac"><i class="cr"></i><span class="cap">Western</span></button>
+        </div>
+        <div class="lay" id="lArch">
+          <svg id="arch" viewBox="0 0 600 350" aria-hidden="true"></svg>
+          <div class="gxw"><canvas id="gx" width="248" height="316"></canvas></div>
+          <span class="step-l">Enter your chart</span>
+          <a class="portal" href="#start" aria-label="Enter your chart: go to the ways in"></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="start" aria-labelledby="sH">
+    <h2 id="sH">Three ways in</h2>
+    <p>Everything is calculated first. The guide only explains what the calculation found.</p>
+    <div class="strip" id="strip">
+      <div class="off" id="stripOff"><span>Log in to see your current Dasha and where the Moon, Jupiter and Saturn are now.</span><button type="button" class="go o" id="demoB">Preview with a saved profile (demo)</button></div>
+      <div class="on" id="stripOn" hidden>
+        <div><h4>Current Dasha</h4><div style="font-family:var(--serif);font-size:30px;line-height:1">Jupiter · Saturn</div><p class="note" style="margin-top:4px">Mahadasha · Antardasha</p><div style="position:relative;padding-top:18px"><div class="dbar"><em style="left:36%">NOW</em><span style="flex:10">Mo</span><span style="flex:7">Ma</span><span style="flex:18">Ra</span><span class="n" style="flex:16">Ju</span><span style="flex:19">Sa</span><span style="flex:17">Me</span><span style="flex:7">Ke</span></div></div></div>
+        <div><h4>In the sky now · Vedic</h4><table id="strT"></table><p class="note" style="margin-top:8px">Sample positions.</p></div>
+        <div><h4>Suggested from your chart</h4><div class="sq" id="sq"></div><p class="note" style="margin-top:8px">Choosing one only fills the Guide box.</p><button type="button" class="note" id="demoOff" style="text-decoration:underline;margin-top:6px;min-height:36px">Back to logged-out view</button></div>
+      </div>
+    </div>
+    <div class="doors">
+      <div class="door">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="4" width="32" height="32"/><path d="M4 4L36 36M36 4L4 36M20 4L36 20L20 36L4 20Z"/></svg>
+        <h3>Start with your birth chart</h3>
+        <p>Vedic, Western, a side-by-side comparison, your Dasha timeline and the current transits.</p>
+        <a class="go" href="https://claude.ai/artifact/5Ytc32xW7HPeSCYHD6maci" target="_blank" rel="noopener">Calculate a chart <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="door">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="20" cy="20" r="6"/><path d="M20 3v6M20 31v6M3 20h6M31 20h6M8 8l4 4M28 28l4 4M32 8l-4 4M12 28l-4 4"/></svg>
+        <h3>Read the sky</h3>
+        <p>Built from today's real transits against your natal chart, never from a template.</p>
+        <div class="chips" id="per" role="group" aria-label="Period"><button type="button" class="chip" aria-pressed="false">Today</button><button type="button" class="chip" aria-pressed="true">This week</button><button type="button" class="chip" aria-pressed="false">This month</button><button type="button" class="chip" aria-pressed="false">Birth chart</button></div>
+        <div class="chips" id="foc" role="group" aria-label="Focus"><button type="button" class="chip" aria-pressed="true">General</button><button type="button" class="chip" aria-pressed="false">Career</button><button type="button" class="chip" aria-pressed="false">Love</button><button type="button" class="chip" aria-pressed="false">Relationships</button><button type="button" class="chip" aria-pressed="false">Growth</button></div>
+        <button type="button" class="go" id="rd">Open reading <span aria-hidden="true">→</span></button>
+      </div>
+      <div class="door">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M20 4c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12z"/><circle cx="32" cy="31" r="3"/></svg>
+        <h3>Ask the Guide</h3>
+        <p>Answers show their working: the calculated facts, the traditional knowledge and your own context.</p>
+        <form class="ask" id="askf"><input id="q" type="text" placeholder="What would you like to understand?" aria-label="Question for the Guide"><button class="go" type="submit">Ask</button></form>
+        <div class="seg sm" id="depth" role="group" aria-label="Explanation"><button type="button" aria-pressed="true">Beginner</button><button type="button" aria-pressed="false">Technical</button></div>
+        <p class="note">Nothing is sent until you press Ask.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><p>Celestara treats astrology as an interpretive and traditional framework, not scientifically validated prediction. This page is a prototype: planet positions are samples and nothing is sent to a server.</p></footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)},$$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+
+/* ----- page sky ----- */
+function sky(){
+  var c=$('#bg'),x=c.getContext('2d'),d=Math.min(devicePixelRatio||1,1.5),w=c.width=Math.round(innerWidth*d),h=c.height=Math.round(innerHeight*d),r=rng(5),i;
+  var g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#02030a');g.addColorStop(1,'#050a1c');x.fillStyle=g;x.fillRect(0,0,w,h);
+  x.save();x.translate(w*.62,h*.45);x.rotate(-.42);
+  for(i=0;i<9;i++){var gx=(i-4)*w*.14,rad=h*.35,gg=x.createRadialGradient(gx,0,0,gx,0,rad);gg.addColorStop(0,i>2&&i<6?'rgba(235,220,190,.06)':'rgba(200,170,130,.035)');gg.addColorStop(1,'rgba(200,170,130,0)');x.fillStyle=gg;x.fillRect(gx-rad,-rad,rad*2,rad*2)}
+  for(i=0;i<5000;i++){var u=(r()+r()+r()-1.5)*w*.9,v=(r()+r()+r()+r()-2)*h*.16*(1-Math.abs(u)/(w*.8));x.fillStyle='rgba(255,'+(225+Math.round(r()*30))+','+(190+Math.round(r()*60))+','+(.1+r()*.4)+')';x.fillRect(u,v,d*.9,d*.9)}
+  x.restore();
+  var cols=['255,255,255','255,255,255','190,210,255','255,226,190','255,200,140'];
+  for(i=0;i<800;i++){var s=r()<.04?1.8:1,a=.2+r()*.7;x.fillStyle='rgba('+cols[Math.floor(r()*5)]+','+a+')';x.fillRect(r()*w,r()*h,s*d,s*d)}
+}
+var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(sky,150)});sky();
+
+/* ----- scene: fit, parallax ----- */
+var scene=$('#scene'),stage=$('#stage');
+function fit(){stage.style.transform='scale('+(scene.clientWidth/600)+')'}
+addEventListener('resize',fit);fit();
+var lays=[['#lPl',10],['#lArc',6],['#lArch',4]].map(function(a){return[$(a[0]),a[1]]});
+var cl=$('#cl'),st=$('#st'),px=0,py=0,tx=0,ty=0;
+scene.addEventListener('pointermove',function(e){var b=scene.getBoundingClientRect();tx=(e.clientX-b.left)/b.width-.5;ty=(e.clientY-b.top)/b.height-.5},{passive:true});
+scene.addEventListener('pointerleave',function(){tx=0;ty=0});
+(function par(){px+=(tx-px)*.07;py+=(ty-py)*.07;
+  lays.forEach(function(l){l[0].style.transform='translate3d('+(-px*l[1])+'px,'+(-py*l[1]*.7)+'px,0)'});
+  cl.style.transform='translate3d('+(-px*16)+'px,'+(-py*10)+'px,0)';st.style.transform='translate3d('+(-px*3)+'px,'+(-py*2)+'px,0)';
+  if(!rm)requestAnimationFrame(par)})();
+
+/* stars in the scene */
+(function(){
+  var c=st,d=Math.min(devicePixelRatio||1,2);c.width=600*d;c.height=740*d;var x=c.getContext('2d');x.scale(d,d);var r=rng(3),i;
+  var g=x.createLinearGradient(0,0,0,740);g.addColorStop(0,'#02040c');g.addColorStop(.7,'#03060e');g.addColorStop(1,'#05060c');x.fillStyle=g;x.fillRect(-10,-10,620,760);
+  var cols=['255,255,255','255,255,255','190,210,255','255,226,190','255,200,140'];
+  for(i=0;i<520;i++){var s=r()<.06?2:r()<.3?1.3:.9;x.fillStyle='rgba('+cols[Math.floor(r()*5)]+','+(.25+r()*.75)+')';x.fillRect(r()*600,r()*500,s,s)}
+  for(i=0;i<7;i++){var sx=40+r()*520,sy=30+r()*320,L=10+r()*10;x.strokeStyle='rgba(255,240,215,.7)';x.lineWidth=1;x.beginPath();x.moveTo(sx-L,sy);x.lineTo(sx+L,sy);x.moveTo(sx,sy-L);x.lineTo(sx,sy+L);x.stroke();x.fillStyle='#fff';x.beginPath();x.arc(sx,sy,1.8,0,6.3);x.fill()}
+})();
+
+/* the great planet: marbled teal, drawn once */
+function planet(){
+  var N=520,c=$('#pl');c.width=c.height=N;var x=c.getContext('2d'),im=x.createImageData(N,N),D=im.data;
+  function hash(a,b){var h=Math.sin(a*127.1+b*311.7)*43758.5453;return h-Math.floor(h)}
+  function vn(a,b){var ai=Math.floor(a),bi=Math.floor(b),af=a-ai,bf=b-bi,u=af*af*(3-2*af),v=bf*bf*(3-2*bf);return hash(ai,bi)*(1-u)*(1-v)+hash(ai+1,bi)*u*(1-v)+hash(ai,bi+1)*(1-u)*v+hash(ai+1,bi+1)*u*v}
+  function fbm(a,b){var s=0,m=.5,i;for(i=0;i<5;i++){s+=m*vn(a,b);a=a*2.03+5.2;b=b*2.03+1.3;m*=.5}return s}
+  var ST=[[0,[3,10,24]],[.35,[8,66,92]],[.58,[18,124,156]],[.78,[74,196,222]],[1,[205,242,250]]];
+  function ramp(t){var i=0;while(i<ST.length-2&&t>ST[i+1][0])i++;var a=ST[i],b=ST[i+1],k=clamp((t-a[0])/(b[0]-a[0]),0,1);return[a[1][0]+(b[1][0]-a[1][0])*k,a[1][1]+(b[1][1]-a[1][1])*k,a[1][2]+(b[1][2]-a[1][2])*k]}
+  var py,pxx;
+  for(py=0;py<N;py++)for(pxx=0;pxx<N;pxx++){
+    var nx=pxx/N*2-1,ny=py/N*2-1,d2=nx*nx+ny*ny,o=(py*N+pxx)*4;
+    if(d2>1){continue}
+    var nz=Math.sqrt(1-d2),u=nx/(.55+nz*.45),v=ny/(.55+nz*.45);
+    var q=fbm(u*2.1+3,v*2.1),w=fbm(u*3+q*2.6+1.7,v*3-q*2.6),val=clamp((w-.22)*1.9,0,1);
+    var col=ramp(val),light=Math.max(.1,-.34*nx-.5*ny+.8*nz),sh=.2+.95*light,rim=Math.pow(1-nz,3);
+    D[o]=clamp(col[0]*sh+rim*20,0,255);D[o+1]=clamp(col[1]*sh+rim*70,0,255);D[o+2]=clamp(col[2]*sh+rim*90,0,255);
+    D[o+3]=clamp((1-Math.sqrt(d2))*N*.5,0,1)*255;
+  }
+  x.putImageData(im,0,0);
+}
+setTimeout(planet,30);
+
+/* clouds */
+(function(){
+  var c=cl,d=Math.min(devicePixelRatio||1,2);c.width=600*d;c.height=740*d;var x=c.getContext('2d');x.scale(d,d);var r=rng(9);
+  function puff(px,py,rad){
+    var g=x.createRadialGradient(px,py+rad*.25,rad*.1,px,py+rad*.25,rad);g.addColorStop(0,'rgba(120,128,156,.55)');g.addColorStop(1,'rgba(120,128,156,0)');x.fillStyle=g;x.beginPath();x.arc(px,py+rad*.25,rad,0,6.3);x.fill();
+    g=x.createRadialGradient(px-rad*.15,py-rad*.2,rad*.05,px,py,rad);g.addColorStop(0,'rgba(248,245,252,.92)');g.addColorStop(.6,'rgba(214,214,230,.55)');g.addColorStop(1,'rgba(200,200,222,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,rad,0,6.3);x.fill()}
+  var banks=[[110,540,150,34],[500,520,150,34],[300,700,300,22],[40,600,70,12],[560,610,70,12]],i,j;
+  banks.forEach(function(b){for(j=0;j<b[3];j++){var rr=34+r()*54,ang=r()*6.28,dist=Math.sqrt(r())*b[2];puff(b[0]+Math.cos(ang)*dist*1.1,b[1]+Math.sin(ang)*dist*.38,rr)}});
+})();
+
+/* arch and steps */
+(function(){
+  var r=rng(14),s='<defs><linearGradient id="col" x1="0" x2="1"><stop offset="0" stop-color="#efe5cb"/><stop offset=".6" stop-color="#b8aa88"/><stop offset="1" stop-color="#6b6149"/></linearGradient><linearGradient id="rs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a3f31"/><stop offset="1" stop-color="#241d17"/></linearGradient><linearGradient id="gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(242,197,92,.28)"/><stop offset="1" stop-color="rgba(242,197,92,0)"/></linearGradient></defs>';
+  var i,j;
+  /* steps (y offset 170 in this svg = stage y 560) */
+  for(i=0;i<8;i++){var y=170+i*22,hw=100+i*36;
+    s+='<rect x="'+(300-hw)+'" y="'+(y+8)+'" width="'+(hw*2)+'" height="14" fill="url(#rs)"/><rect x="'+(300-hw)+'" y="'+y+'" width="'+(hw*2)+'" height="8" fill="'+(i%2?'#b3a27a':'#c3b389')+'"/><rect x="'+(300-hw)+'" y="'+y+'" width="'+(hw*2)+'" height="1.5" fill="#efe3bd" opacity=".8"/><rect x="'+(300-hw)+'" y="'+(y+8)+'" width="'+(hw*2)+'" height="14" fill="url(#gl)" opacity="'+(1-i*.1)+'"/>';
+    for(j=0;j<Math.round(hw/12);j++)s+='<circle cx="'+(300-hw+r()*hw*2).toFixed(1)+'" cy="'+(y+9+r()*12).toFixed(1)+'" r="'+(.5+r()*.8).toFixed(1)+'" fill="'+(r()<.5?'#f6e2a8':'#bfd7ff')+'" opacity="'+(.35+r()*.5).toFixed(2)+'"/>'}
+  /* columns and arch (arch centre at stage y 470 = svg y 80) */
+  s+='<g filter="drop-shadow(0 0 10px rgba(242,197,92,.35))">';
+  [216,364].forEach(function(cx){s+='<rect x="'+cx+'" y="80" width="20" height="96" fill="url(#col)"/><rect x="'+(cx-5)+'" y="170" width="30" height="8" fill="#d6c9a6"/><rect x="'+(cx-4)+'" y="72" width="28" height="9" fill="#e6dab8"/><circle cx="'+(cx-3)+'" cy="77" r="4.5" fill="#d9ccaa"/><circle cx="'+(cx+23)+'" cy="77" r="4.5" fill="#d9ccaa"/>'});
+  s+='<path d="M227 80A73 73 0 0 1 373 80" fill="none" stroke="url(#col)" stroke-width="22"/><path d="M216 80A84 84 0 0 1 384 80" fill="none" stroke="#f3e8c8" stroke-width="1.2" opacity=".8"/><path d="M238 80A62 62 0 0 1 362 80" fill="none" stroke="#f3e8c8" stroke-width="1" opacity=".5"/></g>';
+  $('#arch').innerHTML=s;
+})();
+
+/* portal galaxy (a spiral that turns slowly) */
+(function(){
+  var c=$('#gx'),x=c.getContext('2d'),W=c.width,H=c.height,r=rng(21),n=1500,P=[],i;
+  for(i=0;i<n;i++)P.push([r(),r(),r()]);
+  function draw(t){
+    x.setTransform(1,0,0,1,0,0);x.fillStyle='#030816';x.fillRect(0,0,W,H);
+    var rot=t*.00022,cx=W*.5,cy=H*.46,g=x.createRadialGradient(cx,cy,0,cx,cy,W*.5);g.addColorStop(0,'rgba(255,226,170,.85)');g.addColorStop(.12,'rgba(255,190,110,.4)');g.addColorStop(.5,'rgba(50,100,190,.22)');g.addColorStop(1,'rgba(20,50,120,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
+    for(var k=0;k<n;k++){var p=P[k],rr=Math.pow(p[0],.62)*W*.62,th=(k%3)*2.094+rr*.034+rot*(1+(1-p[0])*.8)+(p[1]-.5)*.7,xx=cx+Math.cos(th)*rr,yy=cy+Math.sin(th)*rr*1.05,tt=rr/(W*.62),cr,cg,cb;
+      if(tt<.15){cr=255;cg=232;cb=185}else if(tt<.5){cr=110;cg=170;cb=255}else{cr=50;cg=110;cb=190}
+      x.fillStyle='rgba('+cr+','+cg+','+cb+','+((.25+p[2]*.7)*(1-tt*.5)).toFixed(2)+')';x.fillRect(xx,yy,1+p[2]*2.2,1+p[2]*2.2)}
+  }
+  draw(0);var last=0;
+  if(!rm)(function loop(t){if(t-last>33&&!document.hidden){last=t;draw(t)}requestAnimationFrame(loop)})(0);
+})();
+
+/* ----- the sky now: ecliptic arc, signs, grahas ----- */
+var AY=24.23,R=250,CX=300,CY=430,K=220/370;
+var TR=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+var SI=['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makara','Kumbha','Meena'];
+var PL=[['Su','Sun',237.8],['Mo','Moon',91],['Ma','Mars',203],['Me','Mercury',262],['Ju','Jupiter',130],['Ve','Venus',281],['Sa','Saturn',359],['Ra','Rahu',332],['Ke','Ketu',152]];
+function ang(L){return 200-K*L}
+function pt(L,rad){var a=ang(L)*Math.PI/180;return[CX+rad*Math.cos(a),CY-rad*Math.sin(a)]}
+function sid(L){return((L-AY)%360+360)%360}
+function sign(L,names){return names[Math.floor(L/30)]}
+var d='';for(var L=-12;L<=382;L+=4){var p=pt(L,R);d+=(d?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)}
+$('#arcp').setAttribute('d',d);$('#arcg').setAttribute('d',d);
+var items=[],ring=$('#ring');
+['t','s'].forEach(function(sys){for(var k=0;k<12;k++){
+  var tk=document.createElement('div');tk.className='ringitem '+sys;tk.innerHTML='<i class="rt"></i>';
+  var lb=document.createElement('div');lb.className='ringitem '+sys;lb.innerHTML='<span class="rl">'+(sys==='t'?TR[k]:SI[k])+'</span>';
+  ring.appendChild(tk);ring.appendChild(lb);items.push({tk:tk,lb:lb,sys:sys,k:k})}});
+var mode='v',sel=-1;
+function place(){
+  items.forEach(function(it){
+    var off=it.sys==='s'?AY:0,vis=mode==='c'||(mode==='v'&&it.sys==='s')||(mode==='w'&&it.sys==='t');
+    var inner=it.sys==='s'&&mode==='c',rt=inner?R-40:R,rl=inner?R-62:R-22;
+    var a1=ang(it.k*30+off),a2=ang(it.k*30+15+off);
+    it.tk.style.transform='rotate('+(-a1)+'deg) translateX('+rt+'px)';
+    it.lb.style.transform='rotate('+(-a2)+'deg) translateX('+rl+'px) rotate('+a2+'deg) translate(-50%,-50%)';
+    it.tk.style.opacity=it.lb.style.opacity=vis?1:0;
+  });
+}
+var orbs=$('#orbs');
+PL.forEach(function(p,i){var b=document.createElement('button'),q=pt(p[2],R);b.type='button';b.className='orb';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',p[1]);b.style.left=q[0].toFixed(1)+'px';b.style.top=q[1].toFixed(1)+'px';b.innerHTML='<i>'+p[0]+'</i>';
+  b.addEventListener('click',function(){sel=sel===i?-1:i;info();orbSel()});orbs.appendChild(b)});
+function orbSel(){$$('.orb').forEach(function(o,i){o.setAttribute('aria-pressed',i===sel)});
+  var tip=$('#tip');if(sel<0){tip.classList.remove('on');return}
+  var p=PL[sel],q=pt(p[2],R+30);tip.style.left=q[0]+'px';tip.style.top=q[1]+'px';tip.textContent=p[1];tip.classList.add('on')}
+var COPY={v:['The sidereal zodiac, which the Vedic tradition uses: signs are measured against the fixed stars.'],w:['The tropical zodiac, which the Western tradition uses: signs are measured from the March equinox, so they follow the seasons.'],c:['Both zodiacs at once. Western signs sit outside the arc, Vedic signs inside it.']};
+function info(){
+  $('#zt').textContent=COPY[mode][0];
+  $('#zs').textContent='The two zodiacs differ by '+AY.toFixed(2)+'°, the ayanamsa. The planets do not move when you change zodiac; the signs turn around them.';
+  var el=$('#pinfo');
+  if(sel<0){el.innerHTML='<p style="margin:0">Choose a planet on the arc to see its sign in each zodiac.</p>';return}
+  var p=PL[sel],w=sign(p[2],TR),v=sign(sid(p[2]),SI),rows='';
+  if(mode!=='w')rows+='<span>Vedic</span><span><b>'+v+'</b> · sidereal</span>';
+  if(mode!=='v')rows+='<span>Western</span><span><b>'+w+'</b> · tropical</span>';
+  el.innerHTML='<h2>'+p[1]+'</h2><div class="rows">'+rows+'</div>';
+}
+function setMode(m){mode=m;$$('#mode button,.tg').forEach(function(x){x.setAttribute('aria-pressed',x.dataset.m===m)});place();info()}
+$$('#mode button,.tg').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.m)})});
+$('#ptab').innerHTML='<table><thead><tr><th>Graha</th><th>Western</th><th>Vedic</th></tr></thead><tbody>'+PL.map(function(p){return'<tr><td>'+p[1]+'</td><td>'+sign(p[2],TR)+'</td><td>'+sign(sid(p[2]),SI)+'</td></tr>'}).join('')+'</tbody></table>';
+(function(){var n=new Date(),m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];function z(v){return(v<10?'0':'')+v}
+  $('#asof').textContent='As of '+n.getUTCDate()+' '+m[n.getUTCMonth()]+' '+n.getUTCFullYear()+', '+z(n.getUTCHours())+':'+z(n.getUTCMinutes())+' UTC'})();
+place();info();
+
+/* ----- doors ----- */
+var tt;function toast(t){var e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){e.classList.remove('on')},3400)}
+function group(sel){$$(sel+' button').forEach(function(b){b.addEventListener('click',function(){$$(sel+' button').forEach(function(x){x.setAttribute('aria-pressed',x===b)})})})}
+group('#per');group('#foc');group('#depth');
+$('#rd').addEventListener('click',function(){var p=$('#per [aria-pressed=true]').textContent,f=$('#foc [aria-pressed=true]').textContent;toast('In the app this opens the '+p.toLowerCase()+' reading, focus: '+f.toLowerCase()+'.')});
+$('#askf').addEventListener('submit',function(e){e.preventDefault();if(!$('#q').value.trim()){toast('Type a question first, or choose a suggestion.');$('#q').focus();return}toast('In the app this sends your question to the Guide.')});
+var QS=['What does a Jupiter–Saturn Dasha period suggest about this phase?','What is Saturn doing in my chart right now?','How does my Moon’s nakshatra shape my temperament?'];
+$('#sq').innerHTML=QS.map(function(q){return'<button type="button">'+q+'</button>'}).join('');
+$$('#sq button').forEach(function(b){b.addEventListener('click',function(){$('#q').value=b.textContent;$('#q').focus();$('#askf').scrollIntoView({behavior:rm?'auto':'smooth',block:'center'})})});
+function mo(i){return SI[Math.floor(sid(PL[i][2])/30)]}
+$('#strT').innerHTML='<tbody><tr><td>Moon</td><td>'+mo(1)+'</td></tr><tr><td>Jupiter</td><td>'+mo(4)+'</td></tr><tr><td>Saturn</td><td>'+mo(6)+'</td></tr></tbody>';
+function strip(on){$('#stripOn').hidden=!on;$('#stripOff').hidden=on}
+$('#demoB').addEventListener('click',function(){strip(true)});$('#demoOff').addEventListener('click',function(){strip(false)});
+})();
+</script>
+
+</body></html>

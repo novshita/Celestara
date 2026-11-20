@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ChartShell } from "@/components/chart/ChartShell";
+import { DesignShell } from "@/components/chart/DesignShell";
 import { ChartWorkspace } from "@/components/chart/ChartWorkspace";
 import { birthDefaults, getSavedBirth } from "@/lib/profile";
 
@@ -10,8 +10,8 @@ export default async function ChartPage() {
   const saved = await getSavedBirth();
 
   return (
-    <ChartShell>
+    <DesignShell current="chart">
       <ChartWorkspace defaults={birthDefaults(saved)} saved={saved.status} />
-    </ChartShell>
+    </DesignShell>
   );
 }

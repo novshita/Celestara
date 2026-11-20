@@ -27,7 +27,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🪐 Planet exploration | ✅ Implemented - one call per planet: placement, current transit or aspects, and its description |
 | 🔒 Privacy controls | ✅ Implemented - delete memory, conversations, or everything in one call |
 | 📖 Daily/weekly/monthly readings + birth chart, career, love, relationships, growth | ✅ Implemented - weekly/monthly look ahead for real changes; follow-ups go through saved conversations |
-| 🖥️ Next.js frontend | ✅ Implemented - calculation views and drawings, Celestial Universe home page, auth, profile, journal, memory and conversation management, delete-my-data, AI Guide (with safety notices), readings, recurring themes; visual redesign pending |
+| 🖥️ Next.js frontend | ✅ Implemented - calculation views and drawings, the Home hub (live sky, saved-profile strip, three doors), auth, profile, journal, memory and conversation management, delete-my-data, AI Guide (with safety notices), readings, recurring themes; visual redesign pending |
 | 🚀 Deployment | ✅ Docker (SQLite or PostgreSQL), CI, security scanning, backups - see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
 
 | 📄 Document | What it covers |
@@ -341,8 +341,35 @@ page:
   into the app. Signed in, `/` is the app home below. A signed-out visitor
   reaches that same home, with no account, at `/guide`. With reduced motion the
   pointer parallax is off and the figures show their final values at once.
-- **Home** (`/` signed in, `/guide` for anyone): readings (today, this week, this month or your birth chart,
-  optionally focused on career, love, relationships or growth) and the AI
+- **Home** (`/` signed in, `/guide` for anyone; redesigned from `design/Celestara Home.html`): the
+  sky as it is now, as a portal scene - a stair climbing to a glowing doorway under a great planet,
+  with an arc over the doorway that carries the nine grahas where the backend says they stand, each
+  drawn as its planet (photographs for the Sun, Moon, Mars, Mercury, Jupiter and Saturn; drawn images
+  for Venus and for Rahu and Ketu, the lunar nodes, shown as dark spheres in an eclipse's rim;
+  `design/prepare_grahas.py` makes them). Pick a planet to see its sign in both zodiacs. Choosing a zodiac, clicking the doorway, or scrolling over
+  it zooms the scene into the door: the great planet, clouds and arc fade away, the doorway grows until
+  its galaxy fills the scene, and a chart wheel of the sky now appears inside it, with the planets laid
+  out in order round their signs (Vedic and Western each draw their own ring of signs; Both draws the
+  two side by side and rings the planets that change sign between them; planets that stand close
+  together are moved in or out so none covers another). "Step back out", Escape or a scroll the other
+  way returns, and focus goes back to what you used. The chart is not in the page until you step in,
+  and while you are not inside it nothing in it can take focus. With reduced motion it is in or out at
+  once and the wheel is left to the page. On the page itself, switching between Vedic, Western and
+  Compare leaves the planets where they are while the signs turn around them by the ayanamsa (about
+  24 degrees), because that is all the difference between the two zodiacs is. On the arc, planets
+  that stand close together move onto separate tracks so none covers another, and every position is
+  also given as a table. Below it, a strip for a
+  saved profile (your current Dasha and Antardasha to scale, where the Moon, Jupiter and Saturn are
+  now, and questions built from those facts) and three doors: the birth chart; a reading (choose a
+  period and focus); and the Guide (type a question and choose an explanation level). The doors only
+  choose: they take you to the reading or Guide form further down the page, filled in, and nothing is
+  sent until you press that form's own button. Those forms keep their existing look until they are
+  redesigned. The scene's painted layers are pre-rendered images (`design/prepare_home.mjs`) that
+  fade to nothing at every edge, so the scene melts into the page's sky instead of sitting on it as a
+  rectangle; the planets and controls are never faded. With reduced motion the pointer drift and the
+  turning galaxy stop.
+- **Readings and the AI Guide** (the forms below the Home hub): readings (today, this week, this month
+  or your birth chart, optionally focused on career, love, relationships or growth) and the AI
   Guide. Both have an Explanation choice (beginner or technical, or your saved
   default) and a collapsed "How this was built" panel showing the calculated
   facts, the traditional knowledge drawn on, and how much of your own context
@@ -364,22 +391,13 @@ page:
   marks the results "calculate again". The wheel itself is an illustration, not
   your chart. Calculates a Vedic, Western, Compare, Vimshottari Dasha or
   current-transits view against the running backend - every calculation endpoint
-  it exposes. Only this page wears the new header and sky; the others keep the
+  it exposes. This page and Home wear the new header and sky; the others keep the
   app's standard header until they are redone.
   Below it, **Explore a planet** shows one planet in the chart you just
   calculated (nothing is typed twice): where it sits, what it is doing now
   (Vedic) or its aspects (Western), its curated traditional description, and a
   link to ask the guide how it reads for you. Vedic offers the nine grahas,
   Western the ten planets. Nothing there uses AI or needs an account.
-- **Celestial Universe** (product spec §9, §26): the home page opens on the
-  sky as it is now - the nine grahas on a wheel of signs - and, with a saved
-  profile, your own birth chart and ascendant inside it. Pick a planet to see
-  its sign in both zodiacs, or ask the Guide about it. Switching between Vedic
-  and Western does not swap a picture: the planets stay where they are and the
-  ring of signs turns around them by the ayanamsa (about 24 degrees), because
-  that is all the difference between the two zodiacs is. Compare shows both
-  rings at once, the Vedic one tucked inside the Western one. Every position is
-  also given as a table, and with reduced motion the changes are instant.
 - **Recurring themes** (product spec §20): if one topic (career, love,
   relationships, personal growth) comes up in at least three of a signed-in
   user's saved questions within 30 days, the home page says so, in plain
@@ -417,12 +435,6 @@ page:
   remembers (add or forget anything; nothing is remembered on its own), your
   saved AI Guide conversations (read or delete), and "Delete my data", which
   asks you to type `DELETE` before erasing the account and everything in it.
-
-With a saved profile, Home also shows a small dashboard under the birth-chart
-link (product spec §9): your current Dasha and Antardasha, where the Moon,
-Jupiter and Saturn are now, and a few suggested questions built from those
-calculated facts. Clicking a question only fills the Guide's box; nothing is
-sent until you press Ask.
 
 Once you have saved a birth profile, the birth forms on Home and Birth Chart
 fill themselves in from it (you can still change them for a one-off). If you
@@ -564,9 +576,9 @@ Things the code cannot settle, so they are listed rather than hidden:
   been checked against an independent program.
 - **Live model.** Every test of the AI path used a fake Claude. Run the AI Guide
   and Dasha explanations once against a real `ANTHROPIC_API_KEY` before launch.
-- **Browsers.** The browser tests run in Chrome. The Celestial Universe turns
-  rings with CSS transforms on SVG, which Safari has handled inconsistently, so
-  look at it there.
+- **Browsers.** The browser tests run in Chrome. The Home scene scales itself with a CSS
+  trigonometry trick (`tan(atan2())`) and uses container-query units, and its masks and
+  transforms have been inconsistent in older Safari, so look at it there.
 - **Embeddings (pgvector).** Retrieval is keyword-based, which suits 47 entries.
   Revisit when the corpus is in the hundreds.
 - **Privacy policy and terms**, and a strict Content-Security-Policy.

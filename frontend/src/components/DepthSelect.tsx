@@ -3,11 +3,11 @@
  * wanted. "My default" sends nothing, so a logged-in visitor's saved
  * preference applies and everyone else gets beginner.
  */
-export function DepthSelect() {
+export function DepthSelect({ initial = "" }: { initial?: "" | "beginner" | "technical" }) {
   return (
     <label className="flex items-center gap-2 text-sm text-slate-300">
       Explanation
-      <select name="depth" defaultValue="" className="input w-auto">
+      <select name="depth" defaultValue={initial} className="input w-auto">
         <option value="">My default</option>
         <option value="beginner">Beginner</option>
         <option value="technical">Technical</option>
