@@ -11,6 +11,7 @@ import {
   archMarkup,
   CHART,
   JOURNEY,
+  ORB_BOX,
   ORB_CLEARANCE,
   ORB_STAGGER,
   asOf,
@@ -97,59 +98,71 @@ describe("changing zodiac turns the signs, not the planets", () => {
 });
 
 describe("planets that stand close together", () => {
+  const boxesOf = (lons: number[]) => {
+    const offsets = orbOffsets(lons);
+    return lons.map((l, i) => {
+      const [x, y] = arcPoint(l, ARC.radius + offsets[i]);
+      return { x, y };
+    });
+  };
+  const worstOverlap = (lons: number[]) => {
+    const pts = boxesOf(lons);
+    let min = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        min = Math.min(min, Math.max(Math.abs(pts[i].x - pts[j].x), Math.abs(pts[i].y - pts[j].y)));
+      }
+    }
+    return min;
+  };
+
   it("leaves planets on the arc when they are apart", () => {
     expect(orbOffsets([10, 60, 120, 200, 300])).toEqual([0, 0, 0, 0, 0]);
   });
 
-  it("moves a close neighbour off the arc so the discs do not cover each other", () => {
+  it("moves a close neighbour off the arc so the boxes do not touch", () => {
     const offsets = orbOffsets([100, 105]);
     expect(offsets[0]).toBe(0);
-    expect(Math.abs(offsets[1])).toBe(ORB_STAGGER);
+    expect(Math.abs(offsets[1])).toBeGreaterThanOrEqual(ORB_STAGGER);
+    expect(worstOverlap([100, 105])).toBeGreaterThanOrEqual(ORB_BOX);
   });
 
   it("keeps the order given, whatever the longitudes' order", () => {
     // the planet at 105 is second in the list but later round the arc
-    expect(orbOffsets([105, 100])).toEqual([ORB_STAGGER, 0]);
+    const offsets = orbOffsets([105, 100]);
+    expect(offsets[1]).toBe(0);
+    expect(offsets[0]).not.toBe(0);
   });
 
-  it("treats exactly the clearance as clear, and a hair less as crowded", () => {
-    expect(orbOffsets([50, 50 + ORB_CLEARANCE])).toEqual([0, 0]);
-    expect(orbOffsets([50, 50 + ORB_CLEARANCE - 0.1])[1]).not.toBe(0);
+  it("gets today's trouble right: Mars on a track beside Ketu, boxes clear on a phone", () => {
+    // the real sky on 20 Nov 2026: Jupiter 129°, Ketu 150°, Mars ~202° etc., with Mars and Ketu near in the arc
+    const lons = [238, 91, 200, 262, 130, 281, 359, 332, 152];
+    expect(worstOverlap(lons)).toBeGreaterThanOrEqual(ORB_BOX);
   });
 
-  it("separates three at once, using the inner and outer tracks", () => {
-    const offsets = orbOffsets([100, 102, 104]);
-    expect(new Set(offsets).size).toBe(3);
-  });
-
-  it("keeps every pair of planets that share a track at least the clearance apart, over many skies", () => {
+  it("keeps every pair of boxes apart, over many skies, as long as the planets are not stacked beyond what five tracks hold", () => {
     let seed = 7;
     const random = () => {
       seed = (seed * 1664525 + 1013904223) % 4294967296;
       return seed / 4294967296;
     };
     let checked = 0;
-    for (let trial = 0; trial < 400; trial++) {
-      const longitudes = Array.from({ length: 9 }, () => random() * 360);
-      const sorted = [...longitudes].sort((a, b) => a - b);
-      // a crowd of four or more inside one clearance cannot be kept apart by three tracks: skip those
-      const crowded = sorted.some((l, i) => sorted.filter((m) => m >= l && m < l + ORB_CLEARANCE).length > 3 && i >= 0);
+    for (let trial = 0; trial < 600; trial++) {
+      const lons = Array.from({ length: 9 }, () => random() * 360);
+      const sorted = [...lons].sort((a, b) => a - b);
+      // four or more inside one box-width of arc cannot all be separated: skip those skies
+      const crowded = sorted.some((l) => sorted.filter((m) => m >= l && m < l + ORB_CLEARANCE).length > 3);
       if (crowded) continue;
-      const offsets = orbOffsets(longitudes);
-      for (let i = 0; i < 9; i++) {
-        for (let j = i + 1; j < 9; j++) {
-          if (offsets[i] === offsets[j]) expect(Math.abs(longitudes[i] - longitudes[j])).toBeGreaterThanOrEqual(ORB_CLEARANCE);
-        }
-      }
+      expect(worstOverlap(lons)).toBeGreaterThanOrEqual(ORB_BOX - 0.001);
       checked += 1;
     }
-    expect(checked).toBeGreaterThan(100);
+    expect(checked).toBeGreaterThan(150);
   });
 
   it("never loses a planet when a crowd is bigger than the tracks", () => {
-    const offsets = orbOffsets([100, 101, 102, 103, 104]);
-    expect(offsets).toHaveLength(5);
-    expect(offsets.every((o) => [0, ORB_STAGGER, -ORB_STAGGER].includes(o))).toBe(true);
+    const offsets = orbOffsets([100, 101, 102, 103, 104, 105, 106]);
+    expect(offsets).toHaveLength(7);
+    expect(offsets.every((o) => Number.isFinite(o))).toBe(true);
   });
 });
 

@@ -127,22 +127,29 @@ test.describe("the hub", () => {
     await expect(page.locator(".hm-zinfo")).toContainText("Both zodiacs at once");
   });
 
-  test("no two planets cover each other, however close they stand in the sky", async ({ page }) => {
-    await page.goto("/guide");
-    const boxes = await orbs(page).evaluateAll((els) =>
-      els.map((el) => {
-        const r = el.getBoundingClientRect();
-        return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
-      }),
-    );
-    expect(boxes).toHaveLength(9);
-    for (let i = 0; i < boxes.length; i++) {
-      for (let j = i + 1; j < boxes.length; j++) {
-        const distance = Math.hypot(boxes[i].x - boxes[j].x, boxes[i].y - boxes[j].y);
-        expect(distance, `planet ${i} and ${j}`).toBeGreaterThanOrEqual(24);
+  for (const width of [360, 390, 1440]) {
+    test(`no planet's clickable box overlaps another's, however close they stand in the sky (${width}px)`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/guide");
+      const boxes = await orbs(page).evaluateAll((els) =>
+        els.map((el) => {
+          const r = el.getBoundingClientRect();
+          return { name: el.getAttribute("aria-label")!, left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+        }),
+      );
+      expect(boxes).toHaveLength(9);
+      // the narrowest phone still gives every planet a box of at least 24px (WCAG 2.5.8)
+      for (const b of boxes) expect(Math.min(b.right - b.left, b.bottom - b.top), b.name).toBeGreaterThanOrEqual(24);
+      for (let i = 0; i < boxes.length; i++) {
+        for (let j = i + 1; j < boxes.length; j++) {
+          const a = boxes[i];
+          const c = boxes[j];
+          const overlap = Math.min(a.right, c.right) - Math.max(a.left, c.left) > 0.01 && Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top) > 0.01;
+          expect(overlap, `${a.name} and ${c.name} overlap`).toBe(false);
+        }
       }
-    }
-  });
+    });
+  }
 
   test("the planets are pictures of planets, each from its own file", async ({ page }) => {
     const seen = new Map<string, number>();

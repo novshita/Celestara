@@ -53,6 +53,8 @@ export function arcPathData(): string {
  */
 export const ORB_CLEARANCE = 17.5;
 export const ORB_STAGGER = 46;
+/** A planet's clickable box on the stage, in stage units (44, which is 24px at the narrowest phone). */
+export const ORB_BOX = 44;
 
 /**
  * How far in or out each planet sits (0 = on the line). A planet close to one already placed would
@@ -95,9 +97,36 @@ export function spreadOffsets(
   return offsets;
 }
 
-/** The arc's version: planets in a line, so no wrap-around. */
-export const orbOffsets = (longitudes: readonly number[]): number[] =>
-  spreadOffsets(longitudes, ORB_CLEARANCE, ORB_STAGGER);
+/**
+ * The arc's version. Planets in a line along it; each is put on the arc, or moved onto an inner or
+ * outer track, so that no two clickable boxes overlap. This checks real positions on the stage, not
+ * just longitudes: a planet one track over can still sit on top of its neighbour's box, and a box
+ * partly covered fails WCAG 2.5.8 (24px targets) once the stage shrinks to a phone's width.
+ */
+export function orbOffsets(longitudes: readonly number[]): number[] {
+  const tracks = [0, ORB_STAGGER, -ORB_STAGGER, 2 * ORB_STAGGER, -2 * ORB_STAGGER];
+  const offsets = new Array<number>(longitudes.length).fill(0);
+  const placed: { x: number; y: number }[] = [];
+  const order = longitudes.map((longitude, index) => ({ longitude, index })).sort((a, b) => a.longitude - b.longitude);
+  // Boxes are square, so two are clear of each other when either axis separates them by a full box
+  const apart = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+    Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
+  for (const { longitude, index } of order) {
+    let best = { offset: 0, clear: -Infinity, x: 0, y: 0 };
+    for (const offset of tracks) {
+      const [x, y] = arcPoint(longitude, ARC.radius + offset);
+      const clear = placed.length ? Math.min(...placed.map((p) => apart(p, { x, y }))) : Infinity;
+      if (clear >= ORB_BOX) {
+        best = { offset, clear, x, y };
+        break;
+      }
+      if (clear > best.clear) best = { offset, clear, x, y }; // none is clear: the least bad
+    }
+    offsets[index] = best.offset;
+    placed.push({ x: best.x, y: best.y });
+  }
+  return offsets;
+}
 
 export type System = "tropical" | "sidereal";
 
