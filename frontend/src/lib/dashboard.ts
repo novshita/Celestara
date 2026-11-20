@@ -12,6 +12,10 @@ const HIGHLIGHT_GRAHAS = ["Moon", "Jupiter", "Saturn"] as const;
 export interface DashboardData {
   /** Mahadasha first, then Antardasha, as far as the backend reports. */
   dasha: DashaPeriod[];
+  /** Every Mahadasha of the timeline, in order, for drawing it to scale. */
+  periods: DashaPeriod[];
+  /** The moment the Dasha was reckoned for. */
+  dashaAsOf: string;
   transits: GrahaTransit[];
   asOf: string;
 }
@@ -33,6 +37,8 @@ export const getDashboard = cache(
       );
       return {
         dasha: dasha.active_now,
+        periods: dasha.timeline.periods,
+        dashaAsOf: dasha.as_of,
         transits,
         asOf: transit.report.snapshot.moment,
       };
@@ -70,4 +76,49 @@ export function suggestedQuestions(data: DashboardData): string[] {
   questions.push("What does my Moon's nakshatra say about my temperament?");
 
   return questions.slice(0, 4);
+}
+
+// ---- the Home page's saved-profile strip ------------------------------------------------
+
+export interface StripDashboard {
+  /** "Jupiter · Saturn": the current Mahadasha and Antardasha. */
+  current: { maha: string; antar: string | null };
+  /** The Mahadashas in order, as widths (their length in years), with the current one marked. */
+  bar: { lord: string; years: number; current: boolean }[];
+  /** How far through the whole timeline the present moment is, 0 to 1. */
+  nowFraction: number;
+  /** Where the Moon, Jupiter and Saturn are now, in the Vedic zodiac. */
+  sky: { graha: string; rashi: string; retrograde: boolean }[];
+  /** Questions worth asking, built only from what was calculated. */
+  questions: string[];
+}
+
+/** The strip's state: not signed in, signed in without a profile, a profile, or a failure. */
+export type ProfileStrip =
+  | { status: "anonymous" | "none" | "unavailable" }
+  | { status: "saved"; dashboard: StripDashboard | null };
+
+/** What the strip shows, from the dashboard data. Pure, so it can be tested on its own. */
+export function stripFrom(data: DashboardData): StripDashboard {
+  const [maha, antar] = data.dasha;
+  const periods = data.periods;
+  const start = periods.length ? new Date(periods[0].start).getTime() : 0;
+  const end = periods.length ? new Date(periods[periods.length - 1].end).getTime() : 0;
+  const now = new Date(data.dashaAsOf).getTime();
+  const span = end - start;
+  return {
+    current: { maha: maha?.lord ?? "", antar: antar?.lord ?? null },
+    bar: periods.map((period) => ({
+      lord: period.lord,
+      years: period.duration_years,
+      current: period.lord === maha?.lord && period.start === maha?.start,
+    })),
+    nowFraction: span > 0 ? Math.min(1, Math.max(0, (now - start) / span)) : 0,
+    sky: data.transits.map((item) => ({
+      graha: item.graha,
+      rashi: item.transit.rashi,
+      retrograde: item.transit.retrograde,
+    })),
+    questions: suggestedQuestions(data),
+  };
 }

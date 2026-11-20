@@ -93,6 +93,8 @@ describe("suggestedQuestions", () => {
   } as unknown as GrahaTransit;
   const data = (over: Partial<DashboardData> = {}): DashboardData => ({
     dasha: [period("Venus", "maha"), period("Sun", "antar")],
+    periods: [period("Venus", "maha")],
+    dashaAsOf: "2026-11-04T00:00:00Z",
     transits: [saturn],
     asOf: "2026-11-04T00:00:00Z",
     ...over,

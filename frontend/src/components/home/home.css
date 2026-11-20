@@ -1,0 +1,173 @@
+/* Ported from design/Celestara Home.html. Everything is scoped under .cx .hm and its classes are
+ * prefixed hm-, so none of it reaches the reading and guide forms that follow the hub (those are styled
+ * with Tailwind). The header, tokens and reduced-motion rule come from chart.css. */
+.cx .hm{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding-block:40px 80px}
+.cx .hm .hm-hero{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,5fr);gap:40px;align-items:center}
+.cx .hm .hm-eyebrow{color:var(--gold);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.cx .hm h1{font-family:var(--serif);font-weight:400;font-size:clamp(50px,6.4vw,88px);line-height:.96;letter-spacing:-.02em;margin:14px 0 18px;text-wrap:balance}
+.cx .hm .hm-lede{color:var(--ink2);font-size:17px;max-width:48ch;text-wrap:pretty}
+.cx .hm .hm-seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;margin-top:26px}
+.cx .hm .hm-seg button{padding:0 18px;min-height:44px;border-radius:999px;font-size:14px;color:var(--ink2);transition:all .2s}
+.cx .hm .hm-seg button[aria-pressed=true]{background:var(--gold);color:#1a1405;font-weight:600}
+.cx .hm .hm-seg.hm-sm{margin-top:0}
+.cx .hm .hm-seg.hm-sm button{min-height:38px;padding:0 14px}
+.cx .hm .hm-seg.hm-sm button[aria-pressed=true]{background:var(--ink);color:#0a0b14}
+.cx .hm .hm-zinfo{margin-top:22px;display:flex;flex-direction:column;gap:10px;color:var(--ink2);font-size:15px;max-width:50ch}
+.cx .hm .hm-zinfo small{font-size:13px;color:var(--ink3)}
+.cx .hm .hm-zinfo b{color:var(--ink);font-weight:600}
+.cx .hm .hm-pinfo{margin-top:18px;min-height:96px;padding:14px 16px;border-left:2px solid var(--gold);background:var(--gold-soft);border-radius:0 10px 10px 0;max-width:50ch}
+.cx .hm .hm-pinfo h2{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1}
+.cx .hm .hm-pinfo p{font-size:14px;color:var(--ink2);margin-top:6px}
+.cx .hm .hm-pinfo .hm-rows{display:grid;grid-template-columns:auto 1fr;gap:2px 16px;margin-top:8px;font-size:15px}
+.cx .hm .hm-pinfo .hm-rows span:nth-child(odd){color:var(--ink3);font:400 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;align-self:center}
+.cx .hm details{margin-top:16px;color:var(--ink2);font-size:14px}
+.cx .hm summary{cursor:pointer;min-height:36px;display:flex;align-items:center}
+.cx .hm table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin-top:8px}
+.cx .hm th{text-align:left;font:400 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:6px 10px 6px 0;border-bottom:1px solid var(--line)}
+.cx .hm td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.cx .hm .hm-scene{container-type:inline-size;position:relative;width:100%;max-width:700px;margin-inline:auto;aspect-ratio:600/740;
+  /* While the scene zooms, its own edges fade too (--edge goes from 1 to 0), so the galaxy that fills it melts into the page.
+   * At rest the fade is off, so it never dims a planet standing near a side. */
+  -webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,var(--edge,1)) 0,#000 10%,#000 90%,rgba(0,0,0,var(--edge,1)) 100%),linear-gradient(180deg,rgba(0,0,0,var(--edge,1)) 0,#000 8%,#000 88%,rgba(0,0,0,var(--edge,1)) 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(90deg,rgba(0,0,0,var(--edge,1)) 0,#000 10%,#000 90%,rgba(0,0,0,var(--edge,1)) 100%),linear-gradient(180deg,rgba(0,0,0,var(--edge,1)) 0,#000 8%,#000 88%,rgba(0,0,0,var(--edge,1)) 100%);
+  mask-composite:intersect}
+.cx .hm .hm-stage{position:absolute;left:0;top:0;width:600px;height:740px;transform-origin:0 0;overflow:hidden;transform:scale(1);transform:scale(tan(atan2(100cqw,600px)))}
+.cx .hm .hm-stage>*,.cx .hm .hm-fade>*,.cx .hm .hm-world>*{position:absolute}
+.cx .hm .hm-lay{left:0;top:0;width:600px;height:740px;pointer-events:none;will-change:transform}
+.cx .hm .hm-lay>*{position:absolute}
+.cx .hm .hm-stars,.cx .hm .hm-clouds{left:0;top:0;width:600px;height:740px}
+.cx .hm .hm-planet{left:-30px;top:-500px;width:660px;height:660px}
+.cx .hm .hm-glint{width:60px;height:60px;margin:-30px;pointer-events:none}
+.cx .hm .hm-glint:before,.cx .hm .hm-glint:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(90deg,transparent,#d8f6ff,transparent);width:100%;height:1.5px}
+.cx .hm .hm-glint:after{width:1.5px;height:100%;background:linear-gradient(180deg,transparent,#d8f6ff,transparent)}
+.cx .hm .hm-glint i{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:#fff;box-shadow:0 0 14px 4px rgba(150,230,255,.8)}
+.cx .hm .hm-tg{width:56px;height:56px;margin:-28px 0 0 -28px;pointer-events:auto;border-radius:50%;display:block;opacity:.55;transition:opacity .3s,transform .3s}
+.cx .hm .hm-tg:hover,.cx .hm .hm-tg[aria-pressed=true]{opacity:1}
+.cx .hm .hm-tg:hover{transform:scale(1.08)}
+.cx .hm .hm-tg i{position:absolute;left:4px;top:4px;width:48px;height:48px;border-radius:50%;transition:filter .3s,box-shadow .3s}
+.cx .hm .hm-tg .hm-cap{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:2px;font:500 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.cx .hm .hm-tg[aria-pressed=true] .hm-cap{color:var(--gold)}
+.cx .hm .hm-tg .hm-mn{background:radial-gradient(circle at 62% 38%,rgba(90,110,130,.5) 0 8%,transparent 9%),radial-gradient(circle at 34% 64%,rgba(90,110,130,.45) 0 10%,transparent 11%),radial-gradient(circle at 36% 30%,#f6f9fc,#a9bccd 55%,#566a7e);box-shadow:0 0 16px 3px rgba(120,210,235,.3),inset -8px -8px 16px rgba(10,20,40,.55)}
+.cx .hm .hm-tg[aria-pressed=true] .hm-mn{box-shadow:0 0 30px 8px rgba(120,210,235,.6),inset -8px -8px 16px rgba(10,20,40,.55)}
+.cx .hm .hm-tg .hm-cl{box-shadow:inset 11px 0 0 0 #f0e2bd;transform:rotate(-18deg)}
+.cx .hm .hm-tg .hm-cr{box-shadow:inset -11px 0 0 0 #f0e2bd;transform:rotate(18deg)}
+.cx .hm .hm-tg[aria-pressed=true] .hm-cl,.cx .hm .hm-tg[aria-pressed=true] .hm-cr{filter:drop-shadow(0 0 10px rgba(242,197,92,.9))}
+.cx .hm .hm-arc{left:0;top:0;width:600px;height:740px;overflow:visible}
+.cx .hm .hm-arc path{fill:none;stroke:var(--gold);stroke-width:1.2;opacity:.55}
+.cx .hm .hm-arc path.hm-g{stroke-width:5;opacity:.12;filter:blur(3px)}
+.cx .hm .hm-ringitem{left:300px;top:430px;width:0;height:0;transition:transform .9s cubic-bezier(.3,.7,.2,1),opacity .6s}
+.cx .hm .hm-rt{position:absolute;left:-7px;top:0;width:14px;height:1px;background:currentColor}
+.cx .hm .hm-rl{position:absolute;left:0;top:0;white-space:nowrap;font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.cx .hm .hm-t{color:var(--cool)}
+.cx .hm .hm-s{color:var(--gold)}
+.cx .hm .hm-orb{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;display:grid;place-items:center;pointer-events:auto;border-radius:50%}
+.cx .hm .hm-orb i{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe9a6,#f2c55c 60%,#b8892c);color:#1a1405;font:600 11px var(--mono);box-shadow:0 0 14px rgba(242,197,92,.55);transition:transform .25s,box-shadow .25s;font-style:normal}
+.cx .hm .hm-orb:hover i{transform:scale(1.18)}
+.cx .hm .hm-orb[aria-pressed=true] i{transform:scale(1.3);box-shadow:0 0 0 3px #03040b,0 0 0 5px var(--gold),0 0 24px rgba(242,197,92,.8)}
+.cx .hm .hm-tip{pointer-events:none;font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;background:rgba(3,4,11,.85);border:1px solid var(--gold);color:var(--gold);padding:3px 8px;border-radius:3px;white-space:nowrap;transform:translate(-50%,-50%);opacity:0;transition:opacity .3s}
+.cx .hm .hm-tip.hm-on{opacity:1}
+.cx .hm .hm-arch{left:0;top:390px;width:600px;height:350px;overflow:visible}
+.cx .hm .hm-gxw{left:238px;top:408px;width:124px;height:158px;border-radius:62px 62px 0 0;overflow:hidden;background:#030816;box-shadow:0 0 40px 6px rgba(242,197,92,.2)}
+.cx .hm .hm-gxw canvas{display:block;width:124px;height:158px}
+.cx .hm .hm-gxw:after{content:"";position:absolute;inset:0;background:radial-gradient(70% 45% at 25% 100%,rgba(242,160,70,.45),transparent 70%),radial-gradient(60% 40% at 80% 95%,rgba(240,190,110,.3),transparent 70%);pointer-events:none}
+.cx .hm .hm-portal{left:200px;top:400px;width:200px;height:340px;pointer-events:auto;border-radius:100px 100px 0 0;display:block}
+.cx .hm .hm-portal:hover~.hm-gxw,.cx .hm .hm-portal:focus-visible~.hm-gxw{box-shadow:0 0 60px 14px rgba(242,197,92,.4)}
+.cx .hm .hm-step-l{left:50%;transform:translateX(-50%);top:580px;font:500 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:#f6e7bd;text-shadow:0 1px 6px rgba(0,0,0,.8);pointer-events:none;white-space:nowrap}
+.cx .hm .hm-sec{margin-top:96px}
+.cx .hm .hm-sec>h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,4vw,54px);line-height:1}
+.cx .hm .hm-sec>p{color:var(--ink2);margin-top:10px;max-width:56ch}
+.cx .hm .hm-doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:34px;border-top:1px solid var(--line)}
+.cx .hm .hm-door{padding:28px 28px 8px 0;display:flex;flex-direction:column;gap:14px;min-width:0}
+.cx .hm .hm-door+.hm-door{padding-left:28px;border-left:1px solid var(--line)}
+.cx .hm .hm-door svg{width:40px;height:40px;color:var(--gold)}
+.cx .hm .hm-door h3{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.02}
+.cx .hm .hm-door p{color:var(--ink2);font-size:15px}
+.cx .hm .hm-chips{display:flex;gap:6px;flex-wrap:wrap}
+.cx .hm .hm-chip{min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--ink2);display:inline-flex;align-items:center;transition:all .2s;text-align:left}
+.cx .hm .hm-chip:hover{border-color:var(--gold);color:var(--ink)}
+.cx .hm .hm-chip[aria-pressed=true]{background:var(--ink);color:#0a0b14;border-color:var(--ink);font-weight:600}
+.cx .hm .hm-go{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;border-radius:999px;background:var(--gold);color:#1a1405;font-weight:600;font-size:15px;align-self:flex-start;transition:transform .2s,box-shadow .3s}
+.cx .hm .hm-go:hover{transform:translateY(-2px);box-shadow:0 10px 30px -8px rgba(242,197,92,.6)}
+.cx .hm .hm-go.hm-o{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+.cx .hm .hm-go.hm-o:hover{background:var(--gold-soft);box-shadow:none}
+.cx .hm .hm-ask{display:flex;gap:8px}
+.cx .hm .hm-ask input{flex:1;min-width:0;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);font:400 17px var(--sans);padding:10px 0;min-height:48px}
+.cx .hm .hm-ask input:focus{outline:0;border-bottom-color:var(--gold)}
+.cx .hm .hm-ask input::placeholder{color:var(--ink3)}
+.cx .hm .hm-note{font-size:13px;color:var(--ink3)}
+.cx .hm .hm-strip{margin-top:56px;padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cx .hm .hm-strip .hm-off{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;color:var(--ink2);font-size:15px}
+.cx .hm .hm-strip .hm-on{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px}
+.cx .hm .hm-strip h4{font:400 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.cx .hm .hm-dbar{display:flex;gap:3px;height:34px;margin-top:6px;position:relative}
+.cx .hm .hm-dbar span{border:1px solid var(--line);border-radius:3px;font:500 10px var(--mono);color:var(--ink3);display:flex;align-items:flex-end;padding:3px 5px;min-width:0}
+.cx .hm .hm-dbar span.hm-n{border-color:var(--gold);background:var(--gold-soft);color:var(--gold)}
+.cx .hm .hm-dbar em{position:absolute;top:-16px;font:500 10px var(--mono);letter-spacing:.14em;color:var(--gold);font-style:normal;transform:translateX(-50%)}
+.cx .hm .hm-sq{display:flex;flex-direction:column;gap:6px}
+.cx .hm .hm-sq button{text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink2);min-height:44px}
+.cx .hm .hm-sq button:hover{border-color:var(--gold);color:var(--ink)}
+@media (max-width:960px){
+.cx .hm .hm-hero{grid-template-columns:minmax(0,1fr);gap:28px}
+.cx .hm .hm-scene{order:-1;max-width:440px}
+.cx .hm .hm-doors{grid-template-columns:minmax(0,1fr)}
+.cx .hm .hm-door,.cx .hm .hm-door+.hm-door{padding:26px 0;border-left:0}
+.cx .hm .hm-door+.hm-door{border-top:1px solid var(--line)}
+.cx .hm .hm-strip .hm-on{grid-template-columns:minmax(0,1fr);gap:24px}
+}
+@media (max-width:640px){
+.cx .hm .hm-seg button{padding:0 14px}
+}
+/* Additions: the painted layers are pre-rendered images (design/prepare_home.mjs); the rest are small needs of the app */
+.cx .hm .hm-stars{background:url(/home/stars.webp) 0 0/600px 740px no-repeat}
+.cx .hm .hm-clouds{background:url(/home/clouds.webp) 0 0/600px 740px no-repeat}
+.cx .hm .hm-planet{background:url(/home/planet.webp) 0 0/100% 100% no-repeat}
+.cx .hm .hm-scene{overflow:hidden}
+.cx .hm .hm-alert{color:var(--warn);font-size:14px;margin-top:8px}
+.cx .hm a.hm-chip{text-decoration:none}
+.cx .hm .hm-sq a{display:block;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink2);min-height:44px}
+.cx .hm .hm-sq a:hover{border-color:var(--gold);color:var(--ink)}
+.cx .hm .hm-link{color:var(--gold);text-decoration:underline;text-underline-offset:3px;min-height:36px;display:inline-flex;align-items:center}
+.cx .hm .hm-off a.hm-go{text-decoration:none}
+.cx .hm-legacy{position:relative;z-index:1;max-width:1240px;margin:0 auto 90px;display:flex;flex-direction:column;gap:32px}
+.cx .hm-legacy>*{max-width:880px;width:100%}
+.cx .hm-legacy-head{max-width:1240px;margin:0 auto;position:relative;z-index:1}
+.cx .hm-legacy-head h2{font-family:var(--serif);font-weight:400;font-size:clamp(30px,3.4vw,44px);line-height:1}
+.cx .hm-legacy-head p{color:var(--ink2);margin-top:8px;max-width:56ch}
+.cx .hm-legacy section[id]{scroll-margin-top:96px}
+.cx .hm .hm-dashalords{font-family:var(--serif);font-size:30px;line-height:1}
+.cx .hm .hm-seg.hm-sm{align-self:flex-start}
+/* The two letters on a planet disc are generated content, not text: a button whose visible text ("Su") differs from its name ("Sun") fails WCAG 2.5.3 */
+/* The labels in the planet card sit on a tinted panel: the dimmer text colour is too faint there on a phone */
+.cx .hm .hm-pinfo .hm-rows span:nth-child(odd){color:var(--ink2)}
+/* The arc's planets are pictures (public/grahas), shown as they are: no gold disc behind them */
+.cx .hm .hm-orb i{display:block;width:var(--w,34px);height:var(--h,34px);border-radius:0;background:var(--img) center/contain no-repeat;box-shadow:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.55))}
+.cx .hm .hm-orb:hover i{transform:scale(1.18)}
+.cx .hm .hm-orb[aria-pressed=true] i{transform:scale(1.32);box-shadow:none;filter:drop-shadow(0 0 5px rgba(242,197,92,.95)) drop-shadow(0 0 14px rgba(242,197,92,.65))}
+/* The painted layers (stars, the great planet, clouds, the doorway and steps) fade to nothing at every edge before
+ * they reach the box, so the scene melts into the page's own sky instead of showing a rectangle. The arc, the
+ * planets and the controls are not in these groups, so they are never dimmed, however near a side they stand. */
+.cx .hm .hm-fade{left:0;top:0;width:600px;height:740px;pointer-events:none;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 22%,#000 78%,transparent),linear-gradient(to bottom,transparent,#000 7%,#000 80%,transparent);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent,#000 22%,#000 78%,transparent),linear-gradient(to bottom,transparent,#000 7%,#000 80%,transparent);
+  mask-composite:intersect}
+
+/* the label under each planet on the arc: generated content, so it is never read out (the button has its full name) */
+.cx .hm .hm-orb:after{content:attr(data-code);position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:-6px;font:500 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#f6e7bd;text-shadow:0 1px 3px #000,0 0 6px #000;pointer-events:none}
+
+/* inside the door: the chart */
+.cx .hm .hm-ov{left:0;top:0;width:600px;height:740px;pointer-events:none}
+.cx .hm .hm-ov svg{position:absolute;left:0;top:0;width:600px;height:740px}
+.cx .hm .hm-sn{font:500 9.5px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.cx .hm .hm-ct{font:500 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;fill:#a9adc2}
+.cx .hm .hm-ct.hm-g{fill:#f2c55c}
+.cx .hm .hm-cp{font:400 13px var(--sans);fill:#cdd5e6}
+.cx .hm .hm-pc{font:500 9px var(--mono);letter-spacing:.1em;fill:#f2c55c;text-transform:uppercase;pointer-events:none}
+.cx .hm .hm-pn{pointer-events:auto;cursor:pointer;outline:none}
+.cx .hm .hm-pn:focus-visible circle.hm-m{stroke:#fff;stroke-width:2}
+.cx .hm .hm-back{position:absolute;left:28px;top:24px;min-height:44px;padding:0 16px;border:1px solid var(--gold);border-radius:999px;color:var(--gold);font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;background:rgba(3,4,11,.6);pointer-events:auto;cursor:pointer}
+.cx .hm .hm-back:hover{background:var(--gold-soft)}
+.cx .hm .hm-ovt{position:absolute;left:0;right:0;top:668px;display:flex;justify-content:center;gap:8px}
+.cx .hm .hm-ovb{pointer-events:auto;cursor:pointer;min-height:44px;padding:0 18px;border:1px solid var(--line);border-radius:999px;font-size:14px;color:var(--ink2);background:rgba(3,4,11,.6)}
+.cx .hm .hm-ovb[aria-pressed=true]{background:var(--gold);color:#1a1405;border-color:var(--gold);font-weight:600}

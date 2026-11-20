@@ -1,65 +1,74 @@
-import Link from "next/link";
-
+import { DesignShell } from "@/components/chart/DesignShell";
 import { AiGuideForm } from "@/components/AiGuideForm";
-import { CelestialUniverseSection } from "@/components/CelestialUniverseSection";
-import { Dashboard } from "@/components/Dashboard";
-import { PageHeading } from "@/components/PageHeading";
+import { HomeHub } from "@/components/home/HomeHub";
 import { PatternsNote } from "@/components/PatternsNote";
 import { ReadingForm } from "@/components/ReadingForm";
-import { SavedProfileNote } from "@/components/SavedProfileNote";
+import { getDashboard, stripFrom, type ProfileStrip } from "@/lib/dashboard";
 import { birthDefaults, getSavedBirth } from "@/lib/profile";
+import { loadSky } from "@/lib/sky";
+import type { ReadingFocus, ReadingKind } from "@/lib/types";
 
 const MAX_PREFILL = 300;
 
+const KINDS: readonly ReadingKind[] = ["daily", "weekly", "monthly", "birth_chart"];
+const FOCI: readonly ReadingFocus[] = ["career", "love", "relationships", "growth"];
+const DEPTHS = ["beginner", "technical"] as const;
+
+type Search = { [key: string]: string | string[] | undefined };
+
+const one = (value: string | string[] | undefined): string => (typeof value === "string" ? value : "");
+
 /**
- * The app's home: the sky now, readings and the AI Guide. Signed in, it is
- * `/`; for anyone, it is `/guide`.
+ * The app's home: the hub (the sky now and three ways in) and, below it, the reading and Guide
+ * forms the hub's doors lead to. Signed in, it is `/`; for anyone, it is `/guide`.
  *
- * A suggested question arrives as `?q=`. It only fills the box - nothing is
- * sent until the visitor presses Ask - and is clamped like any other input.
+ * The doors only choose: `?period=`, `?focus=`, `?depth=` and `?q=` pre-fill the forms below,
+ * and nothing is sent until the visitor presses a form's own button. Each is checked against
+ * the values the forms actually offer, so a mangled address simply pre-fills nothing.
  */
-export async function AppHome({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string | string[] }>;
-}) {
-  const { q } = await searchParams;
-  const prefill = (typeof q === "string" ? q : "").slice(0, MAX_PREFILL);
+export async function AppHome({ searchParams }: { searchParams: Promise<Search> }) {
+  const params = await searchParams;
+  const question = one(params.q).slice(0, MAX_PREFILL);
+  const period = KINDS.find((k) => k === one(params.period));
+  const focus = FOCI.find((f) => f === one(params.focus));
+  const depth = DEPTHS.find((d) => d === one(params.depth));
+
   const saved = await getSavedBirth();
   const defaults = birthDefaults(saved);
 
+  const [sky, dashboard] = await Promise.all([
+    loadSky(),
+    saved.status === "saved" ? getDashboard(saved.birth) : Promise.resolve(null),
+  ]);
+  const strip: ProfileStrip =
+    saved.status === "saved"
+      ? { status: "saved", dashboard: dashboard ? stripFrom(dashboard) : null }
+      : { status: saved.status };
+
+  const signedIn = saved.status === "saved" || saved.status === "none" || saved.status === "unavailable";
+
   return (
-    <>
-      <PageHeading title="Your celestial universe">
-        Calculate your Vedic and Western charts, read the sky as it is now,
-        and ask questions of a guide that interprets only what has been
-        calculated. For reflection, not prediction.
-      </PageHeading>
+    <DesignShell current="home">
+      <HomeHub sky={sky} homePath={signedIn ? "/" : "/guide"} strip={strip} />
 
-      <CelestialUniverseSection birth={saved.status === "saved" ? saved.birth : undefined} />
-
-      <Link
-        href="/chart"
-        className="flex flex-col gap-1 panel p-5 transition hover:border-amber-400/50"
-      >
-        <span className="font-medium text-amber-300">
-          Start with your birth chart →
-        </span>
-        <span className="text-sm text-slate-400">
-          Vedic, Western, a side-by-side comparison, your Dasha timeline and
-          the current transits.
-        </span>
-      </Link>
-
-      <SavedProfileNote saved={saved} />
-
-      {saved.status === "saved" && <Dashboard birth={saved.birth} />}
-
-      <PatternsNote />
-
-      <ReadingForm defaults={defaults} />
-
-      <AiGuideForm key={prefill} defaults={defaults} initialQuestion={prefill} />
-    </>
+      <div className="hm-legacy-head">
+        <h2>Your reading and the Guide</h2>
+        <p>
+          Choose above, or fill these in here. Your birth details are filled in from your saved profile if you have
+          one. Nothing is sent until you press the button on a form.
+        </p>
+      </div>
+      <div className="hm-legacy">
+        <PatternsNote />
+        <ReadingForm
+          key={`${period}-${focus}-${depth}`}
+          defaults={defaults}
+          initialKind={period}
+          initialFocus={focus ?? (period ? "" : undefined)}
+          initialDepth={depth}
+        />
+        <AiGuideForm key={`${question}-${depth}`} defaults={defaults} initialQuestion={question} initialDepth={depth} />
+      </div>
+    </DesignShell>
   );
 }

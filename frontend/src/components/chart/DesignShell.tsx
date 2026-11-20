@@ -9,11 +9,18 @@ import { NightSky } from "./NightSky";
 import "./chart.css";
 
 /**
- * The frame of the redesigned birth-chart page (design/Celestara Birth Chart.html): a night
- * sky, a wide sticky header with the primary navigation, and the page itself. Only /chart
- * wears it for now; the other pages keep the app's standard header until they are redone.
+ * The frame of the redesigned pages (design/Celestara Birth Chart.html, design/Celestara
+ * Home.html): a night sky, a wide sticky header with the primary navigation, and the page
+ * itself. Home and Birth Chart wear it; the other pages keep the app's standard header until
+ * they are redone.
  */
-export async function ChartShell({ children }: { children: React.ReactNode }) {
+export async function DesignShell({
+  current,
+  children,
+}: {
+  current: "home" | "chart";
+  children: React.ReactNode;
+}) {
   const email = await getSessionEmail();
 
   return (
@@ -30,8 +37,8 @@ export async function ChartShell({ children }: { children: React.ReactNode }) {
             Celestara
           </Link>
           <nav className="cx-links" aria-label="Primary">
-            <Link href={email ? "/" : "/guide"}>Home</Link>
-            <Link href="/chart" aria-current="page">Birth Chart</Link>
+            <Link href={email ? "/" : "/guide"} aria-current={current === "home" ? "page" : undefined}>Home</Link>
+            <Link href="/chart" aria-current={current === "chart" ? "page" : undefined}>Birth Chart</Link>
             <Link href="/journal">Journal</Link>
             <Link href="/profile">Profile</Link>
           </nav>

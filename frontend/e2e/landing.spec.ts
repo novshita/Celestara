@@ -70,7 +70,7 @@ test.describe("the landing page", () => {
     await expect(navLogo.locator("svg path")).toHaveCount(3); // the C, the orbit and the star
 
     await page.goto("/guide");
-    const header = page.locator("header").getByRole("link", { name: "Celestara", exact: true });
+    const header = page.locator("header").getByRole("link", { name: "Celestara home" });
     await expect(header.locator("svg path")).toHaveCount(3);
 
     const icon = page.locator('link[rel="icon"]');

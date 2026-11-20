@@ -22,9 +22,11 @@ const SYSTEM_OPTIONS: { value: AiSystem; label: string }[] = [
 export function AiGuideForm({
   defaults,
   initialQuestion,
+  initialDepth,
 }: {
   defaults?: BirthData;
   initialQuestion?: string;
+  initialDepth?: "" | "beginner" | "technical";
 }) {
   const [state, onSubmit, isPending] = useKeptFormAction(
     askAiGuideAction,
@@ -82,7 +84,7 @@ export function AiGuideForm({
 
         <BirthFieldsFieldset fieldErrors={fieldErrors} defaults={defaults} />
 
-        <DepthSelect />
+        <DepthSelect initial={initialDepth} />
 
         {conversationId !== null && (
           <>

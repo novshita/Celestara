@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Guide · Celestara" };
 export default function GuidePage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string | string[] }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   return <AppHome searchParams={searchParams} />;
 }

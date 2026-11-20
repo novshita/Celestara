@@ -47,7 +47,18 @@ function formatMoment(iso: string): string {
   });
 }
 
-export function ReadingForm({ defaults }: { defaults?: BirthData }) {
+export function ReadingForm({
+  defaults,
+  initialKind,
+  initialFocus,
+  initialDepth,
+}: {
+  defaults?: BirthData;
+  /** Chosen on the Home page's "Read the sky" door; the visitor can still change them. */
+  initialKind?: ReadingKind;
+  initialFocus?: "" | ReadingFocus;
+  initialDepth?: "" | "beginner" | "technical";
+}) {
   const [state, onSubmit, isPending] = useKeptFormAction(
     requestReadingAction,
     INITIAL_STATE,
@@ -55,10 +66,10 @@ export function ReadingForm({ defaults }: { defaults?: BirthData }) {
   const fieldErrors = state.status === "error" ? state.fieldErrors : {};
   // The birth-chart reading reads the natal chart alone, so a focus does
   // not apply to it.
-  const [kind, setKind] = useState<ReadingKind>("daily");
+  const [kind, setKind] = useState<ReadingKind>(initialKind ?? "daily");
 
   return (
-    <section className="flex flex-col gap-6 panel p-6">
+    <section id="reading" className="flex scroll-mt-4 flex-col gap-6 panel p-6">
       <div>
         <h2 className="display text-lg font-semibold text-amber-300">Reading</h2>
         <p className="text-sm text-slate-500">
@@ -92,7 +103,7 @@ export function ReadingForm({ defaults }: { defaults?: BirthData }) {
           <select
             name="focus"
             disabled={kind === "birth_chart"}
-            defaultValue=""
+            defaultValue={initialFocus ?? ""}
             className="input w-auto disabled:opacity-50"
           >
             {FOCUS_OPTIONS.map((option) => (
@@ -105,7 +116,7 @@ export function ReadingForm({ defaults }: { defaults?: BirthData }) {
 
         <BirthFieldsFieldset fieldErrors={fieldErrors} defaults={defaults} />
 
-        <DepthSelect />
+        <DepthSelect initial={initialDepth} />
 
         <button
           type="submit"
