@@ -78,10 +78,11 @@ export function uniqueEmail(): string {
 export async function register(page: Page): Promise<string> {
   const email = uniqueEmail();
   await page.goto("/profile");
-  await page.getByRole("button", { name: "Create account" }).click();
+  await page.getByRole("tab", { name: "Create account" }).click();
   await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill("a-long-enough-password");
+  await page.getByLabel("Password", { exact: true }).fill("a-long-enough-password");
   await page.locator("main form").getByRole("button", { name: "Create account" }).click();
-  await expect(page.getByRole("heading", { name: "What the guide remembers" })).toBeVisible();
+  // The door opens, then the page changes to the signed-in Profile
+  await expect(page.getByRole("heading", { name: "Guide memory" })).toBeVisible({ timeout: 15_000 });
   return email;
 }

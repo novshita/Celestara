@@ -1,0 +1,479 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Celestara Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Profile and Journal, logged out. One layout for both: a calm form beside a sealed door, then a dimmed sample of what is inside. Same tokens as Home. */
+:root{
+  --void:#03040b;--ink:#f1ede4;--ink2:#a9adc2;--ink3:#7d8299;
+  --gold:#f2c55c;--gold-soft:rgba(242,197,92,.14);--cool:#c9d4e6;
+  --line:rgba(255,255,255,.14);--field:rgba(255,255,255,.045);--bad:#ff9d8a;
+  --serif:"Instrument Serif","Times New Roman",serif;
+  --sans:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--void)}
+body{font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer;text-align:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:2px}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;font-size:11px}
+.tag{display:inline-block;font:400 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;border:1px dashed var(--ink3);color:var(--ink2);padding:2px 7px;border-radius:2px}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);background:rgba(3,4,11,.72);border-bottom:1px solid var(--line)}
+.top>div{max-width:1240px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-size:26px;color:var(--gold)}
+.links{display:flex;gap:4px;align-items:center}
+.links a{padding:8px 14px;border-radius:8px;font-size:14px;color:var(--ink2);min-height:40px;display:flex;align-items:center}
+.links a:hover{color:var(--ink)}
+.links a[aria-current]{background:var(--gold-soft);color:var(--gold)}
+.login{border:1px solid var(--line);padding:9px 16px;border-radius:8px;font-size:14px;min-height:40px;display:flex;align-items:center}
+.login:hover{border-color:var(--gold)}
+
+main{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding-block:56px 80px}
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:center}
+.eyebrow{color:var(--gold);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(54px,6.4vw,88px);line-height:.96;letter-spacing:-.02em;margin:14px 0 16px}
+.lede{color:var(--ink2);font-size:17px;max-width:46ch;text-wrap:pretty}
+
+/* form card */
+.card{margin-top:28px;max-width:480px;padding:22px 24px 26px;border:1px solid var(--line);border-radius:16px;background:rgba(10,12,24,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.tabs{position:relative;display:flex;gap:22px;border-bottom:1px solid var(--line)}
+.tabs button{padding:6px 0 12px;min-height:44px;font-size:15px;color:var(--ink3);transition:color .2s}
+.tabs button[aria-selected=true]{color:var(--gold)}
+.tabs .ul{position:absolute;left:0;bottom:-1px;height:2px;background:var(--gold);width:40px;transition:transform .35s cubic-bezier(.3,.7,.2,1),width .35s}
+.fld{margin-top:18px}
+.fld label{display:block;font:400 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+.inp{position:relative}
+.inp input{width:100%;min-height:48px;padding:0 14px;background:var(--field);border:1px solid var(--line);border-radius:10px;font-size:16px;transition:border-color .2s,background .2s}
+.inp input::placeholder{color:var(--ink3)}
+.inp input:hover{border-color:rgba(255,255,255,.28)}
+.inp input:focus{outline:0;border-color:var(--gold);background:rgba(242,197,92,.05)}
+.inp input[aria-invalid=true]{border-color:var(--bad)}
+.inp.pw input{padding-right:70px}
+.show{position:absolute;right:4px;top:4px;min-height:40px;padding:0 12px;font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);border-radius:8px}
+.show:hover{color:var(--gold)}
+.err{min-height:20px;margin-top:5px;font-size:13px;color:var(--bad)}
+.go{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 24px;border-radius:999px;background:var(--gold);color:#1a1405;font-weight:600;font-size:15px;transition:transform .2s,box-shadow .3s}
+.go:hover{transform:translateY(-2px);box-shadow:0 10px 30px -8px rgba(242,197,92,.6)}
+.go[disabled]{opacity:.7;transform:none;box-shadow:none;cursor:default}
+.card .go{margin-top:10px}
+.fine{margin-top:16px;font-size:13px;color:var(--ink3);max-width:46ch}
+.note{font-size:13px;color:var(--ink3)}
+
+/* sealed door */
+.dwrap{display:flex;justify-content:center;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12%,#000 88%,transparent 100%),linear-gradient(180deg,transparent 0,#000 6%,#000 86%,transparent 100%);-webkit-mask-composite:source-in;
+  mask-image:linear-gradient(90deg,transparent 0,#000 12%,#000 88%,transparent 100%),linear-gradient(180deg,transparent 0,#000 6%,#000 86%,transparent 100%);mask-composite:intersect}
+.door{position:relative;width:420px;max-width:100%;aspect-ratio:300/400;container-type:inline-size}
+.door>*{position:absolute}
+.door .glow{left:0;top:0;width:100%;height:100%;background:radial-gradient(40% 36% at 50% 48%,rgba(242,197,92,.16),transparent 72%);transition:opacity 1.2s;opacity:.7}
+.door.open .glow{opacity:1.6}
+.cloud{bottom:7%;width:46%;height:26%;border-radius:50%;background:radial-gradient(closest-side,rgba(226,226,240,.85),rgba(200,200,225,.35) 60%,transparent);filter:blur(10px)}
+.cloud.a{left:-12%}.cloud.b{right:-12%}
+.op{left:31.33%;top:34.75%;width:37.33%;height:47.75%;border-radius:999px 999px 0 0;overflow:hidden;background:#030816;box-shadow:0 0 0 1px rgba(242,197,92,.2)}
+.op canvas{position:absolute;inset:0;width:100%;height:100%}
+.op:after{content:"";position:absolute;inset:0;background:radial-gradient(70% 45% at 25% 100%,rgba(242,160,70,.4),transparent 70%);pointer-events:none}
+.lf{position:absolute;top:0;width:50.5%;height:100%;background:linear-gradient(90deg,#3b3025,#5b4b35 45%,#2a2119);box-shadow:inset 0 0 0 1px rgba(242,197,92,.4);transition:transform 1.5s cubic-bezier(.6,.05,.2,1);z-index:2}
+.lf.l{left:0;border-radius:999px 0 0 0}.lf.r{right:0;border-radius:0 999px 0 0;background:linear-gradient(270deg,#3b3025,#5b4b35 45%,#2a2119)}
+.lf:before{content:"";position:absolute;left:18%;right:18%;top:36%;bottom:8%;border:1px solid rgba(242,197,92,.28);border-radius:3px}
+.door.open .lf.l{transform:translateX(-102%)}.door.open .lf.r{transform:translateX(102%)}
+.frame{left:0;top:0;width:100%;height:100%;overflow:visible}
+.sig{left:50%;top:58.75%;width:18%;transform:translate(-50%,-50%);z-index:3;transition:opacity .6s;filter:drop-shadow(0 0 8px rgba(242,197,92,.7));animation:pulse 3.4s ease-in-out infinite}
+.door.open .sig{opacity:0}
+@keyframes pulse{50%{filter:drop-shadow(0 0 16px rgba(242,197,92,1))}}
+.dcap{left:50%;bottom:2%;transform:translateX(-50%);white-space:nowrap;font:500 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:#f6e7bd;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+
+/* what is inside */
+.inside{margin-top:84px}
+.inside>h2{font-family:var(--serif);font-weight:400;font-size:clamp(32px,3.6vw,48px);line-height:1;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.inside>p{color:var(--ink2);margin-top:8px;max-width:58ch}
+.sample{margin-top:28px;opacity:.62;-webkit-mask-image:linear-gradient(180deg,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 55%,transparent 100%);user-select:none}
+.cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
+.col{padding:22px 22px 28px 0;min-width:0}
+.col+.col{padding-left:22px;border-left:1px solid var(--line)}
+.col h3{font:400 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv span:nth-child(odd){color:var(--ink3)}
+.bar{height:6px;border-radius:3px;background:rgba(255,255,255,.1);margin:4px 0 12px}.bar i{display:block;height:100%;width:6%;background:var(--gold);border-radius:3px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink2)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:12px}
+.seg span{padding:5px 14px;border-radius:999px;font-size:13px;color:var(--ink2)}.seg span.on{background:var(--ink);color:#0a0b14;font-weight:600}
+.danger{border:1px solid rgba(255,157,138,.5);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--ink2);margin-top:10px}
+.jgrid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:48px;border-top:1px solid var(--line);padding-top:26px}
+.paper{position:relative;padding:22px 24px 22px;border:1px solid var(--line);border-radius:6px;background:rgba(245,238,220,.05)}
+.paper.s1,.paper.s2{position:absolute;left:0;right:0;height:100%;z-index:-1}
+.stack{position:relative;margin-bottom:34px}
+.paper.s1{transform:translateY(12px) scale(.985);opacity:.7}.paper.s2{transform:translateY(24px) scale(.97);opacity:.45}
+.dline{display:flex;align-items:center;gap:10px;color:var(--ink2);font-size:13px}
+.moon{width:18px;height:18px;border-radius:50%;box-shadow:inset 5px 0 0 0 #f0e2bd;flex:none}
+.paper h4{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.05;margin:10px 0 8px}
+.paper p{color:var(--ink2);font-size:15px;max-width:52ch}
+.acts{display:flex;gap:18px;margin-top:14px;font:400 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+.steps{list-style:none;display:flex;flex-direction:column;gap:16px}
+.steps li{display:flex;gap:14px;align-items:flex-start;color:var(--ink2);font-size:15px}
+.steps b{display:block;color:var(--ink);font-weight:600}
+.steps svg{width:30px;height:30px;color:var(--gold);flex:none}
+.skyline{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--ink2);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+footer{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:0 0 60px;color:var(--ink3);font-size:13px}
+footer p{max-width:74ch}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;z-index:40;background:var(--ink);color:#0a0b14;padding:12px 18px;border-radius:10px;font-size:14px;pointer-events:none;transition:all .3s;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+[hidden]{display:none!important}
+
+/* signed in */
+.inp select,.inp textarea{width:100%;min-height:48px;padding:0 14px;background:var(--field);border:1px solid var(--line);border-radius:10px;font-size:16px;transition:border-color .2s,background .2s;color:var(--ink)}
+.inp select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink2) 50%),linear-gradient(135deg,var(--ink2) 50%,transparent 50%);background-position:calc(100% - 20px) 21px,calc(100% - 14px) 21px;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+.inp select option{background:#0a0c18;color:var(--ink)}
+.inp select:focus,.inp textarea:focus{outline:0;border-color:var(--gold);background:rgba(242,197,92,.05)}
+.inp textarea{padding:12px 14px;resize:vertical;line-height:1.6;font-family:var(--sans)}
+.ilay{display:grid;grid-template-columns:230px minmax(0,1fr);gap:64px;margin-top:36px;align-items:start}
+.side{position:sticky;top:96px;display:flex;flex-direction:column;gap:6px}
+.side a{padding:9px 12px;border-left:2px solid var(--line);font-size:14px;color:var(--ink2);min-height:40px;display:flex;align-items:center}
+.side a:hover{color:var(--ink);border-left-color:var(--gold)}
+.glance{margin-top:22px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--ink2)}
+.glance b{display:block;color:var(--ink);font-weight:600}
+.sect{padding:30px 0 34px;border-top:1px solid var(--line)}
+.sect:first-child{border-top:0;padding-top:0}
+.sect h2{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1}
+.sect>p.sub{color:var(--ink2);margin:8px 0 20px;max-width:56ch;font-size:15px}
+.frm{max-width:620px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px}
+.frm .full{grid-column:1/-1}
+.frm label{display:block;font:400 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+.saverow{display:flex;gap:14px;align-items:center;margin-top:20px}
+.ok{font-size:14px;color:var(--gold);opacity:0;transition:opacity .3s}.ok.on{opacity:1}
+.opts{display:grid;gap:10px;max-width:620px}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line);border-radius:12px;cursor:pointer;min-height:48px;transition:all .2s}
+.opt:hover{border-color:rgba(255,255,255,.3)}
+.opt:has(input:checked){border-color:var(--gold);background:var(--gold-soft)}
+.opt input{accent-color:#f2c55c;margin-top:4px;width:16px;height:16px}
+.opt b{display:block;font-weight:600}.opt span{color:var(--ink2);font-size:14px}
+.cfg{max-width:620px;margin-top:16px;display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:14px}
+.cfg span:nth-child(odd){color:var(--ink3)}
+.list{max-width:620px;border-top:1px solid var(--line)}
+.li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid var(--line);font-size:15px;min-height:52px}
+.li small{color:var(--ink3);margin-left:8px}
+.lk{min-height:44px;padding:0 4px;font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+.lk:hover{color:var(--gold)}.lk.d:hover{color:var(--bad)}
+.addrow{display:flex;gap:10px;max-width:620px;margin-top:16px}.addrow .inp{flex:1}
+.ghost{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:999px;border:1px solid var(--line);font-size:15px;color:var(--ink);transition:all .2s}
+.ghost:hover{border-color:var(--gold);color:var(--gold)}
+.ghost.hot{border-color:var(--bad);color:var(--bad)}
+.dz{max-width:620px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.danger2{max-width:620px;margin-top:26px;padding:18px 20px;border:1px solid rgba(255,157,138,.55);border-radius:14px}
+.danger2 h3{font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--bad)}
+.danger2 p{margin:8px 0 14px;color:var(--ink2);font-size:15px}
+.danger2 .row2{display:flex;gap:10px;flex-wrap:wrap}.danger2 .inp{width:200px}
+.go.bad{background:var(--bad)}
+.jlay{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:48px;margin-top:36px;align-items:start}
+.jh{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.ent{display:block;width:100%;padding:14px 14px;border-left:2px solid var(--line);border-bottom:1px solid var(--line);transition:all .2s;min-height:64px}
+.ent:hover{background:rgba(255,255,255,.03)}
+.ent[aria-pressed=true]{border-left-color:var(--gold);background:var(--gold-soft)}
+.ent b{display:block;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ent small{display:block;color:var(--ink3);font-size:12px;margin-top:1px}
+.ent span{display:block;color:var(--ink2);font-size:13px;margin-top:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.editor{padding:24px 28px 26px;border:1px solid var(--line);border-radius:12px;background:rgba(245,238,220,.04)}
+.editor .tin{width:100%;background:transparent;border:0;border-bottom:1px solid var(--line);font:400 34px/1.1 var(--serif);color:var(--ink);padding:8px 0 10px;margin:12px 0 14px}
+.editor .tin::placeholder{color:var(--ink3)}
+.editor .tin:focus{outline:0;border-bottom-color:var(--gold)}
+.editor textarea{width:100%;min-height:300px;background:transparent;border:0;color:var(--ink);font:400 17px/1.75 var(--sans);resize:vertical;padding:0}
+.editor textarea:focus{outline:0}
+.editor textarea::placeholder{color:var(--ink3)}
+.jfoot{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px;padding-top:16px;border-top:1px solid var(--line)}
+.jbtns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.empty{padding:40px 0;color:var(--ink2);font-size:15px}
+@media (max-width:960px){
+  .ilay,.jlay{grid-template-columns:minmax(0,1fr);gap:28px}
+  .side{display:none}
+  .frm{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:960px){
+  .hero{grid-template-columns:minmax(0,1fr);gap:24px}
+  .dwrap{order:-1}.door{width:300px}
+  .cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .col:nth-child(3){padding-left:0;border-left:0}
+  .col{border-top:0}.col:nth-child(n+3){border-top:1px solid var(--line)}
+  .jgrid{grid-template-columns:minmax(0,1fr);gap:28px}
+  .links a:not([aria-current]){display:none}
+}
+@media (max-width:640px){.login{display:none}.cols{grid-template-columns:minmax(0,1fr)}.col,.col+.col{padding:20px 0;border-left:0}.col+.col{border-top:1px solid var(--line)}main{padding-top:36px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="top"><div>
+  <a class="logo" href="https://claude.ai/artifact/BkNEQpiYjmX1d1WQb2kUap" target="_blank" rel="noopener" aria-label="Celestara home"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="1.6"/><ellipse cx="16" cy="16" rx="13" ry="5" fill="none" stroke="currentColor" stroke-width="1.2" transform="rotate(-24 16 16)"/><circle cx="16" cy="16" r="4" fill="currentColor"/></svg>Celestara</a>
+  <nav class="links" aria-label="Primary"><a href="https://claude.ai/artifact/BkNEQpiYjmX1d1WQb2kUap" target="_blank" rel="noopener">Home</a><a href="https://claude.ai/artifact/5Ytc32xW7HPeSCYHD6maci" target="_blank" rel="noopener">Birth Chart</a><a href="#journal" id="nJ">Journal</a><a href="#profile" id="nP" aria-current="page">Profile</a></nav>
+  <a class="login" href="#form" id="nL">Log in</a><button type="button" class="login" id="nO" hidden>Log out</button>
+</div></header>
+
+<main>
+  <div id="out">
+  <section class="hero" aria-labelledby="h">
+    <div>
+      <div class="eyebrow mono"><span id="eb">Your saved profile</span><span class="tag">Account required</span></div>
+      <h1 id="h">Profile</h1>
+      <p class="lede" id="lede"></p>
+      <form class="card" id="form" novalidate aria-label="Account">
+        <div class="tabs" role="tablist" aria-label="Log in or create account"><button type="button" role="tab" id="tIn" aria-selected="true" aria-controls="form">Log in</button><button type="button" role="tab" id="tUp" aria-selected="false" aria-controls="form">Create account</button><i class="ul" id="ul"></i></div>
+        <div class="fld"><label for="em">Email</label><div class="inp"><input id="em" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="emE"></div><p class="err" id="emE" role="alert"></p></div>
+        <div class="fld" style="margin-top:2px"><label for="pw">Password</label><div class="inp pw"><input id="pw" type="password" autocomplete="current-password" placeholder="Your password" aria-describedby="pwE"><button type="button" class="show" id="show" aria-pressed="false" aria-label="Show password">Show</button></div><p class="err" id="pwE" role="alert"></p></div>
+        <button class="go" type="submit" id="sub">Log in</button>
+      </form>
+      <p class="fine">Everything else on Celestara works without an account. Your birth data and conversations are only saved if you choose to.</p>
+    </div>
+    <div class="dwrap" aria-hidden="true">
+      <div class="door" id="door">
+        <div class="glow"></div>
+        <i class="cloud a"></i><i class="cloud b"></i>
+        <svg class="frame" viewBox="0 0 300 400">
+          <defs><linearGradient id="col" x1="0" x2="1"><stop offset="0" stop-color="#efe5cb"/><stop offset=".6" stop-color="#b8aa88"/><stop offset="1" stop-color="#6b6149"/></linearGradient><linearGradient id="rs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a3f31"/><stop offset="1" stop-color="#241d17"/></linearGradient></defs>
+          <g id="steps"></g>
+          <g filter="drop-shadow(0 0 8px rgba(242,197,92,.3))"><rect x="80" y="195" width="14" height="135" fill="url(#col)"/><rect x="206" y="195" width="14" height="135" fill="url(#col)"/><rect x="76" y="326" width="22" height="7" fill="#d6c9a6"/><rect x="202" y="326" width="22" height="7" fill="#d6c9a6"/>
+          <path d="M87 195A63 63 0 0 1 213 195" fill="none" stroke="url(#col)" stroke-width="16"/><path d="M79 195A71 71 0 0 1 221 195" fill="none" stroke="#f3e8c8" stroke-width="1" opacity=".8"/></g>
+        </svg>
+        <div class="op"><canvas id="gx" width="448" height="574"></canvas><div class="lf l"></div><div class="lf r"></div></div>
+        <svg class="sig" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="rgba(20,16,10,.7)" stroke="#f2c55c" stroke-width="1.2"/><path d="M20 7l2.6 9.4L32 20l-9.4 2.6L20 33l-2.6-10.4L8 20l9.4-3.6z" fill="#f2c55c"/></svg>
+        <span class="dcap" id="dcap">Sealed</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="inside" aria-labelledby="inH">
+    <h2 id="inH">What opens up</h2><p id="inP"></p>
+
+    <div class="sample" id="pv" inert aria-label="Preview of a saved profile, sample data">
+      <div class="cols">
+        <div class="col"><h3>Birth profile</h3><div class="kv"><span>Date</span><span>15 Aug 1990</span><span>Time</span><span>14:30 · exact</span><span>Place</span><span>18.98° N, 72.83° E</span><span>Timezone</span><span>Asia/Kolkata</span></div><p class="note" style="margin-top:10px">One saved profile.</p></div>
+        <div class="col"><h3>Preferences</h3><div class="seg"><span class="on">Beginner</span><span>Technical</span></div><div class="kv"><span>Ayanamsa</span><span>Lahiri</span></div><p class="note" style="margin-top:10px">A request in the Guide wins over the saved depth.</p></div>
+        <div class="col"><h3>Guide memory <span style="color:var(--ink3)">3 of 50</span></h3><div class="bar"><i></i></div><div class="row"><span>Prefers short answers</span><span>Forget</span></div><div class="row"><span>Works in product design</span><span>Forget</span></div><p class="note" style="margin-top:10px">Nothing is remembered unless you add it.</p></div>
+        <div class="col"><h3>Privacy and data</h3><div class="row"><span>Delete all memory</span><span>→</span></div><div class="row"><span>Delete all conversations</span><span>→</span></div><div class="danger">Delete my data erases everything. You type DELETE to confirm.</div></div>
+      </div>
+    </div>
+
+    <div class="sample" id="jv" inert aria-label="Preview of a journal, sample data" hidden>
+      <div class="jgrid">
+        <div class="stack"><div class="paper s2"></div><div class="paper s1"></div>
+          <div class="paper"><div class="dline"><i class="moon"></i><span>Today · Sample entry</span></div><h4>A restless morning</h4><p>Felt unsettled before breakfast. Wrote down the question I want to ask the Guide about the Moon, then went for a walk.</p><div class="acts"><span>New entry</span><span>Edit</span><span>Delete</span></div></div>
+        </div>
+        <div>
+          <ul class="steps">
+            <li><svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 25l3-8L21 4l5 5L13 22z"/><path d="M18 7l5 5"/></svg><span><b>Write an entry</b>Your own words, saved to your account.</span></li>
+            <li><svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="5" y="5" width="20" height="20" rx="2"/><path d="M10 11h10M10 15h10M10 19h6"/></svg><span><b>Edit it later</b>Come back and change what you wrote.</span></li>
+            <li><svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M7 9h16M12 9V6h6v3M9 9l1 16h10l1-16"/></svg><span><b>Delete when you like</b>Entries are yours to remove.</span></li>
+          </ul>
+          <div class="skyline"><span class="mono" style="color:var(--gold)">The sky now</span><span>Moon in Mithuna (Vedic)</span><span class="tag">Sample</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <div id="inn" hidden>
+    <div class="eyebrow mono"><span id="ieb"></span><span class="tag">Demo account</span></div>
+    <h1 id="ih">Profile</h1>
+    <p class="lede" id="il"></p>
+
+    <div id="ipro" class="ilay">
+      <nav class="side" aria-label="Profile sections"><a href="#s1">Birth profile</a><a href="#s2">Preferences</a><a href="#s3">Guide memory</a><a href="#s4">Saved conversations</a><a href="#s5">Privacy and data</a>
+        <div class="glance"><span class="mono" style="color:var(--gold)">Saved profile</span><b id="gl">15 Aug 1990, 14:30</b><a href="https://claude.ai/artifact/5Ytc32xW7HPeSCYHD6maci" target="_blank" rel="noopener" style="padding:8px 0;border:0;color:var(--gold)">Open your birth chart →</a></div></nav>
+      <div>
+        <section class="sect" id="s1"><h2>Birth profile</h2><p class="sub">One saved profile. The Birth Chart page can start from it.</p>
+          <form class="frm" id="f1" novalidate>
+            <div class="inp"><label for="pd">Date</label><input id="pd" type="date" value="1990-08-15"></div>
+            <div class="inp"><label for="pt">Time</label><input id="pt" type="time" value="14:30"></div>
+            <div class="inp full"><label for="pc">Time confidence</label><select id="pc"><option>Exact</option><option>Approximate</option><option>Unknown</option></select></div>
+            <div class="inp"><label for="pla">Latitude</label><input id="pla" type="text" inputmode="decimal" value="18.9756"></div>
+            <div class="inp"><label for="plo">Longitude</label><input id="plo" type="text" inputmode="decimal" value="72.8258"></div>
+            <div class="inp full"><label for="ptz">Timezone</label><input id="ptz" type="text" value="Asia/Kolkata"></div>
+            <div class="full saverow" style="margin-top:4px"><button class="go" type="submit">Save profile</button><span class="ok" id="ok1" role="status"></span></div>
+          </form>
+        </section>
+        <section class="sect" id="s2"><h2>Preferences</h2><p class="sub">How the Guide explains things. A request in the Guide wins over the saved depth.</p>
+          <form id="f2"><div class="opts"><label class="opt"><input type="radio" name="depth" checked><span><b>Beginner</b>Plain language, the default.</span></label><label class="opt"><input type="radio" name="depth"><span><b>Technical</b>Degrees, ayanamsa and house system.</span></label></div>
+          <div class="cfg"><span>Ayanamsa</span><span>Lahiri</span><span>House system</span><span>Set in calculation configuration</span></div>
+          <div class="saverow"><button class="go" type="submit">Save preferences</button><span class="ok" id="ok2" role="status"></span></div></form>
+        </section>
+        <section class="sect" id="s3"><h2>Guide memory <span class="note" id="memCnt" style="font-family:var(--mono);font-size:12px;letter-spacing:.14em;margin-left:8px"></span></h2><p class="sub">Only what you add here. Nothing is remembered on its own.</p>
+          <div class="bar" style="max-width:620px;margin:0 0 14px"><i id="memBar"></i></div>
+          <div class="list" id="memList"></div>
+          <form class="addrow" id="memF"><div class="inp"><input id="memIn" type="text" placeholder="Add something for the Guide to keep" aria-label="Add a memory"></div><button class="ghost" type="submit">Add</button></form>
+        </section>
+        <section class="sect" id="s4"><h2>Saved conversations</h2><p class="sub">Crisis messages and declined off-topic requests are never saved.</p>
+          <div class="list" id="cvList"></div>
+        </section>
+        <section class="sect" id="s5"><h2>Privacy and data</h2><p class="sub">Each delete is a single action, separate from the others.</p>
+          <div class="dz"><button type="button" class="ghost" id="dm">Delete all memory</button><button type="button" class="ghost" id="dc">Delete all conversations</button></div>
+          <div class="danger2"><h3>Delete my data</h3><p>Permanently erases your account and everything in it: profile, journal, memory and conversations. Type <b>DELETE</b> to continue.</p>
+            <div class="row2"><div class="inp"><input id="delIn" type="text" placeholder="DELETE" aria-label="Type DELETE to confirm" autocomplete="off"></div><button type="button" class="go bad" id="delGo" disabled>Delete my data</button></div></div>
+        </section>
+      </div>
+    </div>
+
+    <div id="ijou" class="jlay" hidden>
+      <div>
+        <div class="jh"><span class="mono" style="color:var(--gold)">Entries</span><button type="button" class="go" id="jnew" style="min-height:44px;padding:0 18px">New entry</button></div>
+        <div id="jlist"></div>
+      </div>
+      <div class="editor" id="jed">
+        <div class="dline"><i class="moon"></i><span id="jd"></span><span class="tag">Sample sky</span><span>Moon in Mithuna (Vedic)</span></div>
+        <input class="tin" id="jt" type="text" placeholder="Give it a title" aria-label="Entry title">
+        <textarea id="jb" placeholder="What did you notice today?" aria-label="Entry text"></textarea>
+        <div class="jfoot"><div class="jbtns" id="jbtns"><button type="button" class="go" id="jsave">Save entry</button><button type="button" class="ghost" id="jdel">Delete</button><span class="ok" id="jok" role="status"></span></div><span class="note">Placeholder fields: the title is a design suggestion.</span></div>
+      </div>
+      <p class="empty" id="jempty" hidden>No entries yet. Press New entry to write the first one.</p>
+    </div>
+  </div>
+</main>
+<footer><p>Celestara treats astrology as an interpretive and traditional framework, not scientifically validated prediction. This page is a prototype: the previews are samples and nothing is sent to a server.</p></footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)};
+var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* page sky (same as Home) */
+function sky(){
+  var c=$('#bg'),x=c.getContext('2d'),d=Math.min(devicePixelRatio||1,1.5),w=c.width=Math.round(innerWidth*d),h=c.height=Math.round(innerHeight*d),r=rng(5),i;
+  var g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#02030a');g.addColorStop(1,'#050a1c');x.fillStyle=g;x.fillRect(0,0,w,h);
+  x.save();x.translate(w*.62,h*.45);x.rotate(-.42);
+  for(i=0;i<9;i++){var gx=(i-4)*w*.14,rad=h*.35,gg=x.createRadialGradient(gx,0,0,gx,0,rad);gg.addColorStop(0,i>2&&i<6?'rgba(235,220,190,.06)':'rgba(200,170,130,.035)');gg.addColorStop(1,'rgba(200,170,130,0)');x.fillStyle=gg;x.fillRect(gx-rad,-rad,rad*2,rad*2)}
+  for(i=0;i<5000;i++){var u=(r()+r()+r()-1.5)*w*.9,v=(r()+r()+r()+r()-2)*h*.16*(1-Math.abs(u)/(w*.8));x.fillStyle='rgba(255,'+(225+Math.round(r()*30))+','+(190+Math.round(r()*60))+','+(.1+r()*.4)+')';x.fillRect(u,v,d*.9,d*.9)}
+  x.restore();
+  var cols=['255,255,255','255,255,255','190,210,255','255,226,190','255,200,140'];
+  for(i=0;i<800;i++){var s=r()<.04?1.8:1,a=.2+r()*.7;x.fillStyle='rgba('+cols[Math.floor(r()*5)]+','+a+')';x.fillRect(r()*w,r()*h,s*d,s*d)}
+}
+var rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(sky,150)});sky();
+
+/* door: steps and the galaxy behind the leaves */
+(function(){
+  var s='',i;
+  for(i=0;i<4;i++){var y=330+i*16,hw=88+i*26;
+    s+='<rect x="'+(150-hw)+'" y="'+(y+7)+'" width="'+(hw*2)+'" height="9" fill="url(#rs)"/><rect x="'+(150-hw)+'" y="'+y+'" width="'+(hw*2)+'" height="7" fill="'+(i%2?'#b3a27a':'#c3b389')+'"/><rect x="'+(150-hw)+'" y="'+y+'" width="'+(hw*2)+'" height="1.2" fill="#efe3bd" opacity=".8"/>'}
+  $('#steps').innerHTML=s;
+  var c=$('#gx'),x=c.getContext('2d'),W=c.width,H=c.height,r=rng(21),n=1100,P=[],k;
+  for(k=0;k<n;k++)P.push([r(),r(),r()]);
+  function draw(t){
+    x.setTransform(1,0,0,1,0,0);x.fillStyle='#030816';x.fillRect(0,0,W,H);
+    var rot=t*.00022,cx=W*.5,cy=H*.46,g=x.createRadialGradient(cx,cy,0,cx,cy,W*.5);g.addColorStop(0,'rgba(255,226,170,.85)');g.addColorStop(.12,'rgba(255,190,110,.4)');g.addColorStop(.5,'rgba(50,100,190,.22)');g.addColorStop(1,'rgba(20,50,120,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
+    for(var j=0;j<n;j++){var p=P[j],rr=Math.pow(p[0],.62)*W*.62,th=(j%3)*2.094+rr*.034*(248/W)*(W/248)*0+rr*.034*(248/W)+rot*(1+(1-p[0])*.8)+(p[1]-.5)*.7,xx=cx+Math.cos(th)*rr,yy=cy+Math.sin(th)*rr*1.05,tt=rr/(W*.62),cr,cg,cb;
+      if(tt<.15){cr=255;cg=232;cb=185}else if(tt<.5){cr=110;cg=170;cb=255}else{cr=50;cg=110;cb=190}
+      x.fillStyle='rgba('+cr+','+cg+','+cb+','+((.25+p[2]*.7)*(1-tt*.5)).toFixed(2)+')';var sz=(1+p[2]*2.2)*W/248;x.fillRect(xx,yy,sz,sz)}
+  }
+  draw(0);var last=0;
+  if(!rm)(function loop(t){if(t-last>33&&!document.hidden){last=t;draw(t)}requestAnimationFrame(loop)})(0);
+})();
+
+/* views */
+var VIEW={
+  profile:{eb:'Your saved profile',h:'Profile',lede:'Log in or create an account to use a saved profile. Everything else on Celestara works without one.',inH:'What opens up',inP:'One saved birth profile, your explanation depth, what the Guide remembers, and clear controls to delete it. A sample is shown below.'},
+  journal:{eb:'Your journal',h:'Journal',lede:'Log in or create an account to use your journal. Everything else on Celestara works without one.',inH:'A page of your own',inP:'Write what you notice, come back to it, and delete it whenever you like. A sample is shown below.'}
+};
+var auth=false,email='',curView='profile';
+function show(v){
+  curView=v;
+  var d=VIEW[v];
+  $('#ieb').textContent='Signed in as '+email;$('#ih').textContent=d.h;
+  $('#il').textContent=v==='profile'?'Your saved birth profile, preferences and what the Guide remembers. Each section saves on its own.':'Write what you notice. Entries are saved to your account.';
+  $('#ipro').hidden=v!=='profile';$('#ijou').hidden=v!=='journal';$('#eb').textContent=d.eb;$('#h').textContent=d.h;$('#lede').textContent=d.lede;$('#inH').textContent=d.inH;$('#inP').textContent=d.inP;
+  $('#pv').hidden=v!=='profile';$('#jv').hidden=v!=='journal';
+  var p=$('#nP'),j=$('#nJ');p.removeAttribute('aria-current');j.removeAttribute('aria-current');(v==='profile'?p:j).setAttribute('aria-current','page');
+  document.title='Celestara '+d.h;
+}
+['#nP','#nJ'].forEach(function(s,i){$(s).addEventListener('click',function(e){e.preventDefault();var v=i?'journal':'profile';history.replaceState(null,'','#'+v);show(v)})});
+show(location.hash==='#journal'?'journal':'profile');
+$('#nL').addEventListener('click',function(e){e.preventDefault();$('#form').scrollIntoView({behavior:rm?'auto':'smooth',block:'center'});$('#em').focus({preventScroll:true})});
+
+/* form */
+var mode='in',tIn=$('#tIn'),tUp=$('#tUp');
+function ul(){var t=mode==='in'?tIn:tUp;$('#ul').style.width=t.offsetWidth+'px';$('#ul').style.transform='translateX('+t.offsetLeft+'px)'}
+function setTab(m){mode=m;tIn.setAttribute('aria-selected',m==='in');tUp.setAttribute('aria-selected',m==='up');
+  $('#sub').textContent=m==='in'?'Log in':'Create account';$('#pw').autocomplete=m==='in'?'current-password':'new-password';$('#pw').placeholder=m==='in'?'Your password':'Choose a password';clearErr();ul()}
+tIn.addEventListener('click',function(){setTab('in')});tUp.addEventListener('click',function(){setTab('up')});
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(ul);addEventListener('resize',ul);ul();
+$('#show').addEventListener('click',function(){var i=$('#pw'),on=i.type==='password';i.type=on?'text':'password';this.textContent=on?'Hide':'Show';this.setAttribute('aria-pressed',on);this.setAttribute('aria-label',on?'Hide password':'Show password')});
+function err(id,inp,msg){$(id).textContent=msg;$(inp).setAttribute('aria-invalid',msg?'true':'false')}
+function clearErr(){err('#emE','#em','');err('#pwE','#pw','')}
+function check(){
+  var e=$('#em').value.trim(),p=$('#pw').value,bad=null;
+  err('#emE','#em',!e?'Enter your email.':!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)?'That email does not look right. Check for a missing @ or dot.':'');
+  err('#pwE','#pw',!p?'Enter your password.':'');
+  if($('#emE').textContent)bad='#em';else if($('#pwE').textContent)bad='#pw';
+  return bad}
+$('#em').addEventListener('blur',function(){if(this.value.trim())check()});
+var tt;function toast(t){var e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){e.classList.remove('on')},3600)}
+$('#form').addEventListener('submit',function(e){
+  e.preventDefault();var bad=check();if(bad){$(bad).focus();return}
+  var b=$('#sub'),door=$('#door');b.disabled=true;b.textContent=mode==='in'?'Opening…':'Creating…';door.classList.add('open');$('#dcap').textContent='Open';
+  setTimeout(function(){
+    email=$('#em').value.trim();auth=true;
+    door.classList.remove('open');$('#dcap').textContent='Sealed';b.disabled=false;b.textContent=mode==='in'?'Log in':'Create account';
+    renderAuth();scrollTo(0,0);toast(mode==='in'?'Signed in (demo).':'Account created (demo).');
+  },rm?300:1900);
+});
+
+/* signed-in state */
+function renderAuth(){
+  $('#out').hidden=auth;$('#inn').hidden=!auth;$('#nL').hidden=auth;$('#nO').hidden=!auth;show(curView)}
+$('#nO').addEventListener('click',logout);
+function logout(){auth=false;$('#pw').value='';clearErr();renderAuth();scrollTo(0,0);toast('Logged out (demo).')}
+function flash(id){var e=$(id);e.textContent='Saved';e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('on')},2600)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function twoStep(btn,label,fn){var t;btn.addEventListener('click',function(){
+  if(btn.classList.contains('hot')){clearTimeout(t);btn.classList.remove('hot');btn.textContent=label;fn();return}
+  btn.classList.add('hot');btn.textContent='Press again to confirm';t=setTimeout(function(){btn.classList.remove('hot');btn.textContent=label},3500)})}
+
+/* profile */
+$('#f1').addEventListener('submit',function(e){e.preventDefault();
+  var d=$('#pd').value,t=$('#pt').value,m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if(d){var p=d.split('-');$('#gl').textContent=(+p[2])+' '+m[+p[1]-1]+' '+p[0]+(t?', '+t:'')}
+  flash('#ok1')});
+$('#f2').addEventListener('submit',function(e){e.preventDefault();flash('#ok2')});
+var mem=['Prefers short answers','Works in product design','Likes plain explanations first'];
+function renderMem(){
+  $('#memCnt').textContent=mem.length+' of 50';$('#memBar').style.width=(mem.length/50*100)+'%';
+  $('#memList').innerHTML=mem.length?mem.map(function(m,i){return'<div class="li"><span>'+esc(m)+'</span><button type="button" class="lk d" data-i="'+i+'" aria-label="Forget: '+esc(m)+'">Forget</button></div>'}).join(''):'<p class="note" style="padding:14px 0">Nothing remembered yet.</p>';
+  Array.prototype.forEach.call(document.querySelectorAll('#memList .lk'),function(b){b.addEventListener('click',function(){mem.splice(+b.dataset.i,1);renderMem();$('#memIn').focus()})})}
+$('#memF').addEventListener('submit',function(e){e.preventDefault();var v=$('#memIn').value.trim();if(!v)return;if(mem.length>=50){toast('The Guide can keep up to 50 things. Forget one to add another.');return}mem.push(v);$('#memIn').value='';renderMem()});
+var cv=[['Jupiter–Saturn Dasha','today'],['Moon’s nakshatra','yesterday'],['Saturn transit','28 Oct']];
+function renderCv(){
+  $('#cvList').innerHTML=cv.length?cv.map(function(c,i){return'<div class="li"><span>'+esc(c[0])+'<small>'+c[1]+'</small></span><span><button type="button" class="lk" data-r="'+i+'">Read</button> <button type="button" class="lk d" data-d="'+i+'" aria-label="Delete conversation: '+esc(c[0])+'">Delete</button></span></div>'}).join(''):'<p class="note" style="padding:14px 0">No saved conversations.</p>';
+  Array.prototype.forEach.call(document.querySelectorAll('#cvList [data-r]'),function(b){b.addEventListener('click',function(){toast('In the app this opens the conversation in the Guide.')})});
+  Array.prototype.forEach.call(document.querySelectorAll('#cvList [data-d]'),function(b){b.addEventListener('click',function(){cv.splice(+b.dataset.d,1);renderCv()})})}
+twoStep($('#dm'),'Delete all memory',function(){mem=[];renderMem();toast('All Guide memory deleted (demo).')});
+twoStep($('#dc'),'Delete all conversations',function(){cv=[];renderCv();toast('All conversations deleted (demo).')});
+$('#delIn').addEventListener('input',function(){$('#delGo').disabled=this.value!=='DELETE'});
+$('#delGo').addEventListener('click',function(){$('#delIn').value='';this.disabled=true;logout();toast('Your data would be erased (demo). You are logged out.')});
+renderMem();renderCv();
+
+/* journal */
+var ent=[{id:1,t:'A restless morning',d:'19 Nov 2026',b:'Felt unsettled before breakfast. Wrote down the question I want to ask the Guide about the Moon, then went for a walk.'},{id:2,t:'Saturn questions',d:'12 Nov 2026',b:'Reading about Saturn transits. I want to understand what is calculated and what is tradition before I ask anything.'},{id:3,t:'First notes',d:'3 Nov 2026',b:'Started keeping this to see whether patterns show up over a few weeks.'}],jcur=1,nid=4;
+function jfind(id){for(var i=0;i<ent.length;i++)if(ent[i].id===id)return ent[i]}
+function jcommit(){var e=jfind(jcur);if(!e)return;e.t=$('#jt').value;e.b=$('#jb').value;if(!e.t.trim()&&!e.b.trim()){ent=ent.filter(function(x){return x!==e});jcur=ent.length?ent[0].id:0}}
+function jrender(){
+  var has=ent.length>0;$('#jed').hidden=!has;$('#jempty').hidden=has;
+  $('#jlist').innerHTML=ent.map(function(e){return'<button type="button" class="ent" data-id="'+e.id+'" aria-pressed="'+(e.id===jcur)+'"><b>'+esc(e.t||'Untitled')+'</b><small>'+e.d+'</small><span>'+esc(e.b)+'</span></button>'}).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('#jlist .ent'),function(b){b.addEventListener('click',function(){jcommit();jcur=+b.dataset.id;jrender()})});
+  var e=jfind(jcur);if(e){$('#jt').value=e.t;$('#jb').value=e.b;$('#jd').textContent=e.d}
+  jbtnsReset()}
+function jbtnsReset(){$('#jbtns').innerHTML='<button type="button" class="go" id="jsave">Save entry</button><button type="button" class="ghost" id="jdel">Delete</button><span class="ok" id="jok" role="status"></span>';
+  $('#jsave').addEventListener('click',function(){var e=jfind(jcur);if(!e)return;if(!$('#jt').value.trim()&&!$('#jb').value.trim()){toast('Write something first.');return}e.t=$('#jt').value;e.b=$('#jb').value;var s=document.querySelector('.ent[aria-pressed=true]');if(s){s.firstChild.textContent=e.t||'Untitled';s.lastChild.textContent=e.b}flash('#jok')});
+  $('#jdel').addEventListener('click',function(){$('#jbtns').innerHTML='<span style="font-size:15px;color:var(--ink2)">Delete this entry?</span><button type="button" class="go bad" id="jyes">Delete</button><button type="button" class="ghost" id="jno">Keep</button>';
+    $('#jno').addEventListener('click',jbtnsReset);$('#jno').focus();
+    $('#jyes').addEventListener('click',function(){ent=ent.filter(function(x){return x.id!==jcur});jcur=ent.length?ent[0].id:0;jrender();toast('Entry deleted.')})})}
+$('#jnew').addEventListener('click',function(){jcommit();var n=new Date(),m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],id=nid++;ent.unshift({id:id,t:'',d:n.getDate()+' '+m[n.getMonth()]+' '+n.getFullYear(),b:''});jcur=id;jrender();$('#jt').focus()});
+jrender();
+renderAuth();
+})();
+</script>
+
+</body></html>

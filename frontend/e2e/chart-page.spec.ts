@@ -17,14 +17,18 @@ async function violations(page: Page) {
 }
 
 test.describe("the page", () => {
-  test("wears its own header and sky; the other pages keep theirs", async ({ page }) => {
+  test("wears the shared header and sky; each page marks itself as current", async ({ page }) => {
     await page.goto("/chart");
     await expect(page.getByRole("heading", { level: 1, name: "Birth chart" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Birth Chart", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.locator("canvas.cx-sky")).toHaveCount(1);
+    // Journal and Profile wear the same header and sky, each marking itself as the current page
     await page.goto("/profile");
-    await expect(page.locator(".cx")).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Birth Chart", exact: true })).toBeVisible();
+    await expect(page.locator("canvas.cx-sky")).toHaveCount(1);
+    await expect(page.getByRole("link", { name: "Profile", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("link", { name: "Birth Chart", exact: true })).not.toHaveAttribute("aria-current", "page");
+    await page.goto("/journal");
+    await expect(page.getByRole("link", { name: "Journal", exact: true })).toHaveAttribute("aria-current", "page");
   });
 
   test("says nothing about samples or prototypes: the numbers are real", async ({ page }) => {

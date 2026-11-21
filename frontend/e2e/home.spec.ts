@@ -176,6 +176,9 @@ test.describe("the hub", () => {
     await page.setViewportSize({ width: 1440, height: 1200 }); // tall enough to hold the whole scene
     await page.goto("/guide");
     await page.waitForTimeout(1500);
+    // This is about the painted backdrop. The planets and controls are never faded (they stand
+    // where the sky puts them, which can be right at an edge), so they are hidden while measuring.
+    await page.addStyleTag({ content: ".hm-orb,.hm-tg,.hm-tip,.hm-step-l{visibility:hidden!important}" });
 
     // How bright a strip of the page is, measured on the real pixels of a screenshot
     const brightness = async (clip: { x: number; y: number; width: number; height: number }) => {

@@ -54,7 +54,7 @@ export async function registerAction(
     return toErrorState(error, "Could not create the account. Please try again.");
   }
 
-  refresh();
+  // No refresh() here: the sign-in page plays the door opening first, then refreshes itself.
   return { status: "success" };
 }
 
@@ -71,7 +71,7 @@ export async function loginAction(
     return toErrorState(error, "Could not log in. Please try again.");
   }
 
-  refresh();
+  // No refresh() here: the sign-in page plays the door opening first, then refreshes itself.
   return { status: "success" };
 }
 
