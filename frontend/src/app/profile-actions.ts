@@ -23,7 +23,7 @@ export async function saveProfileAction(
   const token = await getSessionToken();
   if (!token) {
     // The form that calls this is only ever rendered for a logged-in user
-    // (see AccountBar/ProfileSection), so reaching this means the session
+    // (the Profile page shows the sign-in form instead), so reaching this means the session
     // expired mid-edit, not a reachable UI state to design error copy for.
     return {
       status: "error",

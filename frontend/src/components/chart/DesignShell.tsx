@@ -7,18 +7,18 @@ import { getSessionEmail } from "@/lib/session";
 
 import { NightSky } from "./NightSky";
 import "./chart.css";
+import "../account/account.css";
 
 /**
  * The frame of the redesigned pages (design/Celestara Birth Chart.html, design/Celestara
  * Home.html): a night sky, a wide sticky header with the primary navigation, and the page
- * itself. Home and Birth Chart wear it; the other pages keep the app's standard header until
- * they are redone.
+ * itself. Home, Birth Chart, Journal and Profile all wear it.
  */
 export async function DesignShell({
   current,
   children,
 }: {
-  current: "home" | "chart";
+  current: "home" | "chart" | "journal" | "profile";
   children: React.ReactNode;
 }) {
   const email = await getSessionEmail();
@@ -39,8 +39,8 @@ export async function DesignShell({
           <nav className="cx-links" aria-label="Primary">
             <Link href={email ? "/" : "/guide"} aria-current={current === "home" ? "page" : undefined}>Home</Link>
             <Link href="/chart" aria-current={current === "chart" ? "page" : undefined}>Birth Chart</Link>
-            <Link href="/journal">Journal</Link>
-            <Link href="/profile">Profile</Link>
+            <Link href="/journal" aria-current={current === "journal" ? "page" : undefined}>Journal</Link>
+            <Link href="/profile" aria-current={current === "profile" ? "page" : undefined}>Profile</Link>
           </nav>
           {email ? (
             <div className="cx-account">

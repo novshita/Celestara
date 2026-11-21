@@ -27,7 +27,7 @@ The experience is designed to feel like entering a living celestial observatory:
 | 🪐 Planet exploration | ✅ Implemented - one call per planet: placement, current transit or aspects, and its description |
 | 🔒 Privacy controls | ✅ Implemented - delete memory, conversations, or everything in one call |
 | 📖 Daily/weekly/monthly readings + birth chart, career, love, relationships, growth | ✅ Implemented - weekly/monthly look ahead for real changes; follow-ups go through saved conversations |
-| 🖥️ Next.js frontend | ✅ Implemented - calculation views and drawings, the Home hub (live sky, saved-profile strip, three doors), auth, profile, journal, memory and conversation management, delete-my-data, AI Guide (with safety notices), readings, recurring themes; visual redesign pending |
+| 🖥️ Next.js frontend | ✅ Implemented - calculation views and drawings, the Home hub (live sky, saved-profile strip, three doors), auth, profile, journal, memory and conversation management, delete-my-data, AI Guide (with safety notices), readings, recurring themes; the landing, Home, Birth Chart, Journal and Profile pages are redesigned |
 | 🚀 Deployment | ✅ Docker (SQLite or PostgreSQL), CI, security scanning, backups - see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
 
 | 📄 Document | What it covers |
@@ -427,14 +427,24 @@ page:
   is working, a small constellation animates. All motion switches off for
   anyone whose system asks for reduced motion. The Dasha view is a to-scale
   bar of Mahadashas with a "now" marker; choosing one lists its Antardashas.
-- **Journal** (`/journal`) and **Profile** (`/profile`): need an account.
-  Logged out they show the log-in / create-account form. Logged in, you can
-  save your one birth profile (product spec §28) and keep journal entries
-  (product spec §16: reflective, not predictive) with full create/edit/delete.
-  The Profile page also holds your default explanation depth, what the guide
-  remembers (add or forget anything; nothing is remembered on its own), your
-  saved AI Guide conversations (read or delete), and "Delete my data", which
-  asks you to type `DELETE` before erasing the account and everything in it.
+- **Journal** (`/journal`) and **Profile** (`/profile`) (redesigned from
+  `design/Celestara Account.html`): need an account. Logged out, both show a calm
+  log-in / create-account form beside a sealed door, then a dimmed sample of what an
+  account opens up. The form says what can be fixed at once (an email with no `@`, no
+  password, a new password under 8 characters) and shows the server's answer at the field
+  it belongs to; a wrong password keeps the email. When the server says yes the door
+  opens, then the page changes to the signed-in view (at once, with reduced motion).
+  Logged in, the **Profile** has a side list of sections: your one birth profile (product
+  spec §28; the side box shows its date and time), your default explanation depth and the
+  themes switch, what the Guide remembers (a count out of 50; add a note or a preference,
+  forget anything; nothing is remembered on its own), your saved Guide conversations (read
+  or delete), and privacy. "Delete all memory" and "Delete all conversations" each take two
+  presses, and "Delete my data" stays off until you type `DELETE` exactly. The **Journal**
+  (product spec §16: reflective, not predictive) shows your entries beside the one being
+  written, with full create/edit/delete. Edits are kept for each entry until saved, so
+  moving to another entry loses nothing and the list marks the unsaved ones; deleting asks
+  first. A new entry shows the Moon's sign in the sky now; a saved one does not, because the
+  sky it was written under was not kept.
 
 Once you have saved a birth profile, the birth forms on Home and Birth Chart
 fill themselves in from it (you can still change them for a one-off). If you

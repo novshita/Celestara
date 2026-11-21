@@ -151,17 +151,17 @@ test("7. Unknown birth time: nothing is invented, and the page says so", async (
 test("8. Memory management: add something to remember, then forget it", async ({ page }) => {
   await register(page);
   const section = page.locator("section", {
-    has: page.getByRole("heading", { name: "What the guide remembers" }),
+    has: page.getByRole("heading", { name: "Guide memory" }),
   });
 
-  await section.getByLabel("What to remember").fill("I prefer short answers");
-  await section.getByRole("button", { name: "Remember" }).click();
+  await section.getByLabel("Add a memory").fill("I prefer short answers");
+  await section.getByRole("button", { name: "Add", exact: true }).click();
   await expect(section.getByText("I prefer short answers")).toBeVisible();
 
   await page.reload();
   await expect(section.getByText("I prefer short answers")).toBeVisible();
 
-  await section.getByRole("button", { name: "Forget", exact: true }).click();
+  await section.getByRole("button", { name: /^Forget/ }).click();
   await expect(section.getByText("I prefer short answers")).toHaveCount(0);
 });
 
@@ -169,13 +169,16 @@ test("9. Delete all data: the account is gone and so is the session", async ({ p
   const email = await register(page);
   await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
 
+  // Nothing happens until the word is typed exactly: the button stays off
   const wrong = page.getByLabel("Type DELETE to confirm");
   await wrong.fill("nope");
-  await page.getByRole("button", { name: "Delete my data" }).click();
-  await expect(page.getByRole("alert").filter({ hasText: "Type DELETE to confirm." })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Delete my data" })).toBeDisabled();
+  await wrong.fill("delete");
+  await expect(page.getByRole("button", { name: "Delete my data" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
 
   await wrong.fill("DELETE");
+  await expect(page.getByRole("button", { name: "Delete my data" })).toBeEnabled();
   await page.getByRole("button", { name: "Delete my data" }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("button", { name: "Log out" })).toHaveCount(0);
@@ -183,7 +186,7 @@ test("9. Delete all data: the account is gone and so is the session", async ({ p
   // The credentials no longer work.
   await page.goto("/profile");
   await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill("a-long-enough-password");
+  await page.getByLabel("Password", { exact: true }).fill("a-long-enough-password");
   await page.locator("main form").getByRole("button", { name: "Log in" }).click();
   await expect(page.getByRole("alert").filter({ hasText: /email or password/i })).toBeVisible();
   await expect(page.getByRole("button", { name: "Log out" })).toHaveCount(0);

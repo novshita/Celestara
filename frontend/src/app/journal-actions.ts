@@ -13,7 +13,7 @@ import { getSessionToken } from "@/lib/session";
 export type JournalFormState =
   | { status: "idle" }
   | { status: "error"; message: string; fieldErrors: Record<string, string> }
-  | { status: "success" };
+  | { status: "success"; id?: number };
 
 function entryFields(formData: FormData): { title: string; body: string } {
   return {
@@ -52,14 +52,15 @@ export async function createEntryAction(
 
   const { title, body } = entryFields(formData);
 
+  let id: number;
   try {
-    await createJournalEntry(token, title, body);
+    ({ id } = await createJournalEntry(token, title, body));
   } catch (error) {
     return toErrorState(error, "Could not save the entry. Please try again.");
   }
 
   refresh();
-  return { status: "success" };
+  return { status: "success", id };
 }
 
 export async function updateEntryAction(
