@@ -90,10 +90,10 @@ export function Landing() {
 
             <div className="layer" id="L3">
               <p className="acct" id="acct">Two traditions, one moment of birth. Swiss Ephemeris calculations place every planet in the Vedic sidereal zodiac and the Western tropical zodiac, so you can see not only how the two differ, but why.</p>
-              <button className="hs" type="button" style={{ left: "57%", top: "33%" }}><span className="dot" /><span><span className="lab">Vimshottari Dasha</span><em className="mono">Jupiter · Saturn (sample)</em></span></button>
-              <button className="hs" type="button" style={{ left: "80%", top: "37%" }}><span className="dot" /><span><span className="lab">Gochar transit</span><em className="mono">Saturn · 11th bhava (sample)</em></span></button>
-              <button className="hs" type="button" style={{ left: "56%", top: "70%" }}><span className="dot" /><span><span className="lab">Moon · Nakshatra</span><em className="mono">Read from your chart</em></span></button>
-              <button className="hs" type="button" style={{ left: "81%", top: "72%" }}><span className="dot" /><span><span className="lab">Compare</span><em className="mono">Tropical − ayanamsa = sidereal</em></span></button>
+              <Link className="hs" href="/chart?lens=dasha" style={{ left: "57%", top: "33%" }}><span className="dot" /><span><span className="lab">Vimshottari Dasha</span><em className="mono">Jupiter · Saturn (sample)</em></span></Link>
+              <Link className="hs" href="/chart?lens=transit" style={{ left: "80%", top: "37%" }}><span className="dot" /><span><span className="lab">Gochar transit</span><em className="mono">Saturn · 11th bhava (sample)</em></span></Link>
+              <Link className="hs" href="/chart?lens=vedic&body=Moon" style={{ left: "56%", top: "70%" }}><span className="dot" /><span><span className="lab">Moon · Nakshatra</span><em className="mono">Read from your chart</em></span></Link>
+              <Link className="hs" href="/chart?lens=compare" style={{ left: "81%", top: "72%" }}><span className="dot" /><span><span className="lab">Compare</span><em className="mono">Tropical − ayanamsa = sidereal</em></span></Link>
             </div>
 
             <div className="layer" id="L4">

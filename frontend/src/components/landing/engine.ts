@@ -573,13 +573,6 @@ export function startLanding(root: HTMLElement): () => void {
   raf = requestAnimationFrame(tick);
 
   /* interactions */
-  for (const h of hss) {
-    h.addEventListener("click", () => {
-      const on = h.classList.contains("on");
-      for (const x of hss) x.classList.remove("on");
-      if (!on) h.classList.add("on");
-    });
-  }
   for (const c of qa(".sc")) {
     c.addEventListener("pointermove", (e) => {
       if (reduce) return;

@@ -112,6 +112,40 @@ test.describe("the landing page", () => {
     await expect(page).toHaveURL(/\/profile$/);
   });
 
+  test("the + callouts on the sample chart are links into the real tools", async ({ page }) => {
+    await page.goto("/");
+    const callouts = page.locator("a.hs");
+    await expect(callouts).toHaveCount(4);
+    await expect(page.locator("button.hs")).toHaveCount(0); // none is a button that does nothing
+    const links = await callouts.evaluateAll((els) =>
+      els.map((el) => ({ label: el.querySelector(".lab")!.textContent, href: el.getAttribute("href") })),
+    );
+    expect(links).toEqual([
+      { label: "Vimshottari Dasha", href: "/chart?lens=dasha" },
+      { label: "Gochar transit", href: "/chart?lens=transit" },
+      { label: "Moon · Nakshatra", href: "/chart?lens=vedic&body=Moon" },
+      { label: "Compare", href: "/chart?lens=compare" },
+    ]);
+  });
+
+  test("each callout opens the chart page on the view it names", async ({ page }) => {
+    for (const [href, lens] of [
+      ["/chart?lens=dasha", "Vimshottari Dasha"],
+      ["/chart?lens=transit", "Current transits (Gochar)"],
+      ["/chart?lens=compare", "Compare both"],
+      ["/chart?lens=vedic&body=Moon", "Vedic (Rashi / D1)"],
+    ] as const) {
+      await page.goto(href);
+      await expect(page.getByLabel(lens, { exact: true })).toBeChecked();
+    }
+  });
+
+  test("a made-up view or planet in the link is ignored, not trusted", async ({ page }) => {
+    await page.goto("/chart?lens=<script>&body=Pluto");
+    await expect(page.getByLabel("Vedic (Rashi / D1)", { exact: true })).toBeChecked();
+    await expect(page.getByRole("heading", { level: 1, name: "Birth chart" })).toBeVisible();
+  });
+
   test("scrolling tells the story, in order", async ({ page }) => {
     await page.goto("/");
     const headline = page.getByRole("heading", { level: 1 });
@@ -125,9 +159,15 @@ test.describe("the landing page", () => {
 
     await scrollStory(page, 0.58);
     await expect(page.locator("#chart")).toBeVisible();
-    await expect(page.getByRole("button", { name: /Vimshottari Dasha/ })).toBeVisible();
-    await page.getByRole("button", { name: /Moon · Nakshatra/ }).click();
+    await expect(page.getByRole("link", { name: /Vimshottari Dasha/ })).toBeVisible();
+    // the callouts are links, and the detail line shows on hover (and, below, on focus)
+    await page.getByRole("link", { name: /Moon · Nakshatra/ }).hover();
     await expect(page.getByText("Read from your chart")).toBeVisible();
+    // reachable by keyboard: focus shows the same detail line
+    await page.mouse.move(0, 0);
+    const dasha = page.getByRole("link", { name: /Vimshottari Dasha/ });
+    await dasha.focus();
+    await expect.poll(() => dasha.locator("em").evaluate((el) => getComputedStyle(el).maxHeight)).not.toBe("0px");
 
     await scrollStory(page, 1);
     await expect(page.getByRole("link", { name: /AI Guide grounded in calculated facts/ })).toBeVisible();

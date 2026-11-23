@@ -96,14 +96,26 @@ async function calculate(previous: Calc, formData: FormData): Promise<Calc> {
 
 const EXPLORE_START: ExploreFormState = { status: "idle" };
 
-export function ChartWorkspace({ defaults, saved }: { defaults?: BirthData; saved: SavedStatus }) {
+export function ChartWorkspace({
+  defaults,
+  saved,
+  initialLens = "vedic",
+  initialBody = "Jupiter",
+}: {
+  defaults?: BirthData;
+  saved: SavedStatus;
+  /** The view chosen when the page opens (a link can ask for one). */
+  initialLens?: ChartSystem;
+  /** The planet chosen in the explorer when the page opens. */
+  initialBody?: string;
+}) {
   const [fields, setFields] = useState<Fields>(() => fieldsFrom(defaults));
-  const [lens, setLens] = useState<ChartSystem>("vedic");
+  const [lens, setLens] = useState<ChartSystem>(initialLens);
   const [errors, setErrors] = useState<ChartErrors>({});
   // A message from something the visitor just did that the server was not part of
   const [note, setNote] = useState<string | null>(null);
   const [filled, setFilled] = useState<"saved" | "cleared" | null>(defaults ? "saved" : null);
-  const [selection, setSelection] = useState<ExploreSelection>({ system: "vedic", body: "Jupiter" });
+  const [selection, setSelection] = useState<ExploreSelection>({ system: "vedic", body: initialBody });
 
   const [calc, runCalc, calculating] = useActionState(calculate, START);
   const [exploration, runExplore, exploring] = useActionState(
