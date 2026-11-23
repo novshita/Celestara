@@ -109,7 +109,7 @@
 @keyframes ln-ping{0%{box-shadow:0 0 0 0 rgba(244,210,122,.6)}70%,100%{box-shadow:0 0 0 14px rgba(244,210,122,0)}}
 .landing .hs .lab{padding:6px 9px;border-radius:4px;background:rgba(5,7,14,.74);border:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font:400 10.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
 .landing .hs em{display:block;font-style:normal;color:var(--gold);max-height:0;overflow:hidden;transition:max-height .45s;letter-spacing:.08em}
-.landing .hs:hover em,.landing .hs.on em{max-height:20px}
+.landing .hs:hover em,.landing .hs:focus-visible em,.landing .hs.on em{max-height:20px}
 /* station */
 .landing .cred{position:absolute;left:34px;top:13vh;max-width:400px;font-family:var(--serif);font-size:clamp(28px,2.7vw,42px);line-height:1.04;letter-spacing:-.01em;text-shadow:0 0 24px rgba(7,6,26,.9)}
 .landing .cred .chip{display:flex;width:max-content;margin-bottom:14px;height:auto;padding:4px 8px;font-family:var(--mono)}
